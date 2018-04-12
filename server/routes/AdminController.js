@@ -14,6 +14,10 @@ import Transaction from '../models/Transaction';
                 - Notifications sent
                 - 
 */
+router.get('/test', function(req, res) {
+       res.json("The server is up");
+});
+
 
 router.get('/all', function(req, res) {
     Admin.find().populate(['documents']).populate(['notifications']).populate(['transactions']).then((admins) => {
