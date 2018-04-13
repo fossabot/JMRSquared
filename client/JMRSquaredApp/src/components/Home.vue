@@ -2,9 +2,9 @@
   <page @loaded="pageLoaded()">
     <ActionBar>
       <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
-        <Image class="p-5" src="res://ic_arrow_back_black_24dp" col="0" width="20" height="20"/>
-        <Label col="1" class="p-5" :text="$router.params.name"></Label>
-        <Image class="p-5" textAlignment="right" src="res://ic_more_vert_black_24dp" col="2" width="20" height="20"/>
+        <Image class="p-5" src="res://ic_arrow_back_black_24dp" col="0" width="30" height="30"/>
+        <Label col="1" class="p-5" text="Home"></Label>
+        <Image class="p-5" textAlignment="right" src="res://ic_more_vert_black_24dp" col="2" width="30" height="30"/>
       </GridLayout>
     </ActionBar>
     <FlexboxLayout justifyContent="space-between" width="100%" height="100%" flexDirection="column">
