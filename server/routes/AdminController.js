@@ -14,10 +14,6 @@ import Transaction from '../models/Transaction';
                 - Notifications sent
                 - 
 */
-router.get('/test', function(req, res) {
-       res.json("The server is up");
-});
-
 
 router.get('/all', function(req, res) {
     Admin.find().populate(['documents']).populate(['notifications']).populate(['transactions']).then((admins) => {
@@ -75,7 +71,8 @@ router.post('/add', function(req, res) {
     var admin = new Admin({
         email: req.body.email,
         pass: req.body.pass,
-        numbers:req.body.numbers
+        numbers:req.body.numbers,
+        userName:req.body.username
     });
 
     admin.save(function(err) {
