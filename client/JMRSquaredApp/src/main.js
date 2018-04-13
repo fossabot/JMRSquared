@@ -24,6 +24,8 @@ TNSFontIcon.loadCss();
 
 Vue.registerElement('CardView', () => require('nativescript-cardview').CardView)
 
+Vue.registerElement('Ripple', () => require('nativescript-ripple').Ripple)
+
 Vue.registerElement('PullToRefresh', () => require('nativescript-pulltorefresh').PullToRefresh)
 
 Vue.filter('fonticon', fonticon);

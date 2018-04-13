@@ -2,13 +2,20 @@
   <page @loaded="pageLoaded()">
     <ActionBar>
       <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
-        <Image class="p-5" src="res://ic_arrow_back_black_24dp" col="0" width="30" height="30"/>
-        <Label col="1" class="p-5" text="Home"></Label>
-        <Image class="p-5" textAlignment="right" src="res://ic_more_vert_black_24dp" col="2" width="30" height="30"/>
+        <Ripple col="0" rippleColor="$blueColor" backgroundColor="#fff" borderRadius="50%">
+          <Image class="p-5" src="res://ic_arrow_back_black_24dp" width="30" height="30" />
+        </Ripple>
+        <Label col="1" class="m-l-25" verticalAlignment="center" text="Home"></Label>
+        <Ripple col="2" rippleColor="$blueColor" backgroundColor="#fff" borderRadius="50%">
+          <Image class="p-5" textAlignment="right" src="res://ic_more_vert_black_24dp" width="30" height="30" />
+        </Ripple>
       </GridLayout>
     </ActionBar>
     <FlexboxLayout justifyContent="space-between" width="100%" height="100%" flexDirection="column">
-      <FlexboxLayout padding="10" justifyContent="center" flexDirection="column">
+      <FlexboxLayout justifyContent="flex-start" flexDirection="column">
+        <label :text="introTxt" textWrap="true" class="body p-t-30 p-l-15 p-r-15" textAlignment="center"></label>
+      </FlexboxLayout>
+      <FlexboxLayout flexDirection="column">
         <GridLayout columns="auto" rows="auto" justifyContent="center">
           <Image src="~/images/logo/JMRSQUARED-blue.png" row="0" col="0" width="100%" alignSelf="center" stretch="aspectFit" />
         </GridLayout>
@@ -37,7 +44,8 @@
   export default {
     data() {
       return {
-        isLoading: false
+        isLoading: false,
+        introTxt: 'JMRSqaured is a company that deals with blah blah blah blah ......'
       }
     },
     beforeDestroy() {
@@ -173,6 +181,6 @@
   }
 </script>
 
-<style>
-  
+<style lang="scss" scoped>
+  @import '../assets/variables';
 </style>
