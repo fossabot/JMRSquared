@@ -289,7 +289,7 @@
     
                 <DockLayout v-show="!isLoading" alignSelf="center" justifyContent="flex-end" orientation="horizontal" textAlignment="center">
                     <Button @tap="currentPage--" :isEnabled="currentPage > 0" class="mdi h3" :text="'mdi-arrow-back' | fonticon"></Button>
-                    <Button @tap="currentPage++" v-show="currentPage != 4" :isEnabled="canGoForward()" class="mdi h3" :text="'mdi-arrow-forward' | fonticon"></Button>
+                    <Button @tap="moveForward()" v-show="currentPage != 4" class="mdi h3" :text="'mdi-arrow-forward' | fonticon"></Button>
                     <Button @tap="submitTenant()" v-show="currentPage == 4" class="btn-primary bg-light-blue" text="Proceed"></Button>
                 </DockLayout>
     
@@ -522,6 +522,11 @@
                     return false;
                 }
     
+            },
+            moveForward(){
+                if(this.canGoForward()){
+                    this.currentPage++;
+                }
             },
             changeLeaseDate(isStart) {
     
