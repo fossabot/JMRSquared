@@ -6,17 +6,17 @@
                     <Label verticalAlignment="center" class="mdi h2 p-15" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
                 <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + $store.state.user.userName"></Label>
-                <Ripple @tap="reportBug()" verticalAlignment="center" col="2" rippleColor="$blueColor" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi h2 p-15 m-x-auto" :text="'mdi-bug-report' | fonticon"></Label>
+                <Ripple @tap="reportBug()" verticalAlignment="center" class="p-15" col="2" rippleColor="$blueColor" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi h2" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
-                <Ripple verticalAlignment="center" @tap="logOut()" col="3" rippleColor="$blueColor" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi h2 p-15 m-x-auto text-light-red" :text="'mdi-power-settings-new' | fonticon"></Label>
+                <Ripple verticalAlignment="center" class="p-15" @tap="logOut()" col="3" rippleColor="$blueColor" borderRadius="50%">
+                    <Label class="mdi h2 text-light-red" :text="'mdi-power-settings-new' | fonticon"></Label>
                 </Ripple>
             </GridLayout>
         </ActionBar>
-        <StackLayout orientation="vertical">
+        <StackLayout v-show="currentPage == 0" orientation="vertical">
             <StackLayout v-show="selectedScreen != 2" class="bg-light-blue p-y-20" alignSelf="center" width="100%">
-                <Image @tap="EditProfile" alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic" width="100" height="100" borderRadius="50%" backgroundColor="#1c6b48" />
+                <Image @tap="currentPage = 1" alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic" width="100" height="100" borderRadius="50%" backgroundColor="#1c6b48" />
                 <Label textAlignment="center" class="h2 m-5 text-white" :text="user.userName"></Label>
                 <Label textAlignment="center" class="h3 m-5 text-white" :text="user.role"></Label>
             </StackLayout>
@@ -55,6 +55,46 @@
             </ListView>
             <Documents v-show="selectedScreen == 2"></Documents>
         </StackLayout>
+        <ScrollView>
+            <StackLayout v-show="currentPage == 1">
+                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="User name"></label>
+                    <TextField v-model="tenantUserName" row="1" col="1" class="h4" hint="e.g Joe"></TextField>
+                </GridLayout>
+                <StackLayout width="100%" class="hr-light"></StackLayout>
+        
+                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full Names"></label>
+                    <TextField v-model="tenantName" row="1" col="1" class="h4" hint="e.g Sirwali Joe"></TextField>
+                </GridLayout>
+                <StackLayout width="100%" class="hr-light"></StackLayout>
+                <GridLayout @tap="hasDeposit = !hasDeposit" class="m-10" rows="auto" columns="*,auto">
+                    <label row="0" col="0" class="h3 font-weight-bold text-mute" text="Chane Password?"></label>
+                    <switch row="0" col="1" v-model="changePassword"></switch>
+                </GridLayout>
+                <StackLayout v-show="changePassword">
+                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-lock-outline' | fonticon"></label>
+                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Old Password"></label>
+                        <TextField row="1" col="1" secure="true" returnKeyType="done" v-model="oldPassword"></TextField>
+                    </GridLayout>
+                    <StackLayout width="100%" class="hr-light"></StackLayout>
+                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-lock' | fonticon"></label>
+                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="New Password"></label>
+                        <TextField row="1" col="1" secure="true" returnKeyType="done" v-model="newPassword"></TextField>
+                    </GridLayout><GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-lock' | fonticon"></label>
+                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Confirm new Password"></label>
+                        <TextField row="1" col="1" secure="true" returnKeyType="done" v-model="confirmNewPassword"></TextField>
+                    </GridLayout> 
+                    <StackLayout width="100%" class="hr-light"></StackLayout>
+                </StackLayout>
+                <Button class="btn-primary bg-light-blue" text="Save Changes"></Button>
+            </StackLayout>
+        </ScrollView>
     </page>
 </template>
 
@@ -70,8 +110,10 @@
         },
         data() {
             return {
+                currentPage: 0,
                 currentTab: 0,
                 selectedScreen: 1,
+                changePassword:false,
                 feeds: [],
                 properties: [{
                         id: 'fulham86',
@@ -106,18 +148,21 @@
             this.pageLoaded();
         },
         created() {
-            Toast.makeText("Mounted dashboard").show();
+            this.pageLoaded();
+        },
+        mounted() {
             this.pageLoaded();
         },
         methods: {
-            getMoment(val) {
-                return moment(val);
-            },
             pageLoaded() {
+                this.ApplyNavigation(this);
                 var logged = this.$store.state.user.isLoggedIn;
                 if (!logged) {
                     this.$router.push('/home');
                 }
+            },
+            getMoment(val) {
+                return moment(val);
             },
             eventChanged(event) {
                 dialogs.alert("Changed view").then(() => {
@@ -144,11 +189,6 @@
                 });
                 this.$router.push({
                     path: card.redirect
-                });
-            },
-            EditProfile() {
-                dialogs.alert("About to edit profile").then(() => {
-                    console.log("card.redirect");
                 });
             },
             GoTo(path) {

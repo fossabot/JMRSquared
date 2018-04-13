@@ -60,7 +60,7 @@ Vue.mixin({
         methods: {
           submitBug() {
             alert("We got us a bug");
-            alert(txtBug);
+            alert(this.txtBug);
           }
         },
       })
