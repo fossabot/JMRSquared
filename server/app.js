@@ -38,7 +38,8 @@ mongoose.connect("mongodb://localhost:27017/JMRdb", {
 });
 
 */
-    Server
+//    Server
+
 mongoose.connect("mongodb://localhost:27017/JMRdb", {
     auth: {
         user: "admin",
