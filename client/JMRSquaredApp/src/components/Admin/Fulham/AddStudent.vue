@@ -191,7 +191,7 @@
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Name"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full Names"></label>
                                     <label :text="tenantName" row="1" col="1" class="h4"></label>
                                 </GridLayout>
     
@@ -317,6 +317,7 @@
     export default {
         data() {
             return {
+                isStart:'start',
                 isLoading: false,
                 txtError: '',
                 currentPage: 0,
@@ -452,16 +453,15 @@
                                             dialogs.alert("TODO : Take them to " + self.tenantUserName + "'s profile");
                                         }
                                     });
-    
-                                    console.log(result);
-                                    dialogs.alert(result);
+                                    self.isLoading = true;
+                                    self.router.push('/admin/dashboard');
                                 } else {
                                     self.$feedback.error({
                                         title: "Error (" + statusCode + ")",
                                         duration: 4000,
                                         message: result,
                                         onTap: () => {
-                                            dialogs.alert("TODO : Take them to " + self.tenantUserName + "'s profile");
+                                            dialogs.alert("TODO : Handle the error");
                                         }
                                     });
     
@@ -474,7 +474,16 @@
     
                                 self.isLoading = false;
                             }
-                        );
+                        ).catch(err=>{
+                              self.$feedback.error({
+                                        title: "Server error",
+                                        duration: 4000,
+                                        message: err,
+                                        onTap: () => {
+                                            dialogs.alert("TODO : Handle the error");
+                                        }
+                              });
+                        });
     
                 }
     
@@ -511,14 +520,14 @@
                 var self = this;
                 this.$showModal({
                     template: ` 
-                                                                                        <Page>
-                                                                                            <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                <Label row="0" class="h2 m-5" textAlignment="center" :text="'When does the lease ' + (isStart ? 'start?' : 'end?')"></Label>
-                                                                                                <DatePicker row="1" v-model="selectedDueDate" />
-                                                                                                <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                            </GridLayout>
-                                                                                        </Page>
-                                                                                        `,
+                            <Page>
+                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                    <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
+                                    <DatePicker row="1" v-model="selectedDueDate" />
+                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                </GridLayout>
+                            </Page>
+                            `,
                     data: function() {
                         return {
                             selectedDueDate: new Date()
