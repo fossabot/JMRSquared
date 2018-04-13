@@ -1,12 +1,12 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
     <GridLayout rows="auto,auto,*">
-      <CardView row="0" margin="10" elevation="10" height="40" @tap="ShowNewTransaction(1)" backgroundColor="grey" v-show="showNewTransaction == 0" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+      <CardView row="0" margin="10" elevation="10" height="40" @tap="ShowNewTransaction(1)" backgroundColor="grey" v-show="currentPage == 0" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
         <label verticalAlignment="center" textAlignment="center" text="Create a new transaction"></label>
       </CardView>
   
       <!-- This is the first step -->
-      <CardView row="1" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="showNewTransaction == 1">
+      <CardView row="1" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
         <ScrollView>
           <StackLayout class="form">
             <Label row="0" col="1" @tap="ShowNewTransaction(0)" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
@@ -101,14 +101,14 @@
             </DockLayout>
   
             <StackLayout row="7" col="0" colSpan="2">
-              <Button selfAlign="center" textAlignment="center" @tap="ShowNewTransaction(2)" :isEnabled="canSubmit()" text="Proceed" class="btn btn-primary" />
+              <Button selfAlign="center" textAlignment="center" @tap="ShowNewTransaction(2)" text="Proceed" class="btn btn-primary" />
             </StackLayout>
           </StackLayout>
         </ScrollView>
       </CardView>
       <!-- This is the second step -->
   
-      <CardView row="1" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="showNewTransaction == 2">
+      <CardView row="1" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 2">
         <ScrollView>
           <StackLayout class="form">
             <Label row="0" col="1" @tap="ShowNewTransaction(1)" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10 text-light-red" :text="'mdi-keyboard-backspace' | fonticon"></Label>
@@ -191,8 +191,8 @@
       </CardView>
   
   
-      <SearchBar row="1" v-show="showNewTransaction == 0" hint="Search ..."></SearchBar>
-      <StackLayout row="2" v-show="showNewTransaction == 0">
+      <SearchBar row="1" v-show="currentPage == 0" hint="Search ..."></SearchBar>
+      <StackLayout row="2" v-show="currentPage == 0">
         <ScrollView orientation="horizontal">
           <StackLayout orientation="horizontal">
             <label v-for="(transactionType,i) in transactionTypes" :key="i" @tap="selectedType = i" :text="transactionType" :class="{'bottom-line-red':selectedType == i}" class="m-10"></label>
@@ -253,7 +253,7 @@
         txtError: '',
         Amount: '',
         users: [],
-        hasImage:false,
+        hasImage: false,
         isLoading: false,
         selectedImage: null,
         selectedType: 0,
@@ -303,7 +303,7 @@
           typeIcon: 'down'
         }],
         isWithdraw: false,
-        showNewTransaction: false,
+        currentPage: false,
         isMainScreen: false,
         selectedScreen: '',
         price: '',
@@ -321,32 +321,6 @@
           }
         ]
       }
-    },
-    created() {
-      var self = this;
-      // TODO : Uncomment when done
-      // activity = AndroidApplication.foregroundActivity;
-      // activity.onBackPressed = function () {
-      //   if(self.showNewTransaction > 0){
-      //       self.showNewTransaction--;
-      //   }else{
-      //       self.$router.go(-1);
-      //   }   
-      // };
-    },
-    mounted() {
-      http.getJSON(this.$store.state.settings.baseLink + "/s/students/all/names").then((results) => {
-        this.users = [];
-  
-        results.map((v) => {
-          this.users.push({
-            id: v._id,
-            text: v.username,
-            selected: false
-          });
-        });
-  
-      });
     },
     computed: {
       amount: {
@@ -370,7 +344,29 @@
         }
       }
     },
+    created() {
+      this.pageLoaded();
+    },
+    mounted() {
+      this.pageLoaded();
+    },
     methods: {
+      pageLoaded(args) {
+        var self = this;
+        this.ApplyNavigation(self);
+        http.getJSON(this.$store.state.settings.baseLink + "/s/students/all/names").then((results) => {
+          this.users = [];
+  
+          results.map((v) => {
+            this.users.push({
+              id: v._id,
+              text: v.username,
+              selected: false
+            });
+          });
+  
+        });
+      },
       canSubmit() {
         this.txtError = "";
         if (!this.hasImage) {
@@ -392,12 +388,12 @@
       },
       SubmitTransaction() {
         this.isLoading = true;
-        if(!this.canSubmit()){
-          ShowNewTransaction(1);
+        if (!this.canSubmit()) {
+          this.ShowNewTransaction(1);
           this.isLoading = false;
           return;
         }
-
+  
         let source = new imageSource.ImageSource();
         source.fromAsset(this.selectedImage).then((img) => {
           this.selectedImage = img.toBase64String("png");
@@ -489,14 +485,14 @@
         var self = this;
         this.$showModal({
           template: ` 
-                                                                                                  <Page>
-                                                                                                      <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                          <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                                                                                          <DatePicker row="1" v-model="selectedDueDate" />
-                                                                                                          <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                                      </GridLayout>
-                                                                                                  </Page>
-                                                                                                  `,
+                                                                                                      <Page>
+                                                                                                          <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                                                              <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                                                                                              <DatePicker row="1" v-model="selectedDueDate" />
+                                                                                                              <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                                                                          </GridLayout>
+                                                                                                      </Page>
+                                                                                                      `,
           data: function() {
             return {
               selectedDueDate: new Date()
@@ -526,7 +522,12 @@
         });
       },
       ShowNewTransaction(value) {
-        this.showNewTransaction = value;
+        if(value == 2){
+          if(!this.canSubmit()){
+            return;
+          }
+        }
+        this.currentPage = value;
       },
       uploadEvidence() {
         let context = imagepicker.create({

@@ -19,6 +19,8 @@ TNSFontIcon.paths = {
 };
 TNSFontIcon.loadCss();
 
+const application = require('application')
+
 // Uncommment the following to see NativeScript-Vue output logs
 //Vue.config.silent = false;
 
@@ -35,6 +37,22 @@ Vue.prototype.$feedback = new Feedback();
 
 Vue.mixin({
   methods: {
+    ApplyNavigation(self){
+      var AndroidApplication = application.android;
+      var activity = AndroidApplication.foregroundActivity;
+      activity = AndroidApplication.foregroundActivity;
+      activity.onBackPressed = function(e) {
+          if (self.currentPage && self.currentPage > 0) {
+              self.currentPage--;
+          } else {
+              activity.onBackPressed = function() {
+                  self.$router.back();
+              }
+              self.$router.back();
+          }
+
+      };
+    },
     logBug(){
       console.log("Logggging bug");
     },

@@ -302,7 +302,6 @@
 
 <script>
     const dialogs = require('ui/dialogs')
-    const application = require('application')
     
     import * as Toast from 'nativescript-toast';
     import * as LocalNotifications from "nativescript-local-notifications";
@@ -348,20 +347,7 @@
         methods: {
             pageLoaded(args) {
                 var self = this;
-                var AndroidApplication = application.android;
-                var activity = AndroidApplication.foregroundActivity;
-                activity = AndroidApplication.foregroundActivity;
-                activity.onBackPressed = function(e) {
-                    if (self.currentPage > 0) {
-                        self.currentPage--;
-                    } else {
-                        activity.onBackPressed = function() {
-                            self.$router.back();
-                        }
-                        self.$router.back();
-                    }
-    
-                };
+                this.ApplyNavigation(self);
             },
             changeRentDueOn() {
     
