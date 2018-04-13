@@ -23,7 +23,8 @@
     "nativescript-cfalert-dialog": "^1.0.6",
     "nativescript-imagepicker": "^5.0.2",
     "nativescript-permissions": "^1.2.3",
-    "nativescript-ripple": "^2.0.0"
+    "nativescript-ripple": "^2.0.0",
+    "nativescript-pager": "^7.2.3"
   },
   "devDependencies": {
     "babel-traverse": "6.26.0",

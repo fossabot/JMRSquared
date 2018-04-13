@@ -46,7 +46,6 @@
                         </ScrollView>
                     </CardView>
                 </StackLayout>
-                <!-- PAGE 1 -->
                 <StackLayout v-show="currentPage == 1">
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
@@ -83,7 +82,6 @@
                         </ScrollView>
                     </CardView>
                 </StackLayout>
-                <!-- PAGE 2 -->
                 <StackLayout v-show="currentPage == 2">
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
@@ -120,7 +118,6 @@
                         </ScrollView>
                     </CardView>
                 </StackLayout>
-                <!-- PAGE 3 -->
                 <StackLayout v-show="currentPage == 3">
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
@@ -169,7 +166,6 @@
                         </ScrollView>
                     </CardView>
                 </StackLayout>
-                <!-- PAGE 4 -->
                 <StackLayout v-show="currentPage == 4">
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
@@ -284,7 +280,6 @@
                         </ScrollView>
                     </CardView>
                 </StackLayout>
-    
                 <DockLayout v-show="txtError.length > 2" alignSelf="center" justifyContent="flex-end" orientation="horizontal" textAlignment="center">
                     <Label :text="txtError" textWrap="true" class="text-mute text-light-red" textAlignment="center"></Label>
                 </DockLayout>
@@ -307,6 +302,7 @@
 
 <script>
     const dialogs = require('ui/dialogs')
+    const application = require('application')
     
     import * as Toast from 'nativescript-toast';
     import * as LocalNotifications from "nativescript-local-notifications";
@@ -317,7 +313,6 @@
     export default {
         data() {
             return {
-                isStart:'start',
                 isLoading: false,
                 txtError: '',
                 currentPage: 0,
@@ -351,23 +346,36 @@
             this.pageLoaded();
         },
         methods: {
-            pageLoaded() {
+            pageLoaded(args) {
+                var self = this;
+                var AndroidApplication = application.android;
+                var activity = AndroidApplication.foregroundActivity;
+                activity = AndroidApplication.foregroundActivity;
+                activity.onBackPressed = function(e) {
+                    if (self.currentPage > 0) {
+                        self.currentPage--;
+                    } else {
+                        activity.onBackPressed = function() {
+                            self.$router.back();
+                        }
+                        self.$router.back();
+                    }
     
-                //this.searchedStudents = this.students;
+                };
             },
             changeRentDueOn() {
     
                 var self = this;
                 this.$showModal({
                     template: ` 
-                                                                                <Page>
-                                                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
-                                                                                        <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
-                                                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                    </GridLayout>
-                                                                                </Page>
-                                                                                `,
+                                                                                                    <Page>
+                                                                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                                                            <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
+                                                                                                            <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
+                                                                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                                                                        </GridLayout>
+                                                                                                    </Page>
+                                                                                                    `,
                     data: function() {
                         return {
                             datesDue: ['1st of each month', '15th of each month', '22nd of each month'],
@@ -474,15 +482,15 @@
     
                                 self.isLoading = false;
                             }
-                        ).catch(err=>{
-                              self.$feedback.error({
-                                        title: "Server error",
-                                        duration: 4000,
-                                        message: err,
-                                        onTap: () => {
-                                            dialogs.alert("TODO : Handle the error");
-                                        }
-                              });
+                        ).catch(err => {
+                            self.$feedback.error({
+                                title: "Server error",
+                                duration: 4000,
+                                message: err,
+                                onTap: () => {
+                                    dialogs.alert("TODO : Handle the error");
+                                }
+                            });
                         });
     
                 }
@@ -520,14 +528,14 @@
                 var self = this;
                 this.$showModal({
                     template: ` 
-                            <Page>
-                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                    <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
-                                    <DatePicker row="1" v-model="selectedDueDate" />
-                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                </GridLayout>
-                            </Page>
-                            `,
+                                                <Page>
+                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
+                                                        <DatePicker row="1" v-model="selectedDueDate" />
+                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                    </GridLayout>
+                                                </Page>
+                                                `,
                     data: function() {
                         return {
                             selectedDueDate: new Date()
