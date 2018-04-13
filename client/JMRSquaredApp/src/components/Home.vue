@@ -1,13 +1,10 @@
 <template>
   <page @loaded="pageLoaded()">
     <ActionBar>
-      <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
-        <Ripple col="0" rippleColor="$blueColor" backgroundColor="#fff" borderRadius="50%">
-          <Image class="p-5" src="res://ic_arrow_back_black_24dp" width="30" height="30" />
-        </Ripple>
-        <Label col="1" class="m-l-25" verticalAlignment="center" text="Home"></Label>
-        <Ripple col="2" rippleColor="$blueColor" backgroundColor="#fff" borderRadius="50%">
-          <Image class="p-5" textAlignment="right" src="res://ic_more_vert_black_24dp" width="30" height="30" />
+      <GridLayout rows="auto" columns="*,auto" orientation="horizontal">
+        <Label col="0" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Home"></Label>
+        <Ripple col="1" rippleColor="$blueColor" borderRadius="50%">
+          <Image verticalAlignment="center" class="m-r-15" textAlignment="right" src="res://ic_more_vert_black_24dp" width="30" height="30" />
         </Ripple>
       </GridLayout>
     </ActionBar>

@@ -1,8 +1,21 @@
 <template>
-    <page actionBarHidden="true" class="page" @loaded="pageLoaded()">
+    <page class="page" @loaded="pageLoaded()">
+        <ActionBar>
+            <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
+                <Ripple @tap="$router.back()" verticalAlignment="center" col="0" rippleColor="$blueColor" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi h2 p-15" :text="'mdi-arrow-back' | fonticon"></Label>
+                </Ripple>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + $store.state.user.userName"></Label>
+                <Ripple @tap="reportBug()" verticalAlignment="center" col="2" rippleColor="$blueColor" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi h2 p-15 m-x-auto" :text="'mdi-bug-report' | fonticon"></Label>
+                </Ripple>
+                <Ripple verticalAlignment="center" @tap="logOut()" col="3" rippleColor="$blueColor" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi h2 p-15 m-x-auto text-light-red" :text="'mdi-power-settings-new' | fonticon"></Label>
+                </Ripple>
+            </GridLayout>
+        </ActionBar>
         <StackLayout orientation="vertical">
             <StackLayout v-show="selectedScreen != 2" class="bg-light-blue p-y-20" alignSelf="center" width="100%">
-                <Label @tap="logOut()" textAlignment="right" alignSelf="center" class="mdi h1 text-light-red m-x-20" :text="'mdi-power-settings-new' | fonticon"></Label>
                 <Image @tap="EditProfile" alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic" width="100" height="100" borderRadius="50%" backgroundColor="#1c6b48" />
                 <Label textAlignment="center" class="h2 m-5 text-white" :text="user.userName"></Label>
                 <Label textAlignment="center" class="h3 m-5 text-white" :text="user.role"></Label>

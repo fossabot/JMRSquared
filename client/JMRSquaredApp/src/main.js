@@ -37,6 +37,34 @@ Vue.prototype.$feedback = new Feedback();
 
 Vue.mixin({
   methods: {
+    reportBug(){
+      this.$showModal({
+        template: ` 
+                  <Page>
+                    <StackLayout>
+                      <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                          <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bug-report' | fonticon"></label>
+                          <label row="0" col="1" class="h3 font-weight-bold text-mute" text="What is the bug?"></label>
+                          <TextView v-model="txtBug" row="1" col="1" class="h4" hint="Please explain in a way that i will understand."></TextView>
+                      </GridLayout>
+                      <StackLayout width="100%" class="hr-light"></StackLayout>
+                      <Button text="Submit" @tap="submitBug()"></Button>
+                    </StackLayout>
+                  </Page>
+                  `,
+        data: function() {
+          return {
+            txtBug:''
+          }
+        },
+        methods: {
+          submitBug() {
+            alert("We got us a bug");
+            alert(txtBug);
+          }
+        },
+      })
+    },
     ApplyNavigation(self){
       var AndroidApplication = application.android;
       var activity = AndroidApplication.foregroundActivity;
