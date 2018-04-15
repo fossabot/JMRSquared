@@ -85,7 +85,7 @@ router.post('/add', function(req, res) {
 
 router.get('/bug/all', function(req, res) {
     Bug.find().then((bugs) => {
-        if (admins == null){
+        if (bugs == null){
             res.status(500);
             res.send("Error : 9032rtu834g9erbo");
         } 
@@ -97,7 +97,8 @@ router.post('/bug/add', function(req, res) {
     var bug = new Bug({
         senderName: req.body.senderName,
         senderPic: req.body.senderPic,
-        bugText:req.body.bugText
+        bugText:req.body.bugText,
+        screenshot:req.body.screenshot
     });
 
     bug.save(function(err) {

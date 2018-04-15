@@ -6,6 +6,7 @@ const BugSchema = new mongoose.Schema({
     bugText: String,
     senderName: String,
     senderPic:String,
+    screenshot:{ type: Object, default:null },
     comments:[{type:String}],
     date: { type: Date, default: Date.now() },
     removed: { type: Boolean, default: false }

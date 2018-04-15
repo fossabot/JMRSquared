@@ -43,6 +43,7 @@ Vue.prototype.$feedback = new Feedback();
 Vue.mixin({
   methods: {
     reportBug(){
+      let selectedImage = null;
       this.$showModal({
         template: ` 
                   <Page>
@@ -53,6 +54,14 @@ Vue.mixin({
                                   <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bug-report' | fonticon"></label>
                                   <label row="0" col="1" class="h3 font-weight-bold text-mute" text="What is the bug?"></label>
                                   <TextView v-model="txtBug" row="1" col="1" class="h4" hint="Please explain in a way that i will understand."></TextView>
+                              </GridLayout>
+                              <StackLayout width="100%" class="hr-light"></StackLayout>
+
+                              <GridLayout class="m-10" rows="auto,auto,auto" @tap="uploadScreenshot()" columns="auto,*">
+                                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
+                                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Screenshot"></label>
+                                <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
+                                <Image row="2" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
                               </GridLayout>
                               <StackLayout width="100%" class="hr-light"></StackLayout>
                               <Button text="Submit" @tap="submitBug()"></Button>
@@ -90,6 +99,26 @@ Vue.mixin({
           }
         },
         methods: {
+          uploadScreenshot() {
+            let context = imagepicker.create({
+              mode: "single" // use "multiple" for multiple selection
+            });
+      
+            context
+              .authorize()
+              .then(function() {
+                return context.present();
+              })
+              .then((selection) => {
+                selection.forEach((selected) => {
+                  // process the selected image
+                  selectedImage = selected;
+                });
+              }).catch((err) => {
+                // process error
+                
+              });
+          },    
           submitBug() {
             http.request({
               url: this.$store.state.settings.baseLink + "/a/bug/add",
@@ -100,7 +129,8 @@ Vue.mixin({
               content: JSON.stringify({
                 senderName: this.$store.state.user.userName,
                 senderPic: this.$store.state.user.profilePic,
-                bugText: this.txtBug
+                bugText: this.txtBug,
+                screenshot:selectedImage
               })
             }).then(response => {
 
@@ -144,8 +174,10 @@ Vue.mixin({
             } else {
                 http.getJSON(this.$store.state.settings.baseLink + "/a/bug/all").then((results) => {
                     this.bugs = results;
+                    this.$modal.close();
                     pullRefresh.refreshing = false;
                 }).catch((err) => {
+                    this.$modal.close();
                     this.$feedback.error({
                         title: "Error",
                         duration: 4000,
