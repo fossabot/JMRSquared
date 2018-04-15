@@ -28,7 +28,7 @@ app.use(function(req, res, next) {
     next();
 });
 // Local Host
-/*
+
 mongoose.connect("mongodb://localhost:27017/JMRdb", {
     reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
     reconnectInterval: 500, // Reconnect every 500ms
@@ -37,9 +37,9 @@ mongoose.connect("mongodb://localhost:27017/JMRdb", {
     console.log("Successfully connected to MONGO!");
 });
 
-*/
-//    Server
 
+//    Server
+/*
 mongoose.connect("mongodb://localhost:27017/JMRdb?authSource=admin", {
     auth: {
         user: "admin",
@@ -51,7 +51,7 @@ mongoose.connect("mongodb://localhost:27017/JMRdb?authSource=admin", {
 }).then((answer) => {
     console.log("Successfully connected to MONGO!");
 });
-
+*/
 
 app.use('/s', studentController);
 app.use('/a', adminController);

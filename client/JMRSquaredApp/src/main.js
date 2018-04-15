@@ -12,6 +12,8 @@ import './styles.scss';
 
 import * as connectivity from "tns-core-modules/connectivity";
 
+import * as imagepicker from "nativescript-imagepicker";
+
 import { TNSFontIcon, fonticon } from 'nativescript-fonticon';// require the couchbase module
 
 import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
@@ -75,11 +77,14 @@ Vue.mixin({
                                   <StackLayout>
                                       <CardView v-for="(bug,i) in bugs" :key="i" class="p-20 bg-white" margin="3" elevation="20" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                                           <GridLayout class="p-10" columns="auto,*,auto" rows="auto,auto">
-                                              <Image row="0" col="0" rowSpan="2" alignSelf="center" class="p-5" backgroundColor="#ffffff" stretch="aspectFill" :src="bug.profilePic ? bug.profilePic : $store.state.settings.defaultProfilePic"
+                                              <Image row="0" col="0" rowSpan="2" alignSelf="center" class="p-5" backgroundColor="#ffffff" stretch="aspectFill" :src="bug.senderPic ? bug.senderPic : $store.state.settings.defaultProfilePic"
                                                   width="60" height="60" borderRadius="50%" />
-                                              <Label row="0" col="1" class="font-weight-bold" :text="bug.reporter"></Label>
+                                              <Label row="0" col="1" class="font-weight-bold" :text="bug.senderName"></Label>
                                               <Label row="0" col="2" class="font-italic text-muted" :text="getMoment(bug.date).fromNow()"></Label>
-                                              <Label row="1" col="1" colSpan="2" class="body p-5" :text="bug.text" textWrap="true"></Label>
+                                              <Label row="1" col="1" colSpan="2" class="body p-5" :text="bug.bugText" textWrap="true"></Label>
+                                              <Ripple row="1" col="2" v-show="bug.screenshot" @tap="" borderRadius="50%" width="10" height="10">
+                                                <Label class="mdi" textAlignment="right" verticalAlignment="center" :text="'mdi-image' | fonticon" fontSize="20%"></Label>
+                                              </Ripple>
                                           </GridLayout>
                                       </CardView>
                                   </StackLayout>
@@ -148,8 +153,11 @@ Vue.mixin({
                   message: answer,
                 });
               }
-              
+
+              this.$modal.close();
+                            
             }).catch(err=>{
+              this.$modal.close();
               this.$feedback.error({
                 title: "Error",
                 duration: 4000,
@@ -164,7 +172,8 @@ Vue.mixin({
     
             var connectionType = connectivity.getConnectionType();
             if (connectionType == connectivity.connectionType.none) {
-                this.$feedback.error({
+              this.$modal.close();
+              this.$feedback.error({
                     title: "NO INTERNET CONNECTION",
                     duration: 4000,
                     message: "Please switch on your data/wifi.",
@@ -174,7 +183,6 @@ Vue.mixin({
             } else {
                 http.getJSON(this.$store.state.settings.baseLink + "/a/bug/all").then((results) => {
                     this.bugs = results;
-                    this.$modal.close();
                     pullRefresh.refreshing = false;
                 }).catch((err) => {
                     this.$modal.close();
