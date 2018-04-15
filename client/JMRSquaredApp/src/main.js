@@ -10,6 +10,8 @@ import moment from 'moment';
 
 import './styles.scss';
 
+import * as connectivity from "tns-core-modules/connectivity";
+
 import { TNSFontIcon, fonticon } from 'nativescript-fonticon';// require the couchbase module
 
 import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
@@ -21,7 +23,8 @@ TNSFontIcon.paths = {
 };
 TNSFontIcon.loadCss();
 
-const application = require('application')
+const application = require('application');
+const http = require("http");
 
 // Uncommment the following to see NativeScript-Vue output logs
 //Vue.config.silent = false;
@@ -56,7 +59,9 @@ Vue.mixin({
                             </StackLayout>
                         </TabViewItem>
                         <TabViewItem title="View bugs">
-                            <StackLayout verticalAlignment="center">
+                          <StackLayout verticalAlignment="center">
+                          <Label textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+                            <PullToRefresh row="2" @refresh="refreshList($event)">
                                 <ScrollView>
                                   <StackLayout>
                                       <CardView v-for="(bug,i) in bugs" :key="i" class="p-20 bg-white" margin="3" elevation="20" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
@@ -70,7 +75,8 @@ Vue.mixin({
                                       </CardView>
                                   </StackLayout>
                               </ScrollView>
-                            </StackLayout>
+                            </PullToRefresh>
+                          </StackLayout>
                         </TabViewItem>
                       </TabView>
                   </Page>
@@ -78,16 +84,76 @@ Vue.mixin({
         data: function() {
           return {
             txtBug:'',
-            bugs:[{text:'This is the first bug',reporter:'joe',date:new Date(),profilePic:''},{text:'This is the second bug',reporter:'uzzie',date:new Date(),profilePic:''}],
+            bugs:[
+            //  {text:'This is the first bug',reporter:'joe',date:new Date(),profilePic:''},{text:'This is the second bug',reporter:'uzzie',date:new Date(),profilePic:''}
+            ],
           }
         },
         methods: {
           submitBug() {
-            alert("We got us a bug");
-            alert(this.txtBug);
-          },
-          loadBugs(){
+            http.request({
+              url: this.$store.state.settings.baseLink + "/a/bug/add",
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              content: JSON.stringify({
+                senderName: this.$store.state.user.userName,
+                senderPic: this.$store.state.user.profilePic,
+                bugText: this.txtBug
+              })
+            }).then(response => {
 
+              var answer = response.content.toString();
+              var statusCode = response.statusCode;
+
+              if(statusCode == 200){
+                this.$feedback.success({
+                  message: "Your bug was logged."
+                });
+              }else{
+                this.$feedback.error({
+                  title: "The bug was not logged.",
+                  duration: 4000,
+                  message: answer,
+                });
+              }
+              
+            }).catch(err=>{
+              this.$feedback.error({
+                title: "Error",
+                duration: 4000,
+                message: err,
+              });
+            });
+
+
+          },
+          refreshList(args){
+            var pullRefresh = args.object;
+    
+            var connectionType = connectivity.getConnectionType();
+            if (connectionType == connectivity.connectionType.none) {
+                this.$feedback.error({
+                    title: "NO INTERNET CONNECTION",
+                    duration: 4000,
+                    message: "Please switch on your data/wifi.",
+                });
+
+                pullRefresh.refreshing = false;
+            } else {
+                http.getJSON(this.$store.state.settings.baseLink + "/a/bug/all").then((results) => {
+                    this.bugs = results;
+                    pullRefresh.refreshing = false;
+                }).catch((err) => {
+                    this.$feedback.error({
+                        title: "Error",
+                        duration: 4000,
+                        message: err,
+                    });
+                    pullRefresh.refreshing = false;
+                });
+            }
           }
         },
       })

@@ -5,6 +5,7 @@ var router = express.Router();
 import Admin from '../models/Admin';
 import Document from '../models/Document';
 import Transaction from '../models/Transaction';
+import Bug from '../models/Bug';
 
 /*
   TODO : Add admin
@@ -78,6 +79,33 @@ router.post('/add', function(req, res) {
     admin.save(function(err) {
         if (err) res.send(err);
         res.send("User successfully saved");
+    })
+
+});
+
+router.get('/bug/all', function(req, res) {
+    Bug.find().then((bugs) => {
+        if (admins == null){
+            res.status(500);
+            res.send("Error : 9032rtu834g9erbo");
+        } 
+        res.json(bugs);
+    });
+});
+
+router.post('/bug/add', function(req, res) {
+    var bug = new Bug({
+        senderName: req.body.senderName,
+        senderPic: req.body.senderPic,
+        bugText:req.body.bugText
+    });
+
+    bug.save(function(err) {
+        if (err) {
+            res.status(500);
+            res.send(err);
+        }
+        res.send("Bug added successfully saved");
     })
 
 });
