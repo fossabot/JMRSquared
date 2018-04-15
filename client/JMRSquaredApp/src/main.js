@@ -13,6 +13,7 @@ import './styles.scss';
 import * as connectivity from "tns-core-modules/connectivity";
 
 import * as imagepicker from "nativescript-imagepicker";
+import * as imageSource from "tns-core-modules/image-source";
 
 import { TNSFontIcon, fonticon } from 'nativescript-fonticon';// require the couchbase module
 
@@ -42,10 +43,13 @@ Vue.filter('fonticon', fonticon);
 Vue.prototype.$db = new Couchbase("jmrdb");
 Vue.prototype.$feedback = new Feedback();
 
+import * as Toast from "nativescript-toast";
+
 Vue.mixin({
   methods: {
     reportBug(){
       let selectedImage = null;
+      let isLoading = false;
       this.$showModal({
         template: ` 
                   <Page>
@@ -66,7 +70,9 @@ Vue.mixin({
                                 <Image row="2" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
                               </GridLayout>
                               <StackLayout width="100%" class="hr-light"></StackLayout>
-                              <Button text="Submit" @tap="submitBug()"></Button>
+
+                              <ActivityIndicator :busy="isLoading"></ActivityIndicator>
+                              <Button text="Submit" v-show="!isLoading" @tap="submitBug()"></Button>
                             </StackLayout>
                         </TabViewItem>
                         <TabViewItem title="View bugs">
@@ -82,7 +88,7 @@ Vue.mixin({
                                               <Label row="0" col="1" class="font-weight-bold" :text="bug.senderName"></Label>
                                               <Label row="0" col="2" class="font-italic text-muted" :text="getMoment(bug.date).fromNow()"></Label>
                                               <Label row="1" col="1" colSpan="2" class="body p-5" :text="bug.bugText" textWrap="true"></Label>
-                                              <Ripple row="1" col="2" v-show="bug.screenshot" @tap="" borderRadius="50%" width="10" height="10">
+                                              <Ripple row="1" col="2" @tap="getBugScreenshot(bug._id)" borderRadius="50%" width="10" height="10">
                                                 <Label class="mdi" textAlignment="right" verticalAlignment="center" :text="'mdi-image' | fonticon" fontSize="20%"></Label>
                                               </Ripple>
                                           </GridLayout>
@@ -104,6 +110,21 @@ Vue.mixin({
           }
         },
         methods: {
+            getBugScreenshot(id){
+              http.getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id).then((results) => {
+                this.$feedback.success({
+                    title: "Done",
+                    duration: 40000,
+                    message: results.screenshot
+                });
+            }).catch((err) => {
+                this.$feedback.error({
+                    title: "Error",
+                    duration: 4000,
+                    message: err,
+                });
+            });
+          },
           uploadScreenshot() {
             let context = imagepicker.create({
               mode: "single" // use "multiple" for multiple selection
@@ -125,46 +146,57 @@ Vue.mixin({
               });
           },    
           submitBug() {
-            http.request({
-              url: this.$store.state.settings.baseLink + "/a/bug/add",
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              content: JSON.stringify({
-                senderName: this.$store.state.user.userName,
-                senderPic: this.$store.state.user.profilePic,
-                bugText: this.txtBug,
-                screenshot:selectedImage
-              })
-            }).then(response => {
+            isLoading = true;
+            Toast.makeText("Running").show();
+            let source = new imageSource.ImageSource();
+            source.fromAsset(selectedImage).then((img) => {
+              selectedImage = img.toBase64String("png");
+             
+              Toast.makeText("Download").show();
+             
+              http.request({
+                url: this.$store.state.settings.baseLink + "/a/bug/add",
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                content: JSON.stringify({
+                  senderName: this.$store.state.user.userName,
+                  senderPic: this.$store.state.user.profilePic,
+                  bugText: this.txtBug,
+                  screenshot:selectedImage
+                })
+              }).then(response => {
 
-              var answer = response.content.toString();
-              var statusCode = response.statusCode;
+                var answer = response.content.toString();
+                var statusCode = response.statusCode;
 
-              if(statusCode == 200){
-                this.$feedback.success({
-                  message: "Your bug was logged."
-                });
-              }else{
+                Toast.makeText("DOne " + statusCode).show();
+                isLoading = false;
+                if(statusCode == 200){
+                  this.$feedback.success({
+                    message: "Your bug was logged."
+                  });
+                }else{
+                  this.$feedback.error({
+                    title: "The bug was not logged.",
+                    duration: 40000,
+                    message: answer,
+                  });
+                }
+
+                this.$modal.close();
+
+              }).catch(err=>{
+                isLoading = false;
+                this.$modal.close();
                 this.$feedback.error({
-                  title: "The bug was not logged.",
+                  title: "Error",
                   duration: 4000,
-                  message: answer,
+                  message: err,
                 });
-              }
-
-              this.$modal.close();
-                            
-            }).catch(err=>{
-              this.$modal.close();
-              this.$feedback.error({
-                title: "Error",
-                duration: 4000,
-                message: err,
               });
-            });
-
+          });
 
           },
           refreshList(args){

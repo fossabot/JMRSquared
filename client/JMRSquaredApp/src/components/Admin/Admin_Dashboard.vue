@@ -307,7 +307,7 @@
                     .then(result => {
                         if (result) {
                             this.$store.commit('logout', this);
-                            this.$router.replace('/home');
+                            this.$router.replace('/login');
                         }
                     })
             },

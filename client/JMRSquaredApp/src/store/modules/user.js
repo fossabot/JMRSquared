@@ -26,13 +26,13 @@ const mutations = {
    },
    logout (state,self) {
 
-    for(let obj in state.cacheStrings){
+    for(var obj in state.cacheStrings){
       let documentID = appSettings.getString(obj);
   
       if (documentID != null) {
         var isDeleted = self.$db.deleteDocument(documentID);
         appSettings.remove(obj);
-        console.log("Deleted ? " + isDeleted + " " + documentID);
+        console.log("Deleted ? " + isDeleted);
       }
     }
 

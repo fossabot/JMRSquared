@@ -83,8 +83,20 @@ router.post('/add', function(req, res) {
 
 });
 
+router.get('/bug/get/{bugId}',function(req,res){
+    var bugID = req.params.bugId;
+    Bug.findById(bugID).then((bug) => {
+        if (bug == null) {
+            res.status(500);
+            res.send("Invalid request");
+        } else {
+            res.json(bug);
+        }
+    })
+});
+
 router.get('/bug/all', function(req, res) {
-    Bug.find().then((bugs) => {
+    Bug.find({},'_id senderName senderPic bugText date').then((bugs) => {
         if (bugs == null){
             res.status(500);
             res.send("Error : 9032rtu834g9erbo");
