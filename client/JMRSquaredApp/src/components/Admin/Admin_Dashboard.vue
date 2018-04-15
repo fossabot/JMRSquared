@@ -22,7 +22,7 @@
             </StackLayout>
             <GridLayout class="m-20" rows="*,*" columns="*,*,*">
                 <StackLayout :row="item.row" :col="item.col" v-for="item in layouts">
-                    <CardView radius="100" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
+                    <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
                         <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
                             <Label class="mdi h2" textAlignment="center" fontSize="30%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
                         </Ripple>
@@ -142,7 +142,6 @@
 <script>
     const dialogs = require('ui/dialogs')
     import Documents from './DocumentList.vue'
-    import moment from 'moment';
     import * as Toast from "nativescript-toast";
     
     import * as imagepicker from "nativescript-imagepicker";
@@ -292,9 +291,6 @@
                             }
                         });
                     });
-            },
-            getMoment(val) {
-                return moment(val);
             },
             eventChanged(event) {
                 dialogs.alert("Changed view").then(() => {

@@ -6,6 +6,8 @@ import store from './store';
 
 import { Couchbase } from "nativescript-couchbase";
 
+import moment from 'moment';
+
 import './styles.scss';
 
 import { TNSFontIcon, fonticon } from 'nativescript-fonticon';// require the couchbase module
@@ -41,26 +43,51 @@ Vue.mixin({
       this.$showModal({
         template: ` 
                   <Page>
-                    <StackLayout>
-                      <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                          <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bug-report' | fonticon"></label>
-                          <label row="0" col="1" class="h3 font-weight-bold text-mute" text="What is the bug?"></label>
-                          <TextView v-model="txtBug" row="1" col="1" class="h4" hint="Please explain in a way that i will understand."></TextView>
-                      </GridLayout>
-                      <StackLayout width="100%" class="hr-light"></StackLayout>
-                      <Button text="Submit" @tap="submitBug()"></Button>
-                    </StackLayout>
+                     <TabView selectedTabTextColor="#4ac4d5" androidSelectedTabHighlightColor="#0093a4" tabBackgroundColor="transparent">
+                        <TabViewItem title="Log a bug">
+                            <StackLayout verticalAlignment="center">
+                              <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                  <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bug-report' | fonticon"></label>
+                                  <label row="0" col="1" class="h3 font-weight-bold text-mute" text="What is the bug?"></label>
+                                  <TextView v-model="txtBug" row="1" col="1" class="h4" hint="Please explain in a way that i will understand."></TextView>
+                              </GridLayout>
+                              <StackLayout width="100%" class="hr-light"></StackLayout>
+                              <Button text="Submit" @tap="submitBug()"></Button>
+                            </StackLayout>
+                        </TabViewItem>
+                        <TabViewItem title="View bugs">
+                            <StackLayout verticalAlignment="center">
+                                <ScrollView>
+                                  <StackLayout>
+                                      <CardView v-for="(bug,i) in bugs" :key="i" class="p-20 bg-white" margin="3" elevation="20" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                                          <GridLayout class="p-10" columns="auto,*,auto" rows="auto,auto">
+                                              <Image row="0" col="0" rowSpan="2" alignSelf="center" class="p-5" backgroundColor="#ffffff" stretch="aspectFill" :src="bug.profilePic ? bug.profilePic : $store.state.settings.defaultProfilePic"
+                                                  width="60" height="60" borderRadius="50%" />
+                                              <Label row="0" col="1" class="font-weight-bold" :text="bug.reporter"></Label>
+                                              <Label row="0" col="2" class="font-italic text-muted" :text="getMoment(bug.date).fromNow()"></Label>
+                                              <Label row="1" col="1" colSpan="2" class="body p-5" :text="bug.text" textWrap="true"></Label>
+                                          </GridLayout>
+                                      </CardView>
+                                  </StackLayout>
+                              </ScrollView>
+                            </StackLayout>
+                        </TabViewItem>
+                      </TabView>
                   </Page>
                   `,
         data: function() {
           return {
-            txtBug:''
+            txtBug:'',
+            bugs:[{text:'This is the first bug',reporter:'joe',date:new Date(),profilePic:''},{text:'This is the second bug',reporter:'uzzie',date:new Date(),profilePic:''}],
           }
         },
         methods: {
           submitBug() {
             alert("We got us a bug");
             alert(this.txtBug);
+          },
+          loadBugs(){
+
           }
         },
       })
@@ -83,6 +110,9 @@ Vue.mixin({
     },
     logBug(){
       console.log("Logggging bug");
+    },
+    getMoment(val) {
+        return moment(val);
     },
     loginAdmin(self, result) {
   
