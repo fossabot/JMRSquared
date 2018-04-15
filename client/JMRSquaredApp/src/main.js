@@ -80,19 +80,21 @@ Vue.mixin({
                           <Label textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
                             <PullToRefresh row="2" @refresh="refreshList($event)">
                                 <ScrollView>
-                                  <StackLayout>
-                                      <CardView v-for="(bug,i) in bugs" :key="i" class="p-20 bg-white" margin="3" elevation="20" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                                          <GridLayout class="p-10" columns="auto,*,auto" rows="auto,auto">
-                                              <Image row="0" col="0" rowSpan="2" alignSelf="center" class="p-5" backgroundColor="#ffffff" stretch="aspectFill" :src="bug.senderPic ? bug.senderPic : $store.state.settings.defaultProfilePic"
-                                                  width="60" height="60" borderRadius="50%" />
-                                              <Label row="0" col="1" class="font-weight-bold" :text="bug.senderName"></Label>
-                                              <Label row="0" col="2" class="font-italic text-muted" :text="getMoment(bug.date).fromNow()"></Label>
-                                              <Label row="1" col="1" colSpan="2" class="body p-5" :text="bug.bugText" textWrap="true"></Label>
-                                              <Ripple row="1" col="2" @tap="getBugScreenshot(bug._id)" borderRadius="50%" width="10" height="10">
-                                                <Label class="mdi" textAlignment="right" verticalAlignment="center" :text="'mdi-image' | fonticon" fontSize="20%"></Label>
-                                              </Ripple>
-                                          </GridLayout>
-                                      </CardView>
+                                <StackLayout>
+                                  <StackLayout v-for="(bug,i) in bugs" :key="i">
+                                    <Ripple verticalAlignment="center" @tap="getBugScreenshot(bug._id)" borderRadius="50%">
+                                        <CardView class="p-10 bg-white" margin="3" elevation="20" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                                            <GridLayout class="p-10" columns="auto,*,auto" rows="auto,auto">
+                                                <Image row="0" col="0" rowSpan="2" alignSelf="center" class="p-5" backgroundColor="#ffffff" stretch="aspectFill" :src="bug.senderPic ? bug.senderPic : $store.state.settings.defaultProfilePic"
+                                                    width="60" height="60" borderRadius="50%" />
+                                                <Label row="0" col="1" class="font-weight-bold" :text="bug.senderName"></Label>
+                                                <Label row="0" col="2" class="font-italic text-muted" :text="getMoment(bug.date).fromNow()"></Label>
+                                                <Label row="1" col="1" colSpan="2" class="body p-5" :text="bug.bugText" textWrap="true"></Label>
+                                                <Label row="1" col="2" class="mdi" textAlignment="right" verticalAlignment="center" :text="'mdi-image' | fonticon" fontSize="20%"></Label>
+                                            </GridLayout>
+                                        </CardView>
+                                    </Ripple>
+                                  </StackLayout>
                                   </StackLayout>
                               </ScrollView>
                             </PullToRefresh>
@@ -111,6 +113,7 @@ Vue.mixin({
         },
         methods: {
             getBugScreenshot(id){
+
               http.getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id).then((results) => {
                 this.$feedback.success({
                     title: "Done",

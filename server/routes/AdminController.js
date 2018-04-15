@@ -83,7 +83,7 @@ router.post('/add', function(req, res) {
 
 });
 
-router.get('/bug/get/{bugId}',function(req,res){
+router.get('/bug/get/:bugId',function(req,res){
     var bugID = req.params.bugId;
     Bug.findById(bugID).then((bug) => {
         if (bug == null) {
