@@ -67,12 +67,12 @@ Vue.mixin({
                                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
                                 <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Screenshot"></label>
                                 <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
-                                <Image row="2" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
+                                <Image row="2" col="1" :src="selectedImage" stretch="aspectFill" width="90%" />
                               </GridLayout>
                               <StackLayout width="100%" class="hr-light"></StackLayout>
 
                               <ActivityIndicator :busy="isLoading"></ActivityIndicator>
-                              <Button text="Submit" v-show="!isLoading" @tap="submitBug()"></Button>
+                              <Button text="Submit" v-if="!isLoading" @tap="submitBug()"></Button>
                             </StackLayout>
                         </TabViewItem>
                         <TabViewItem title="View bugs">

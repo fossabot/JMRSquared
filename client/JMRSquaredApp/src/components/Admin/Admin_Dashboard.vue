@@ -154,7 +154,7 @@
             return {
                 layouts:[
                     {id:"rate",icon:"star",title:"Rate",row:0,col:0},
-                    {id:"notifications",icon:"notifications",title:"Reminders",row:0,col:1},
+                    {id:"reminders",icon:"notifications",title:"Reminders",row:0,col:1},
                     {id:"fulham86",icon:"home",title:"Fulham 86",row:0,col:2},
                     {id:"documents",icon:"library-books",title:"Documents",row:1,col:0},
                     {id:"info",icon:"info",title:"Info and help",row:1,col:1},
@@ -327,7 +327,7 @@
                 } else if(item.id ==  'documents') {
                     this.$router.push('/admin/documents');
                 } else if(item.id ==  'reminders') {
-                    Toast.makeText("About to remind you").show();
+                    this.$router.push('/admin/reminders');
                 }  else {
                     dialogs.alert("Not yet assigned").then(() => {
                         console.log("card.redirect");
@@ -336,36 +336,6 @@
             },
             onBusinessTap(item) {
                 
-            },
-            RemoveFeed(feed) {
-                dialogs.confirm({
-                        title: 'Are you sure?',
-                        message: 'This feed will be removed permanently.',
-                        okButtonText: 'Yes',
-                        cancelButtonText: 'No'
-                    })
-                    .then(result => {
-                        if (result) {
-                            this.feeds.splice(this.feeds.indexOf(feed), 1);
-                            //TODO : Remove from DB as well.
-                        }
-                    })
-            },
-            DoneFeed(feed) {
-                dialogs.confirm({
-                        title: 'Mark the task as done?',
-                        message: 'This feed will be removed permanently.',
-                        okButtonText: 'Yes',
-                        cancelButtonText: 'No'
-                    })
-                    .then(result => {
-                        if (result) {
-                            dialogs.alert("Task marked as done").then(() => {
-                                console.log("....")
-                            });
-    
-                        }
-                    })
             }
         }
     }

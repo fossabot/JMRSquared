@@ -17,6 +17,7 @@ import BottomNav from '../components/BottomNav.vue'
 import StudentProfile from '../components/Admin/Fulham/StudentProfile.vue'
 
 import DocumentList from '../components/Admin/DocumentList.vue'
+import RemindersList from '../components/Admin/RemindersList.vue'
 
 import AddStudent from '../components/Admin/Fulham/AddStudent.vue'
 
@@ -58,6 +59,14 @@ const router = new VueRouter({
       component: DocumentList,
       meta: {
         title: 'Documents',
+      },
+    },
+    {
+      name:'adminReminders',
+      path: '/admin/reminders',
+      component: RemindersList,
+      meta: {
+        title: 'Reminders',
       },
     },
     {

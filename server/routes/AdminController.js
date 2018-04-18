@@ -101,6 +101,7 @@ router.get('/bug/all', function(req, res) {
             res.status(500);
             res.send("Error : 9032rtu834g9erbo");
         } 
+        bugs.reverse();
         res.json(bugs);
     });
 });
