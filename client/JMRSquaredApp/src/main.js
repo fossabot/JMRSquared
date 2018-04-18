@@ -44,9 +44,22 @@ Vue.prototype.$db = new Couchbase("jmrdb");
 Vue.prototype.$feedback = new Feedback();
 
 import * as Toast from "nativescript-toast";
+import * as fs from "tns-core-modules/file-system";
+import * as ChangeLog from './changeLog'
 
 Vue.mixin({
   methods: {
+    showChangeLog(){
+      var log = ChangeLog.GetLogs('0.1');
+      if(log != null && log != undefined){
+        this.$feedback.info({
+          title:'Change log (' + log.version +  ')',
+          message:log.text.trim(),
+          duration:90000,
+          position:1
+        });
+      }
+    },
     reportBug(){
       let selectedImage = null;
       let isLoading = false;
@@ -112,9 +125,9 @@ Vue.mixin({
           }
         },
         methods: {
-            getBugScreenshot(id){
+          getBugScreenshot(id){
 
-              http.getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id).then((results) => {
+            http.getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id).then((results) => {
                 this.$feedback.success({
                     title: "Done",
                     duration: 40000,

@@ -27,115 +27,115 @@
                             <Label class="mdi h2" textAlignment="center" fontSize="30%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
                         </Ripple>
                     </CardView>
-                    <Label class="p-t-10" :text="item.title" textAlignment="center"/>
+                    <Label class="p-t-10" :text="item.title" textAlignment="center" />
                 </StackLayout>
             </GridLayout>
         </StackLayout>
         <!--
-        <StackLayout>
-            <GridLayout class="p-10" columns="*,*,*" rows="auto">
-                <StackLayout @tap="selectedScreen = 0" :class="{'bottom-line-blue':selectedScreen == 0}" row="0" col="0">
-                    <Label text="2" class="h2" textAlignment="center"></Label>
-                    <Label text="Properties" class="h3" textAlignment="center"></Label>
-                </StackLayout>
-                <StackLayout @tap="selectedScreen = 1" :class="{'bottom-line-blue':selectedScreen == 1}" row="0" col="1">
-                    <Label :text="Reminders.length" class="h2" textAlignment="center"></Label>
-                    <Label text="Reminders" class="h3" textAlignment="center"></Label>
-                </StackLayout>
-                <StackLayout @tap="selectedScreen = 2" :class="{'bottom-line-blue':selectedScreen == 2}" row="0" col="2">
-                    <Label text="12" class="h2" textAlignment="center"></Label>
-                    <Label text="Documents" class="h3" textAlignment="center"></Label>
-                </StackLayout>
-            </GridLayout>
-            <StackLayout width="100%" class="hr-light"></StackLayout>
-            <WrapLayout v-show="selectedScreen == 0">
-                <CardView class="bottom-line-blue" margin="10" elevation="30" width="40%" height="30%" v-for="(item,j) in properties" :key="j" radius="20" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                    <Image stretch="aspectFill" :src="item.img" width="70" height="70" />
-                    <Label verticalAlignment="center" textAlignment="center" selfAlign="center" textWrap="true" :text="item.text"></Label>
-                </CardView>
-            </WrapLayout>
-            <ListView v-show="selectedScreen == 1" for="task in Reminders">
-                <v-template>
-                    <GridLayout backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
-                        <Label @tap="RemoveFeed(task)" row="0" col="2" textAlignment="center" alignSelf="center" class="mdi h2 text-light-red m-5" :text="'mdi-close' | fonticon"></Label>
-                        <StackLayout @tap="DoneFeed(task)" textAlignment="center" verticalAlignment="center" row="0" col="0" rowSpan="3">
-                            <Label textAlignment="center" class="mdi h1 text-light-green" :text="'mdi-done' | fonticon"></Label>
-                        </StackLayout>
-                        <Label class="m-5" row="1" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
-                        <Label class="m-5" row="2" col="2" textAlignment="right" alignSelf="right" :text="getMoment(task.dueDate).fromNow()"></Label>
-                    </GridLayout>
-                </v-template>
-            </ListView>
-            <Documents v-show="selectedScreen == 2"></Documents>
-    
-        </StackLayout>
-       <StackLayout>
-            <ScrollView>
                 <StackLayout>
-                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
-                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="User name"></label>
-                        <TextField v-model="userName" row="1" col="1" returnKeyType="next" class="h4"></TextField>
+                    <GridLayout class="p-10" columns="*,*,*" rows="auto">
+                        <StackLayout @tap="selectedScreen = 0" :class="{'bottom-line-blue':selectedScreen == 0}" row="0" col="0">
+                            <Label text="2" class="h2" textAlignment="center"></Label>
+                            <Label text="Properties" class="h3" textAlignment="center"></Label>
+                        </StackLayout>
+                        <StackLayout @tap="selectedScreen = 1" :class="{'bottom-line-blue':selectedScreen == 1}" row="0" col="1">
+                            <Label :text="Reminders.length" class="h2" textAlignment="center"></Label>
+                            <Label text="Reminders" class="h3" textAlignment="center"></Label>
+                        </StackLayout>
+                        <StackLayout @tap="selectedScreen = 2" :class="{'bottom-line-blue':selectedScreen == 2}" row="0" col="2">
+                            <Label text="12" class="h2" textAlignment="center"></Label>
+                            <Label text="Documents" class="h3" textAlignment="center"></Label>
+                        </StackLayout>
                     </GridLayout>
                     <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-email' | fonticon"></label>
-                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Email"></label>
-                        <TextField row="1" col="1" keyboardType="email" returnKeyType="next" v-model="email" class="h4" autocorrect="true" autocapitalizationType="none"></TextField>
-                    </GridLayout>
-                    <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-phone' | fonticon"></label>
-                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Contact numbers"></label>
-                        <TextField row="1" col="1" keyboardType="number" returnKeyType="next" v-model="numbers" class="h4" autocorrect="true"></TextField>
-                    </GridLayout>
-                    <StackLayout>
-                        <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                            <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock-outline' | fonticon"></label>
-                            <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Old Password"></label>
-                            <TextField row="1" col="1" secure="true" returnKeyType="next" v-model="oldPassword"></TextField>
-                        </GridLayout>
-                        <StackLayout width="100%" class="hr-light"></StackLayout>
-                        <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                            <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock' | fonticon"></label>
-                            <label row="0" col="1" class="h3 font-weight-bold text-mute" text="New Password"></label>
-                            <TextField row="1" col="1" secure="true" returnKeyType="next" v-model="newPassword"></TextField>
-                        </GridLayout>
-                        <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                            <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock' | fonticon"></label>
-                            <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Confirm new Password"></label>
-                            <TextField row="1" col="1" secure="true" returnKeyType="next" v-model="confirmNewPassword"></TextField>
-                        </GridLayout>
-                        <StackLayout width="100%" class="hr-light"></StackLayout>
-                    </StackLayout>
-                    <GridLayout class="m-10" rows="auto,auto,auto" @tap="changeProfilePicture()" columns="auto,*">
-                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
-                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Profile picture"></label>
-                        <label row="1" col="1" text="Tap to upload change your profile picture" class="h4"></label>
-                        <Image row="2" col="1" v-if="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
-                    </GridLayout>
-    
-                    <GridLayout class="m-10" rows="auto" columns="auto,*">
-                        <label row="0" col="0" verticalAlignment="bottom" class="mdi m-x-15 text-mute text-light-red" fontSize="25%" :text="'mdi-delete-forever' | fonticon"></label>
-                        <label row="0" col="1" verticalAlignment="bottom" class="h3 font-weight-bold text-mute text-light-red" text="I want to remove this account."></label>
-                    </GridLayout>
-                    <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                    <ActivityIndicator :busy="isLoading"></ActivityIndicator>
-    
-                    <DockLayout alignSelf="center" justifyContent="flex-end" verticalAlignment="bottom" orientation="horizontal" textAlignment="center">
-                        <Label :text="txtError" textWrap="true" class="text-mute text-light-red" textAlignment="center"></Label>
-                    </DockLayout>
-                    <DockLayout v-if="txtError.length < 2" alignSelf="center" justifyContent="flex-end" verticalAlignment="bottom" orientation="horizontal" textAlignment="center">
-                        <Label text="You can proceed" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
-                    </DockLayout>
-    
-                    <Button :isEnabled="!isLoading" @tap="SaveProfileChanges()" class="btn-primary bg-light-blue" text="Save Changes"></Button>
+                    <WrapLayout v-show="selectedScreen == 0">
+                        <CardView class="bottom-line-blue" margin="10" elevation="30" width="40%" height="30%" v-for="(item,j) in properties" :key="j" radius="20" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                            <Image stretch="aspectFill" :src="item.img" width="70" height="70" />
+                            <Label verticalAlignment="center" textAlignment="center" selfAlign="center" textWrap="true" :text="item.text"></Label>
+                        </CardView>
+                    </WrapLayout>
+                    <ListView v-show="selectedScreen == 1" for="task in Reminders">
+                        <v-template>
+                            <GridLayout backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
+                                <Label @tap="RemoveFeed(task)" row="0" col="2" textAlignment="center" alignSelf="center" class="mdi h2 text-light-red m-5" :text="'mdi-close' | fonticon"></Label>
+                                <StackLayout @tap="DoneFeed(task)" textAlignment="center" verticalAlignment="center" row="0" col="0" rowSpan="3">
+                                    <Label textAlignment="center" class="mdi h1 text-light-green" :text="'mdi-done' | fonticon"></Label>
+                                </StackLayout>
+                                <Label class="m-5" row="1" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
+                                <Label class="m-5" row="2" col="2" textAlignment="right" alignSelf="right" :text="getMoment(task.dueDate).fromNow()"></Label>
+                            </GridLayout>
+                        </v-template>
+                    </ListView>
+                    <Documents v-show="selectedScreen == 2"></Documents>
+            
                 </StackLayout>
-            </ScrollView>
-        </StackLayout> -->
+               <StackLayout>
+                    <ScrollView>
+                        <StackLayout>
+                            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
+                                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="User name"></label>
+                                <TextField v-model="userName" row="1" col="1" returnKeyType="next" class="h4"></TextField>
+                            </GridLayout>
+                            <StackLayout width="100%" class="hr-light"></StackLayout>
+            
+                            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-email' | fonticon"></label>
+                                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Email"></label>
+                                <TextField row="1" col="1" keyboardType="email" returnKeyType="next" v-model="email" class="h4" autocorrect="true" autocapitalizationType="none"></TextField>
+                            </GridLayout>
+                            <StackLayout width="100%" class="hr-light"></StackLayout>
+            
+                            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-phone' | fonticon"></label>
+                                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Contact numbers"></label>
+                                <TextField row="1" col="1" keyboardType="number" returnKeyType="next" v-model="numbers" class="h4" autocorrect="true"></TextField>
+                            </GridLayout>
+                            <StackLayout>
+                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock-outline' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Old Password"></label>
+                                    <TextField row="1" col="1" secure="true" returnKeyType="next" v-model="oldPassword"></TextField>
+                                </GridLayout>
+                                <StackLayout width="100%" class="hr-light"></StackLayout>
+                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="New Password"></label>
+                                    <TextField row="1" col="1" secure="true" returnKeyType="next" v-model="newPassword"></TextField>
+                                </GridLayout>
+                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Confirm new Password"></label>
+                                    <TextField row="1" col="1" secure="true" returnKeyType="next" v-model="confirmNewPassword"></TextField>
+                                </GridLayout>
+                                <StackLayout width="100%" class="hr-light"></StackLayout>
+                            </StackLayout>
+                            <GridLayout class="m-10" rows="auto,auto,auto" @tap="changeProfilePicture()" columns="auto,*">
+                                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
+                                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Profile picture"></label>
+                                <label row="1" col="1" text="Tap to upload change your profile picture" class="h4"></label>
+                                <Image row="2" col="1" v-if="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
+                            </GridLayout>
+            
+                            <GridLayout class="m-10" rows="auto" columns="auto,*">
+                                <label row="0" col="0" verticalAlignment="bottom" class="mdi m-x-15 text-mute text-light-red" fontSize="25%" :text="'mdi-delete-forever' | fonticon"></label>
+                                <label row="0" col="1" verticalAlignment="bottom" class="h3 font-weight-bold text-mute text-light-red" text="I want to remove this account."></label>
+                            </GridLayout>
+                            <StackLayout width="100%" class="hr-light"></StackLayout>
+            
+                            <ActivityIndicator :busy="isLoading"></ActivityIndicator>
+            
+                            <DockLayout alignSelf="center" justifyContent="flex-end" verticalAlignment="bottom" orientation="horizontal" textAlignment="center">
+                                <Label :text="txtError" textWrap="true" class="text-mute text-light-red" textAlignment="center"></Label>
+                            </DockLayout>
+                            <DockLayout v-if="txtError.length < 2" alignSelf="center" justifyContent="flex-end" verticalAlignment="bottom" orientation="horizontal" textAlignment="center">
+                                <Label text="You can proceed" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
+                            </DockLayout>
+            
+                            <Button :isEnabled="!isLoading" @tap="SaveProfileChanges()" class="btn-primary bg-light-blue" text="Save Changes"></Button>
+                        </StackLayout>
+                    </ScrollView>
+                </StackLayout> -->
     </page>
 </template>
 
@@ -146,19 +146,56 @@
     
     import * as imagepicker from "nativescript-imagepicker";
     
+    var appSettings = require("application-settings");
+    
     export default {
         components: {
             Documents
         },
         data() {
             return {
-                layouts:[
-                    {id:"rate",icon:"star",title:"Rate",row:0,col:0},
-                    {id:"reminders",icon:"notifications",title:"Reminders",row:0,col:1},
-                    {id:"fulham86",icon:"home",title:"Fulham 86",row:0,col:2},
-                    {id:"documents",icon:"library-books",title:"Documents",row:1,col:0},
-                    {id:"info",icon:"info",title:"Info and help",row:1,col:1},
-                    {id:"bugReport",icon:"bug-report",title:"Bug report",row:1,col:2},
+                layouts: [{
+                        id: "rate",
+                        icon: "star",
+                        title: "Rate",
+                        row: 0,
+                        col: 0
+                    },
+                    {
+                        id: "reminders",
+                        icon: "notifications",
+                        title: "Reminders",
+                        row: 0,
+                        col: 1
+                    },
+                    {
+                        id: "fulham86",
+                        icon: "home",
+                        title: "Fulham 86",
+                        row: 0,
+                        col: 2
+                    },
+                    {
+                        id: "documents",
+                        icon: "library-books",
+                        title: "Documents",
+                        row: 1,
+                        col: 0
+                    },
+                    {
+                        id: "info",
+                        icon: "info",
+                        title: "Info and help",
+                        row: 1,
+                        col: 1
+                    },
+                    {
+                        id: "bugReport",
+                        icon: "bug-report",
+                        title: "Bug report",
+                        row: 1,
+                        col: 2
+                    },
                 ],
                 isLoaded: false,
                 //Edit profile staff --START
@@ -218,7 +255,12 @@
         methods: {
             pageLoaded() {
                 this.isLoaded = true;
-                //this.ApplyNavigation(this);
+                var firstTime = appSettings.getBoolean("shownChangeLog");
+                if (firstTime != true) {
+                    this.showChangeLog();
+                    appSettings.setBoolean("shownChangeLog", true);
+                }
+    
                 var logged = this.$store.state.user.isLoggedIn;
                 if (!logged) {
                     this.$router.push('/home');
@@ -319,23 +361,23 @@
                     path: card.redirect
                 });
             },
-            onItemTap(item){
+            onItemTap(item) {
                 if (item.id == 'fulham86') {
                     this.$router.push('/admin/fulham/home');
-                } else if(item.id ==  'bugReport') {
+                } else if (item.id == 'bugReport') {
                     this.reportBug();
-                } else if(item.id ==  'documents') {
+                } else if (item.id == 'documents') {
                     this.$router.push('/admin/documents');
-                } else if(item.id ==  'reminders') {
+                } else if (item.id == 'reminders') {
                     this.$router.push('/admin/reminders');
-                }  else {
+                } else {
                     dialogs.alert("Not yet assigned").then(() => {
                         console.log("card.redirect");
                     });
                 }
             },
             onBusinessTap(item) {
-                
+    
             }
         }
     }

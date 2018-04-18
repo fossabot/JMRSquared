@@ -33,6 +33,7 @@
       return {
         count: 20,
         currentTab: 0,
+        isLoaded:false,
         tabs: [{
             text: 'Notifications',
             icon: 'res://ic_notifications_black_24dp',
@@ -56,21 +57,19 @@
       }
     },
     created() {
-  
+      if (!this.isLoaded) {
+        this.pageLoaded();
+      }
     },
     mounted() {
-  
-    },
-    events: {
-      eventChanged(e) {
-        dialogs.alert("This").then(() => {
-          console.log("Dialog closed")
-        });
-
-        dialogs.alert(e);
+      if (!this.isLoaded) {
+        this.pageLoaded();
       }
     },
     methods: {
+      eventChanged(args) {
+  
+      },
       pageLoaded() {
         var connectionType = connectivity.getConnectionType();
         if (connectionType == connectivity.connectionType.none) {
@@ -81,12 +80,6 @@
           });
           this.isLoading = false;
         }
-      },
-      eventChanged() {
-        this.currentTab = 2;
-        dialogs.alert("This").then(() => {
-          console.log("Dialog closed")
-        });
       }
     }
   }

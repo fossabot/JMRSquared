@@ -31,7 +31,7 @@
 </template>
 
 <script>
-  import dialogs from 'ui/dialogs'
+  var dialogs =  require('ui/dialogs')
   export default {
     name:'studentProfile',
     data() {
@@ -102,6 +102,7 @@
     methods: {
       pageLoaded(e){
         this.profileID =  this.$route.params.profileID;
+        dialogs.alert(this.profileID);
       }
     }
   }

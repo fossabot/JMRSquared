@@ -42,6 +42,7 @@
   
   var appSettings = require("application-settings");
   
+    const http = require("http");
   export default {
     name: 'Documents',
     data() {

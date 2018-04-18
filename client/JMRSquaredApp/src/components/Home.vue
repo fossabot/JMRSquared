@@ -45,13 +45,29 @@
         introTxt: 'JMRSqaured is a company that deals with blah blah blah blah ......'
       }
     },
-    beforeDestroy() {
-      this.pageLoaded();
-    },
     created() {
       this.pageLoaded();
     },
+    mounted() {
+      this.pageLoaded();
+    },
     methods: {
+      pageLoaded() {
+        var logged = this.$store.state.user.isLoggedIn;
+        if (!logged) {
+  
+          let documentID = appSettings.getString("loginResponse");
+  
+          if (documentID != null) {
+            let admin = this.$db.getDocument(documentID);
+            if (admin != null) {
+              this.loginAdmin(this, admin.result);
+  
+            }
+          }
+  
+        }
+      },
       loadAdminData() {
         var connectionType = connectivity.getConnectionType();
         var self = this;
@@ -156,22 +172,6 @@
               });
   
             break;
-        }
-      },
-      pageLoaded() {
-        var logged = this.$store.state.user.isLoggedIn;
-        if (!logged) {
-  
-          let documentID = appSettings.getString("loginResponse");
-  
-          if (documentID != null) {
-            let admin = this.$db.getDocument(documentID);
-            if (admin != null) {
-              this.loginAdmin(this, admin.result);
-  
-            }
-          }
-  
         }
       }
     }

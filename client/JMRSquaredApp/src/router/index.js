@@ -122,6 +122,9 @@ router.beforeEach((to, from, next) => {
   next();
 })
 
+
+
+
 router.replace('/home');
 
 module.exports = router;
