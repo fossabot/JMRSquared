@@ -124,6 +124,50 @@ router.post('/bug/add', function(req, res) {
 
 });
 
+
+router.get('/document/get/:documentId',function(req,res){
+    var documentID = req.params.documentId;
+    Document.findById(documentID).then((document) => {
+        if (document == null) {
+            res.status(500);
+            res.send("Invalid request");
+        } else {
+            res.json(document);
+        }
+    })
+});
+
+router.get('/document/all', function(req, res) {
+    Document.find({},'_id title description type date').then((documents) => {
+        if (documents == null){
+            res.status(500);
+            res.send("Error : 9032rtu834g9erbo");
+        } 
+        documents.reverse();
+        res.json(documents);
+    });
+});
+
+router.post('/document/add', function(req, res) {
+    var document = new Document({
+        title: req.body.title,
+        adminID:req.body.adminID,
+        location: req.body.location,
+        thumbnail:req.body.thumbnail,
+        description:req.body.description,
+        type:req.body.type
+    });
+
+    document.save(function(err) {
+        if (err) {
+            res.status(500);
+            res.send(err);
+        }
+        res.send("Document added successfully saved");
+    })
+
+});
+
 router.post('/transaction/add', function(req, res) {
 
     var transaction = new Transaction({
