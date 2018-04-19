@@ -53,7 +53,7 @@ Vue.mixin({
       var log = ChangeLog.GetLogs('0.1');
       if(log != null && log != undefined){
         this.$feedback.info({
-          title:'Change log (' + log.version +  ')',
+          title:'Change log ( v' + log.version +  ' )',
           message:log.text.trim(),
           duration:90000,
           position:1
@@ -68,7 +68,14 @@ Vue.mixin({
                   <Page>
                      <TabView selectedTabTextColor="#4ac4d5" androidSelectedTabHighlightColor="#0093a4" tabBackgroundColor="transparent">
                         <TabViewItem title="Log a bug">
-                            <StackLayout verticalAlignment="center">
+                           <StackLayout verticalAlignment="center">
+                              <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                  <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
+                                  <label row="0" col="1" class="h3 font-weight-bold text-mute" text="You are logging the bug as"></label>
+                                  <label row="1" col="1" class="h4" :text="$store.state.user.userName" ></label>
+                              </GridLayout>
+                              
+                              <StackLayout width="100%" class="hr-light"></StackLayout>
                               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                   <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bug-report' | fonticon"></label>
                                   <label row="0" col="1" class="h3 font-weight-bold text-mute" text="What is the bug?"></label>
@@ -79,7 +86,7 @@ Vue.mixin({
                               <GridLayout class="m-10" rows="auto,auto,auto" @tap="uploadScreenshot()" columns="auto,*">
                                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
                                 <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Screenshot"></label>
-                                <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
+                                <label row="1" col="1" text="Tap to upload a screenshot of the bug" class="h4"></label>
                                 <Image row="2" col="1" :src="selectedImage" stretch="aspectFill" width="90%" />
                               </GridLayout>
                               <StackLayout width="100%" class="hr-light"></StackLayout>
@@ -126,7 +133,8 @@ Vue.mixin({
         },
         methods: {
           getBugScreenshot(id){
-
+            // TODO : Add a page for an individual bug discussion.
+            return;
             http.getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id).then((results) => {
                 this.$feedback.success({
                     title: "Done",
@@ -163,57 +171,46 @@ Vue.mixin({
           },    
           submitBug() {
             isLoading = true;
-            Toast.makeText("Running").show();
-            let source = new imageSource.ImageSource();
-            source.fromAsset(selectedImage).then((img) => {
-              selectedImage = img.toBase64String("png");
-             
-              Toast.makeText("Download").show();
-             
-              http.request({
-                url: this.$store.state.settings.baseLink + "/a/bug/add",
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                content: JSON.stringify({
-                  senderName: this.$store.state.user.userName,
-                  senderPic: this.$store.state.user.profilePic,
-                  bugText: this.txtBug,
-                  screenshot:selectedImage
-                })
-              }).then(response => {
+                http.request({
+                  url: this.$store.state.settings.baseLink + "/a/bug/add",
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  content: JSON.stringify({
+                    senderName: this.$store.state.user.userName,
+                    senderPic: this.$store.state.user.profilePic,
+                    bugText: this.txtBug
+                  })
+                }).then(response => {
 
-                var answer = response.content.toString();
-                var statusCode = response.statusCode;
+                  var answer = response.content.toString();
+                  var statusCode = response.statusCode;
 
-                Toast.makeText("DOne " + statusCode).show();
-                isLoading = false;
-                if(statusCode == 200){
-                  this.$feedback.success({
-                    message: "Your bug was logged."
-                  });
-                }else{
+                  isLoading = false;
+                  if(statusCode == 200){
+                    this.$feedback.success({
+                      title: "Your bug was logged successfully",
+                      message:"The screenshot was not saved."
+                    });
+                  }else{
+                    this.$feedback.error({
+                      title: "The bug was not logged.",
+                      duration: 40000,
+                      message: answer,
+                    });
+                  }
+
+                  this.$modal.close();
+
+                }).catch(err=>{
+                  isLoading = false;
+                  this.$modal.close();
                   this.$feedback.error({
-                    title: "The bug was not logged.",
-                    duration: 40000,
-                    message: answer,
+                    duration: 4000,
+                    message: err,
                   });
-                }
-
-                this.$modal.close();
-
-              }).catch(err=>{
-                isLoading = false;
-                this.$modal.close();
-                this.$feedback.error({
-                  title: "Error",
-                  duration: 4000,
-                  message: err,
-                });
-              });
-          });
-
+            });
           },
           refreshList(args){
             var pullRefresh = args.object;
