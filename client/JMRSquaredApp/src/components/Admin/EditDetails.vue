@@ -1,4 +1,19 @@
 <template>
+<page @loaded="pageLoaded()">
+    <ActionBar>
+        <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
+            <Ripple @tap="$router.back()" verticalAlignment="center" col="0" rippleColor="$blueColor" borderRadius="50%">
+                <Label verticalAlignment="center" class="mdi h2 p-15" :text="'mdi-arrow-back' | fonticon"></Label>
+            </Ripple>
+            <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + $store.state.user.userName + '\'s details'"></Label>
+            <Ripple @tap="reportBug()" verticalAlignment="center" class="p-15" col="2" rippleColor="$blueColor" borderRadius="50%">
+                <Label verticalAlignment="center" class="mdi h2" :text="'mdi-bug-report' | fonticon"></Label>
+            </Ripple>
+            <Ripple verticalAlignment="center" class="p-15" @tap="logOut()" col="3" rippleColor="$blueColor" borderRadius="50%">
+                <Label class="mdi h2 text-light-red" :text="'mdi-power-settings-new' | fonticon"></Label>
+            </Ripple>
+        </GridLayout>
+    </ActionBar>
     <StackLayout>
         <ScrollView>
             <StackLayout>
@@ -63,6 +78,7 @@
             </StackLayout>
         </ScrollView>
     </StackLayout>
+</page>
 </template>
 
 <script>
@@ -72,6 +88,7 @@
     export default {
         data() {
             return {
+                isLoaded:false,
                 //Edit profile staff --START
                 isLoading: false,
                 txtError: '',
@@ -86,8 +103,20 @@
                 //Edit profile staff --END
             }
         },
+        created() {
+            if (!this.isLoaded) {
+                this.pageLoaded();
+            }
+        },
+        mounted() {
+            if (!this.isLoaded) {
+                this.pageLoaded();
+            }
+        },
         methods: {
-    
+            pageLoaded() {
+                this.isLoaded = true;
+            },
             SaveProfileChanges() {
     
                 this.txtError = '';
@@ -124,30 +153,37 @@
                         return;
                     }
                 }
-  
-                    http.request({
-                      url: this.$store.state.settings.baseLink + "/a/update",
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json"
-                      },
-                      content: JSON.stringify({
-                        id:this.$store.state.user.id,
-                        userName: this.userName,
-                        email: this.email,
-                        numbers: this.numbers,
-                        newPassword: this.newPassword,
-                        oldPassword: this.oldPassword,
-                        profilePic:this.profilePic
-                      })
-                    }).then(response=>{
-                        
-                    }).catch(err=>{
-                          this.$feedback.error({
-                              message:err
-                          });
+                this.$feedback.info({
+                    title:'Not Implemented',
+                    message:"This is not functional yet"
+                });
+
+                //TODO : REMOVE THIS RETURN AND GO TO post the DB
+                this.isLoading = false;
+                return;
+
+                http.request({
+                    url: this.$store.state.settings.baseLink + "/a/update",
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json"
+                    },
+                    content: JSON.stringify({
+                    id:this.$store.state.user.id,
+                    userName: this.userName,
+                    email: this.email,
+                    numbers: this.numbers,
+                    newPassword: this.newPassword,
+                    oldPassword: this.oldPassword,
+                    profilePic:this.profilePic
                     })
-                // TODO : GO TO post the DB
+                }).then(response=>{
+                    
+                }).catch(err=>{
+                        this.$feedback.error({
+                            message:err
+                        });
+                });
             },
     
             changeProfilePicture() {
