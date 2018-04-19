@@ -110,8 +110,7 @@ router.post('/bug/add', function(req, res) {
     var bug = new Bug({
         senderName: req.body.senderName,
         senderPic: req.body.senderPic,
-        bugText:req.body.bugText,
-        screenshot:req.body.screenshot
+        bugText:req.body.bugText
     });
 
     bug.save(function(err) {
