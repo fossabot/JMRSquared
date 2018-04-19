@@ -11,6 +11,7 @@ import Login from '../components/Login.vue'
 import Admin_DashboardVue from '../components/Admin/Admin_Dashboard.vue'
 
 import Fulham_HomeVue from '../components/Admin/Fulham_Home.vue'
+import EditDetails from '../components/Admin/EditDetails.vue'
 
 
 import BottomNav from '../components/BottomNav.vue'
@@ -51,6 +52,13 @@ const router = new VueRouter({
       component: Login,
       meta: {
         title: 'Login',
+      },
+    },{
+      name:'adminProfileEdit',
+      path: '/admin/profile/edit',
+      component: EditDetails,
+      meta: {
+        title: 'ProfileEdit',
       },
     },
     {
