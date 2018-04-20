@@ -218,4 +218,16 @@ router.post('/transaction/add', function(req, res) {
 
 });
 
+
+router.get('/notifications/all', function(req, res) {
+    Notification.find({dueDate:null}).then((result) => {
+        if (result == null) {
+            res.status(400);
+            res.send("Error : 9032egrrtu834g9erbo");
+        }
+
+        res.json(result);
+    });
+});
+
 module.exports = router;

@@ -245,6 +245,7 @@
   
   import * as imagepicker from "nativescript-imagepicker";
   
+  import * as connectivity from "tns-core-modules/connectivity";
   const http = require("http")
   export default {
     data() {
@@ -422,7 +423,7 @@
                   title: "Transaction successfully added",
                   duration: 4000,
                   onTap: () => {
-                    dialogs.alert("TODO : Take them to the transaction window or something");
+                    this.currentPage = 0;
                   }
                 });
                 this.isLoading = false;
@@ -431,16 +432,15 @@
                   title: "Unable to add transaction",
                   message: "The image file is too large",
                   duration: 4000,
-                  onTap: () => {
-                    dialogs.alert("TODO : Take them to the transaction window or something");
-                  }
                 });
                 this.isLoading = false;
               }
-              console.log(response);
             })
             .catch(err => {
-  
+              this.$feedback.error({
+                message: err,
+                duration: 4000,
+              });
               this.isLoading = false;
             })
         });
@@ -459,8 +459,8 @@
   
           pullRefresh.refreshing = false;
         } else {
-          http.getJSON(this.$store.state.settings.baseLink + "/n/all/" + this.$store.state.user.id).then((results) => {
-            this.notifications = results;
+          http.getJSON(this.$store.state.settings.baseLink + "/a/transaction/all").then((results) => {
+            this.filteredTransactions = results;
             pullRefresh.refreshing = false;
           }).catch((err) => {
             this.$feedback.error({
@@ -484,14 +484,14 @@
         var self = this;
         this.$showModal({
           template: ` 
-            <Page>
-                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                    <DatePicker row="1" v-model="selectedDueDate" />
-                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                </GridLayout>
-            </Page>
-            `,
+                <Page>
+                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                        <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                        <DatePicker row="1" v-model="selectedDueDate" />
+                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                    </GridLayout>
+                </Page>
+                `,
           data: function() {
             return {
               selectedDueDate: new Date()

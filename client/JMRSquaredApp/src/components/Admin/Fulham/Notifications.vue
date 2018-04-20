@@ -92,7 +92,7 @@
     
                     pullRefresh.refreshing = false;
                 } else {
-                    http.getJSON(this.$store.state.settings.baseLink + "/n/all/" + this.$store.state.user.id).then((results) => {
+                    http.getJSON(this.$store.state.settings.baseLink + "a/notifications/all").then((results) => {
                         this.notifications = results;
                         pullRefresh.refreshing = false;
                     }).catch((err) => {
