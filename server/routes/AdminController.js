@@ -17,7 +17,7 @@ import Bug from '../models/Bug';
 */
 
 router.get('/all', function(req, res) {
-    Admin.find().populate(['documents']).populate(['notifications']).populate(['transactions','-proof']).then((admins) => {
+    Admin.find().populate(['documents']).populate(['notifications']).populate(['transactions','_id adminID amount type rentTenantName rentMonth description date']).then((admins) => {
         if (admins == null) res.send("Error : 9032rtu834g9erbo");
         res.json(admins);
     });
@@ -25,7 +25,7 @@ router.get('/all', function(req, res) {
 
 router.get('/GetById/:adminID', function(req, res) {
     var adminID = req.params.adminID;
-    Admin.findById(adminID).populate(['documents']).populate(['notifications']).populate(['transactions','-proof']).then((admin) => {
+    Admin.findById(adminID).populate(['documents']).populate(['notifications']).populate(['transactions','_id adminID amount type rentTenantName rentMonth description date']).then((admin) => {
         if (admin == null) {
             res.status(500);
             res.send("Invalid user");
@@ -44,7 +44,7 @@ router.post('/login', function(req, res) {
         Admin.findOne({
             email: req.body.email,
             pass: req.body.pass
-        }).populate(['documents']).populate(['notifications']).populate(['transactions','-proof']).then((admin) => {
+        }).populate(['documents']).populate(['notifications']).populate(['transactions','_id adminID amount type rentTenantName rentMonth description date']).then((admin) => {
             if (admin == null) {
                 res.status(500);
                 res.send("Incorrect log in details");
@@ -56,7 +56,7 @@ router.post('/login', function(req, res) {
         Admin.findOne({
             numbers: req.body.numbers,
             pass: req.body.pass
-        }).populate(['documents']).populate(['notifications']).populate(['transactions','-proof']).then((admin) => {
+        }).populate(['documents']).populate(['notifications']).populate(['transactions','_id adminID amount type rentTenantName rentMonth description date']).then((admin) => {
             if (admin == null) {
                 res.status(500);
                 res.send("Incorrect log in details");
