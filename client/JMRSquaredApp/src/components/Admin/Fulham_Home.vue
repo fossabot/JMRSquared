@@ -1,9 +1,10 @@
 <template>
   <page actionBarHidden="true" @loaded="pageLoaded">
-    <TabView @tabChange="eventChanged($event)" id="bottomNav" :selectedIndex="currentTab" selectedIndexChanged="eventChanged()" selectedTabTextColor="$blueColor" androidSelectedTabHighlightColor="$blueDarkColor" tabBackgroundColor="transparent">
+    <TabView @tabChange="eventChanged($event)" id="bottomNav" :selectedIndex="currentTab" selectedTabTextColor="$blueColor" androidSelectedTabHighlightColor="$blueDarkColor" tabBackgroundColor="transparent">
       <TabViewItem v-for="(tab,i) in tabs" :key="i" :iconSource="tab.icon">
         <StackLayout>
-          <component :is="tab.view"></component>
+          <component v-if="tab.isLoaded" :is="tab.view"></component>
+          <ActivityIndicator verticalAlignment="center" :busy="!tab.isLoaded"></ActivityIndicator>
         </StackLayout>
       </TabViewItem>
     </TabView>
@@ -37,21 +38,25 @@
         tabs: [{
             text: 'Notifications',
             icon: 'res://ic_notifications_black_24dp',
-            view: 'Notifications'
+            view: 'Notifications',
+            isLoaded:false
           }, {
             text: 'Students',
             icon: 'res://ic_people_black_24dp',
-            view: 'Students'
+            view: 'Students',
+            isLoaded:false
           },
           {
             text: 'Transactions',
             icon: 'res://ic_receipt_black_24dp',
-            view: 'Transactions'
+            view: 'Transactions',
+            isLoaded:false
           },
           {
             text: 'Stats',
             icon: 'res://ic_equalizer_black_24dp',
-            view: 'Stats'
+            view: 'Stats',
+            isLoaded:false
           }
         ]
       }
@@ -68,7 +73,9 @@
     },
     methods: {
       eventChanged(args) {
-  
+        if(!this.tabs[args].isLoaded){
+          this.tabs[args].isLoaded = true;
+        }
       },
       pageLoaded() {
         var connectionType = connectivity.getConnectionType();

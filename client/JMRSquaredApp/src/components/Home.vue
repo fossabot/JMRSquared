@@ -3,9 +3,6 @@
     <ActionBar>
       <GridLayout rows="auto" columns="*,auto" orientation="horizontal">
         <Label col="0" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Home"></Label>
-        <Ripple col="1" rippleColor="$blueColor" borderRadius="50%">
-          <Image verticalAlignment="center" class="m-r-15" textAlignment="right" src="res://ic_more_vert_black_24dp" width="30" height="30" />
-        </Ripple>
       </GridLayout>
     </ActionBar>
     <FlexboxLayout justifyContent="space-between" width="100%" height="100%" flexDirection="column">

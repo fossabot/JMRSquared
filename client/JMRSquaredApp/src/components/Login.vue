@@ -1,5 +1,16 @@
 <template>
-  <page actionBarHidden="true" @loaded="pageLoaded()">
+  <page @loaded="pageLoaded()">
+    <ActionBar>
+      <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
+        <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+        </Ripple>
+        <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Login"></Label>
+        <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+        </Ripple>
+      </GridLayout>
+    </ActionBar>
     <ScrollView width="100%">
       <CardView verticalAlignment="center" margin="20" elevation="40" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
         <GridLayout width="100%">

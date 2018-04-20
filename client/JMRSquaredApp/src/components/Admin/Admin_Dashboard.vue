@@ -1,24 +1,24 @@
 <template>
-    <page class="page" @loaded="pageLoaded()">
+    <page @@loaded="pageLoaded()">
         <ActionBar>
             <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
-                <Ripple @tap="$router.back()" verticalAlignment="center" col="0" rippleColor="$blueColor" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi h2 p-15" :text="'mdi-arrow-back' | fonticon"></Label>
+                <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
                 <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + $store.state.user.userName"></Label>
-                <Ripple @tap="reportBug()" verticalAlignment="center" class="p-15" col="2" rippleColor="$blueColor" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi h2" :text="'mdi-bug-report' | fonticon"></Label>
+                <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
-                <Ripple verticalAlignment="center" class="p-15" @tap="logOut()" col="3" rippleColor="$blueColor" borderRadius="50%">
-                    <Label class="mdi h2 text-light-red" :text="'mdi-power-settings-new' | fonticon"></Label>
+                <Ripple class="p-x-15" @tap="logOut()" verticalAlignment="center" col="3" height="100%" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
                 </Ripple>
             </GridLayout>
         </ActionBar>
         <StackLayout>
             <StackLayout class="p-y-20" alignSelf="center" width="100%">
                 <Image alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
-                <Label textAlignment="center" class="h2 m-5" :text="user.userName"></Label>
-                <Label textAlignment="center" class="h3 m-5" :text="user.email"></Label>
+                <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.userName"></label>
+                <Label class="h3 m-5" textAlignment="center" :text="user.email"></Label>
             </StackLayout>
             <Ripple @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
                 <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
@@ -27,7 +27,7 @@
                 <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
                     <CardView radius="100" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
                         <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
-                            <Label class="mdi h2" textAlignment="center" fontSize="30%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
+                            <Label class="mdi" textAlignment="center" fontSize="25%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
                         </Ripple>
                     </CardView>
                     <Label class="p-t-10" :text="item.title" textAlignment="center" />

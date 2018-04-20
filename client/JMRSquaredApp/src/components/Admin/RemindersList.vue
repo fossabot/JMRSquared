@@ -1,18 +1,18 @@
 <template>
   <page class="page" @loaded="pageLoaded()">
-        <ActionBar>
-        <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
-            <Ripple @tap="$router.back()" verticalAlignment="center" col="0" rippleColor="$blueColor" borderRadius="50%">
-                <Label verticalAlignment="center" class="mdi h2 p-15" :text="'mdi-arrow-back' | fonticon"></Label>
-            </Ripple>
-            <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + $store.state.user.userName"></Label>
-            <Ripple @tap="reportBug()" verticalAlignment="center" class="p-15" col="2" rippleColor="$blueColor" borderRadius="50%">
-                <Label verticalAlignment="center" class="mdi h2" :text="'mdi-bug-report' | fonticon"></Label>
-            </Ripple>
-            <Ripple verticalAlignment="center" class="p-15" @tap="logOut()" col="3" rippleColor="$blueColor" borderRadius="50%">
-                <Label class="mdi h2 text-light-red" :text="'mdi-power-settings-new' | fonticon"></Label>
-            </Ripple>
-        </GridLayout>
+    <ActionBar>
+      <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
+        <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+        </Ripple>
+        <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Reminders"></Label>
+        <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+        </Ripple>
+        <Ripple class="p-x-15" @tap="logOut()" verticalAlignment="center" col="3" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
+        </Ripple>
+      </GridLayout>
     </ActionBar>
     <GridLayout rows="auto,*" columns="*">
       <SearchBar row="0" col="0" hint="Search ..." @submit="v" @textChange="onSearchReminders" v-model="searchText"></SearchBar>
@@ -46,7 +46,7 @@
     data() {
       return {
         searchText: '',
-        isLoaded:false
+        isLoaded: false
       }
     },
     computed: {
