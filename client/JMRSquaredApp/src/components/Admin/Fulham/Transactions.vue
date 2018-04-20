@@ -1,6 +1,7 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
     <GridLayout rows="auto,auto,*">
+  
       <CardView row="0" margin="10" elevation="10" height="40" @tap="ShowNewTransaction(1)" backgroundColor="grey" v-show="currentPage == 0" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
         <label verticalAlignment="center" textAlignment="center" text="Create a new transaction"></label>
       </CardView>
@@ -10,12 +11,10 @@
         <ScrollView>
           <StackLayout class="form">
             <Label row="0" col="1" @tap="ShowNewTransaction(0)" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-            <StackLayout row="1" col="0" colSpan="2" class="input-field">
-              <Label textAlignment="center" text="Creating a new Transaction" col="0" class="font-weight-bold m-b-5 h2" />
-              <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            </StackLayout>
+            <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" text="New Transaction"></label>
   
+            <StackLayout width="100%" class="hr-light"></StackLayout>
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transacter"></label>
@@ -210,7 +209,7 @@
   
                   <Label row="1" col="1" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
   
-                  <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="daysAgo(transaction.date)"></Label>
+                  <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                   <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.by"></Label>
   
                 </GridLayout>
@@ -449,29 +448,29 @@
       },
       refreshList(args) {
         var pullRefresh = args.object;
-        setTimeout(function() {
-          dialogs.alert("Done");
+  
+        var connectionType = connectivity.getConnectionType();
+        if (connectionType == connectivity.connectionType.none) {
+          this.$feedback.error({
+            title: "Error (NO INTERNET CONNECTION)",
+            duration: 4000,
+            message: "Please switch on your data/wifi.",
+          });
+  
           pullRefresh.refreshing = false;
-        }, 1000);
-      },
-      daysAgo(date) {
-        let answer = 'No date';
+        } else {
+          http.getJSON(this.$store.state.settings.baseLink + "/n/all/" + this.$store.state.user.id).then((results) => {
+            this.notifications = results;
+            pullRefresh.refreshing = false;
+          }).catch((err) => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err,
+            });
+            pullRefresh.refreshing = false;
   
-        try {
-          var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-          var today = new Date();
-          var diffDays = Math.round(Math.abs((date.getTime() - today.getTime()) / (oneDay)));
-          if (diffDays == 0) {
-            answer = "today";
-          } else if (diffDays == 1) {
-            answer = "1 day ago";
-          } else if (diffDays > 1) {
-            answer = diffDays + ' days ago';
-          }
-          return answer;
-  
-        } catch (err) {
-          return answer
+          });
         }
       },
       changeRentMonth() {
@@ -485,14 +484,14 @@
         var self = this;
         this.$showModal({
           template: ` 
-                                                                                                      <Page>
-                                                                                                          <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                              <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                                                                                              <DatePicker row="1" v-model="selectedDueDate" />
-                                                                                                              <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                                          </GridLayout>
-                                                                                                      </Page>
-                                                                                                      `,
+            <Page>
+                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                    <DatePicker row="1" v-model="selectedDueDate" />
+                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                </GridLayout>
+            </Page>
+            `,
           data: function() {
             return {
               selectedDueDate: new Date()
@@ -522,8 +521,8 @@
         });
       },
       ShowNewTransaction(value) {
-        if(value == 2){
-          if(!this.canSubmit()){
+        if (value == 2) {
+          if (!this.canSubmit()) {
             return;
           }
         }

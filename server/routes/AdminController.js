@@ -167,6 +167,29 @@ router.post('/document/add', function(req, res) {
 
 });
 
+router.get('/transaction/get/:transactionId',function(req,res){
+    var transactionID = req.params.transactionId;
+    Transaction.findById(transactionID).populate('adminID','userName').then((transaction) => {
+        if (transaction == null) {
+            res.status(500);
+            res.send("Invalid request");
+        } else {
+            res.json(transaction);
+        }
+    })
+});
+
+router.get('/transaction/all', function(req, res) {
+    Transaction.find({},'_id adminID amount type rentTenantName rentMonth description date').populate('adminID','userName').then((transactions) => {
+        if (transactions == null){
+            res.status(500);
+            res.send("Error : 9032rtu834g9erbo");
+        } 
+        transactions.reverse();
+        res.json(transactions);
+    });
+});
+
 router.post('/transaction/add', function(req, res) {
 
     var transaction = new Transaction({
@@ -180,13 +203,18 @@ router.post('/transaction/add', function(req, res) {
         date:req.body.date
     });
 
-    console.log(transaction);
-    res.json(transaction);
+    transaction.save(function(err) {
+        if (err) res.send(err);
+        Admin.findById(req.body.adminID,function(err,admin){
+            if (err || admin == null)  { console.log(err); return; };
 
-    // transaction.save(function(err) {
-    //     if (err) res.send(err);
-    //     res.send("User successfully saved");
-    // })
+            admin.transactions.push(transaction._id);
+            admin.save(function(err){
+                if (err)  { console.log(err); return; };
+                res.send("Transaction successfully saved");
+            });
+        });
+    })
 
 });
 

@@ -79,7 +79,6 @@ router.post('/add', function(req, res) {
 
     notification.save(function(err) {
         if (err) { console.log(err); return; };
-        console.log("Passed for : " + notification._id);
         Admin.findById(req.body.fromId,function(err,admin){
             if (err || admin == null)  { console.log(err); return; };
 
