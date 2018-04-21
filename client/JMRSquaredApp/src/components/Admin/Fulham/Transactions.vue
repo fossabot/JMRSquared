@@ -18,35 +18,25 @@
         </ScrollView>
         <PullToRefresh row="1" col="0" @refresh="refreshList($event)">
   
-          <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions" @itemTap="onStudentTap">
-              <v-template>
-              <CardView v-show="transaction.type != 'Rent'" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
+          <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
+            <v-template>
+              <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
                   <Label row="0" col="0" textAlignment="center" class="m-5" :text="transaction.type"></Label>
-                  <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down') | fonticon"></Label>
-                  <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="transaction.amount"></Label>
+                  <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
+                  <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
   
-                  <Label row="1" col="1" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
-  
+                  <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
+                  
+                  <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
+                  <Label row="1" col="1" v-show="transaction.type == 'Rent'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
+                
                   <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                   <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
   
                 </GridLayout>
               </CardView>
-              <CardView v-show="transaction.type == 'Rent'" margin="5" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-                  <Label row="0" col="0" textAlignment="center" class="m-5" text="Rent"></Label>
-                  <Label row="1" col="0" textAlignment="center" class="mdi m-5 text-dark-blue" fontSize="50%" :text="'mdi-attach-money' | fonticon"></Label>
-                  <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="transaction.amount"></Label>
-  
-                  <Label row="0" col="1" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
-  
-                  <Label row="1" col="1" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
-  
-                  <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
-                </GridLayout>
-              </CardView>
-            </v-template>
+              </v-template>
           </ListView>
         </PullToRefresh>
       </StackLayout>
@@ -320,6 +310,26 @@
           });
   
         });
+        
+        var connectionType = connectivity.getConnectionType();
+        if (connectionType == connectivity.connectionType.none) {
+          this.$feedback.error({
+            title: "Error (NO INTERNET CONNECTION)",
+            duration: 4000,
+            message: "Please switch on your data/wifi.",
+          });
+  
+        } else {
+          http.getJSON(this.$store.state.settings.baseLink + "/a/transaction/all").then((results) => {
+            this.filteredTransactions = results;
+          }).catch((err) => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err,
+            });
+          });
+        }
       },
       canSubmit() {
         this.txtError = "";
