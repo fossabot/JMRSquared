@@ -1,14 +1,13 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
-    <GridLayout rows="auto,auto,*">
+    <GridLayout rows="auto,*">
   
       <CardView row="0" margin="10" elevation="10" height="40" @tap="ShowNewTransaction(1)" backgroundColor="grey" v-show="currentPage == 0" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
         <label verticalAlignment="center" textAlignment="center" text="Create a new transaction"></label>
       </CardView>
   
   
-      <SearchBar row="1" v-show="currentPage == 0" hint="Search ..."></SearchBar>
-      <StackLayout row="2" v-show="currentPage == 0">
+      <StackLayout row="1" v-show="currentPage == 0">
         <ScrollView orientation="horizontal">
           <StackLayout orientation="horizontal">
             <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">

@@ -82,9 +82,14 @@
         });
       },
       uploadDocument() {
-        let documentID = appSettings.getString("loginResponses");
-        dialogs.alert(documentID);
   
+  
+        this.$feedback.info({
+          title: 'Not Implemented',
+          message: "This is not functional yet"
+        });
+        return;
+        //TODO : Put on the functionality
   
         if (documentID == null) {
   
@@ -108,41 +113,41 @@
   
         this.$showModal({
           template: `
-                              <Page>
-                                <ActionBar title="Detail"/>
-                                <StackLayout>
-                                            <CardView row="1" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="60">
-                                    <GridLayout class="m-15" rows="auto,auto,auto,auto,*,*" columns="*,*,*">
-                                      <StackLayout row="0" col="0" colSpan="3" class="input-field m-t-10">
-                                        <Label row="0" col="1" @tap="$modal.close" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                                        <Label row="0" text="Uploaded by" col="0" class="label font-weight-bold m-b-5" />
-                                        <Label row="0" :text="adminName" textAlignment="center" col="1" class="h3" />
-                                        <StackLayout width="100%" class="hr-light"></StackLayout>
-                                      </StackLayout>
-                                      <StackLayout row="1" col="0" colSpan="3" class="input-field m-t-10">
-                                        <Label text="Title" col="0" class="label font-weight-bold m-b-5" />
-                                        <TextField v-model="title" class="m-r-30" hint="Document title..." returnKeyType="next" col="1"></TextField>
-                                        <StackLayout width="100%" class="hr-light"></StackLayout>
-                                      </StackLayout>
-                                      <StackLayout row="2" col="0" colSpan="3" class="input-field m-t-10">
-                                        <Label text="Description" col="0" class="label font-weight-bold m-b-5" />
-                                        <TextView v-model="description" class="m-r-30" hint="Document description..." col="1"></TextView>
-                                        <StackLayout width="100%" class="hr-light"></StackLayout>
-                                      </StackLayout>
-                                      <StackLayout row="3" col="0" colSpan="3" class="input-field m-t-10">
-                                        <Label text="Type" col="0" class="label font-weight-bold m-b-5" />
-                                        <ListPicker :items="types" v-model="selectedType" />
-                                        <StackLayout width="100%" class="hr-light"></StackLayout>
-                                      </StackLayout>
-                                      <StackLayout row="4" col="1" verticalAlignment="center">
-                                        <button @tap="pickFile()" selfAlign="center" textAlignment="center" text="Select File"></button>
-                                      </StackLayout>
-                                      <button row="5" @tap="submitDocument()" verticalAlignment="bottom" col="0" colSpan="3" width="100%" textAlignment="center" class="btn btn-active" text="Save Document"></button>
-                                    </GridLayout>
-                                  </CardView>        
-                                </StackLayout>
-                              </Page>
-                            `,
+                                <Page>
+                                  <ActionBar title="Detail"/>
+                                  <StackLayout>
+                                              <CardView row="1" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="60">
+                                      <GridLayout class="m-15" rows="auto,auto,auto,auto,*,*" columns="*,*,*">
+                                        <StackLayout row="0" col="0" colSpan="3" class="input-field m-t-10">
+                                          <Label row="0" col="1" @tap="$modal.close" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                          <Label row="0" text="Uploaded by" col="0" class="label font-weight-bold m-b-5" />
+                                          <Label row="0" :text="adminName" textAlignment="center" col="1" class="h3" />
+                                          <StackLayout width="100%" class="hr-light"></StackLayout>
+                                        </StackLayout>
+                                        <StackLayout row="1" col="0" colSpan="3" class="input-field m-t-10">
+                                          <Label text="Title" col="0" class="label font-weight-bold m-b-5" />
+                                          <TextField v-model="title" class="m-r-30" hint="Document title..." returnKeyType="next" col="1"></TextField>
+                                          <StackLayout width="100%" class="hr-light"></StackLayout>
+                                        </StackLayout>
+                                        <StackLayout row="2" col="0" colSpan="3" class="input-field m-t-10">
+                                          <Label text="Description" col="0" class="label font-weight-bold m-b-5" />
+                                          <TextView v-model="description" class="m-r-30" hint="Document description..." col="1"></TextView>
+                                          <StackLayout width="100%" class="hr-light"></StackLayout>
+                                        </StackLayout>
+                                        <StackLayout row="3" col="0" colSpan="3" class="input-field m-t-10">
+                                          <Label text="Type" col="0" class="label font-weight-bold m-b-5" />
+                                          <ListPicker :items="types" v-model="selectedType" />
+                                          <StackLayout width="100%" class="hr-light"></StackLayout>
+                                        </StackLayout>
+                                        <StackLayout row="4" col="1" verticalAlignment="center">
+                                          <button @tap="pickFile()" selfAlign="center" textAlignment="center" text="Select File"></button>
+                                        </StackLayout>
+                                        <button row="5" @tap="submitDocument()" verticalAlignment="bottom" col="0" colSpan="3" width="100%" textAlignment="center" class="btn btn-active" text="Save Document"></button>
+                                      </GridLayout>
+                                    </CardView>        
+                                  </StackLayout>
+                                </Page>
+                              `,
           data: function() {
             return {
               types: ['Lease Agreement', 'Invoice', 'Company Docs', 'Other'],
