@@ -18,10 +18,7 @@
       <SearchBar row="0" col="0" hint="Search ..." @submit="onSearchDocuments" @textChange="onSearchDocuments" v-model="searchText"></SearchBar>
       <Button row="0" col="1" @tap="uploadDocument()" class="">Upload</Button>
       <PullToRefresh row="1" col="0" colSpan="2" @refresh="refreshList($event)">
-  
-        <ScrollView row="1" col="0" colSpan="2">
-          <StackLayout>
-            <ListView columns="*" rows="auto" for="document in Documents">
+    <ListView columns="*" rows="auto" for="document in Documents">
               <v-template>
                 <CardView row="0" margin="10" elevation="10" height="100%" width="97%" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                   <GridLayout backgroundColor="white" padding="10%" columns="auto,*,auto" rows="auto,auto,auto">
@@ -33,8 +30,6 @@
                 </CardView>
               </v-template>
             </ListView>
-          </StackLayout>
-        </ScrollView>
       </PullToRefresh>
     </GridLayout>
   </page>

@@ -29,8 +29,6 @@
         </StackLayout>
       </ScrollView>
       <PullToRefresh row="1" col="0" @refresh="refreshList($event)">
-        <ScrollView row="1" col="0">
-          <StackLayout>
             <ListView for="task in Reminders">
               <v-template>
                 <GridLayout class="m-10" backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
@@ -45,8 +43,6 @@
                 </GridLayout>
               </v-template>
             </ListView>
-          </StackLayout>
-        </ScrollView>
     </PullToRefresh>
     </GridLayout>
   </page>
