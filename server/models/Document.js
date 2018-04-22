@@ -6,7 +6,7 @@ const DocumentSchema = new mongoose.Schema({
     adminID: { type: Schema.Types.ObjectId, ref: 'Admin' }, //ForeignKey
     title: String,
     location: String,
-    thumbnail:String,
+    thumbnail:{ type:String, default:"ic_picture_as_pdf_black_24dp"},
     description: String,
     type: { type: Object, default: null },
     date: { type: Date, default: Date.now },
