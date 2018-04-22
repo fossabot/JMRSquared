@@ -16,22 +16,24 @@
     </ActionBar>
     <GridLayout rows="auto,*" columns="*">
       <SearchBar row="0" col="0" hint="Search ..." @submit="v" @textChange="onSearchReminders" v-model="searchText"></SearchBar>
-      <ScrollView row="1" col="0">
-        <StackLayout>
-          <ListView for="task in Reminders">
-            <v-template>
-              <GridLayout backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
-                <Label @tap="RemoveFeed(task)" row="0" col="2" textAlignment="center" alignSelf="center" class="mdi h2 text-light-red m-5" :text="'mdi-close' | fonticon"></Label>
-                <StackLayout @tap="DoneFeed(task)" textAlignment="center" verticalAlignment="center" row="0" col="0" rowSpan="3">
-                  <Label textAlignment="center" class="mdi h1 text-light-green" :text="'mdi-done' | fonticon"></Label>
-                </StackLayout>
-                <Label class="m-5" row="1" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
-                <Label class="m-5" row="2" col="2" textAlignment="right" alignSelf="right" :text="getMoment(task.dueDate).fromNow()"></Label>
-              </GridLayout>
-            </v-template>
-          </ListView>
-        </StackLayout>
-      </ScrollView>
+      <PullToRefresh row="1" col="0" @refresh="refreshList($event)">
+        <ScrollView row="1" col="0">
+          <StackLayout>
+            <ListView for="task in Reminders">
+              <v-template>
+                <GridLayout backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
+                  <Label @tap="RemoveFeed(task)" row="0" col="2" textAlignment="center" alignSelf="center" class="mdi h2 text-light-red m-5" :text="'mdi-close' | fonticon"></Label>
+                  <StackLayout @tap="DoneFeed(task)" textAlignment="center" verticalAlignment="center" row="0" col="0" rowSpan="3">
+                    <Label textAlignment="center" class="mdi h1 text-light-green" :text="'mdi-done' | fonticon"></Label>
+                  </StackLayout>
+                  <Label class="m-5" row="1" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
+                  <Label class="m-5" row="2" col="2" textAlignment="right" alignSelf="right" :text="getMoment(task.dueDate).fromNow()"></Label>
+                </GridLayout>
+              </v-template>
+            </ListView>
+          </StackLayout>
+        </ScrollView>
+    </PullToRefresh>
     </GridLayout>
   </page>
 </template>
@@ -41,19 +43,14 @@
   
   var appSettings = require("application-settings");
   
+  const http = require("http");
   export default {
     name: 'Reminders',
     data() {
       return {
         searchText: '',
-        isLoaded: false
-      }
-    },
-    computed: {
-      Reminders: {
-        get() {
-          return this.$store.state.collections.tasks.all;
-        }
+        isLoaded: false,
+        Reminders:[]
       }
     },
     created() {
@@ -68,6 +65,29 @@
     },
     methods: {
       pageLoaded() {
+        http.getJSON(this.$store.state.settings.baseLink + "/tasks/all/" + this.$store.state.user.id).then((result) => {
+          this.Reminders = result;
+  
+        }).catch(err => {
+          this.$feedback.error({
+            title: "Error while loading reminders",
+            message: err,
+          });
+        });
+      },
+      refreshList(args) {
+        var pullRefresh = args.object;
+        http.getJSON(this.$store.state.settings.baseLink + "/tasks/all/" + this.$store.state.user.id).then((result) => {
+          this.Reminders = result;
+  
+          pullRefresh.refreshing = false;
+        }).catch(err => {
+          this.$feedback.error({
+            title: "Error while loading reminders",
+            message: err,
+          });
+          pullRefresh.refreshing = false;
+        });
   
       },
       onSearchReminders() {

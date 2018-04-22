@@ -7,7 +7,7 @@ const DocumentSchema = new mongoose.Schema({
     title: String,
     location: String,
     thumbnail:String,
-    description: { type: Boolean, default: false },
+    description: String,
     type: { type: Object, default: null },
     date: { type: Date, default: Date.now },
     removed: { type: Boolean, default: false }
