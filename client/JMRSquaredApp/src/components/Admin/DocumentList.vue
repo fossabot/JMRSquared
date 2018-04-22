@@ -181,14 +181,10 @@
         });
       },
       onSearchDocuments() {
-        dialogs.alert("Searching for " + this.searchText).then(() => {
-          console.log("Dialog closed")
-        });
+        
       },
       DocumentMenu(document) {
-        dialogs.alert("Open menu for " + document.title).then(() => {
-          console.log("Dialog closed")
-        });
+        
       }
     }
   }
