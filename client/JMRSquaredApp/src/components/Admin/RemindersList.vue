@@ -16,7 +16,7 @@
     </ActionBar>
     <GridLayout rows="auto,*" columns="*">
        <ScrollView row="0" col="0"  orientation="horizontal">
-        <StackLayout orientation="horizontal">
+        <StackLayout class="m-x-10" orientation="horizontal">
           <Ripple borderRadius="50%">
             <label text="Show " class="m-10"></label>
           </Ripple>
