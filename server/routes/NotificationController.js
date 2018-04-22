@@ -50,6 +50,19 @@ router.get('/all/:userId', function(req, res) {
     });
 });
 
+
+router.get('/tasks/all', function(req, res) {
+    Notification.find({
+        dueDate: { $ne: null }
+    }).then((result) => {
+        if (result == null) {
+            res.status(400);
+            res.send("Error : 9032egrrtu834g9erbo");
+        }
+        res.json(result);
+    });
+});
+
 router.get('/tasks/all/:userId', function(req, res) {
     var sender = req.params.userId;
     Notification.find({

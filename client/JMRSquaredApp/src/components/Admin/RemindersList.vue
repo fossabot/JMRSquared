@@ -15,19 +15,33 @@
       </GridLayout>
     </ActionBar>
     <GridLayout rows="auto,*" columns="*">
-      <SearchBar row="0" col="0" hint="Search ..." @submit="v" @textChange="onSearchReminders" v-model="searchText"></SearchBar>
+       <ScrollView row="0" col="0"  orientation="horizontal">
+        <StackLayout orientation="horizontal">
+          <Ripple borderRadius="50%">
+            <label text="Show " class="m-10"></label>
+          </Ripple>
+          <Ripple @tap="pageLoaded(true)" borderRadius="50%">
+            <label text="my notifications only" :class="{'bottom-line-blue':mineOnly}" class="m-10"></label>
+          </Ripple>
+          <Ripple @tap="pageLoaded(false)" borderRadius="50%">
+            <label text="all notifications" :class="{'bottom-line-blue':!mineOnly}" class="m-10"></label>
+          </Ripple>
+        </StackLayout>
+      </ScrollView>
       <PullToRefresh row="1" col="0" @refresh="refreshList($event)">
         <ScrollView row="1" col="0">
           <StackLayout>
             <ListView for="task in Reminders">
               <v-template>
-                <GridLayout backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
-                  <Label @tap="RemoveFeed(task)" row="0" col="2" textAlignment="center" alignSelf="center" class="mdi h2 text-light-red m-5" :text="'mdi-close' | fonticon"></Label>
-                  <StackLayout @tap="DoneFeed(task)" textAlignment="center" verticalAlignment="center" row="0" col="0" rowSpan="3">
-                    <Label textAlignment="center" class="mdi h1 text-light-green" :text="'mdi-done' | fonticon"></Label>
-                  </StackLayout>
-                  <Label class="m-5" row="1" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
-                  <Label class="m-5" row="2" col="2" textAlignment="right" alignSelf="right" :text="getMoment(task.dueDate).fromNow()"></Label>
+                <GridLayout class="m-10" backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
+                  <Ripple @tap="RemoveFeed(task)" verticalAlignment="center" textAlignment="center" row="0" col="2" rowSpan="3">
+                    <Label fontSize="25%" class="mdi text-light-red p-10" :text="'mdi-close' | fonticon"></Label>
+                  </Ripple>
+                  <Ripple @tap="DoneFeed(task)" verticalAlignment="center" textAlignment="center"  row="0" col="0" rowSpan="3">
+                   <Label fontSize="25%" class="mdi text-light-green p-10" :text="'mdi-done' | fonticon"></Label>
+                  </Ripple>
+                  <Label class="m-5" row="0" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
+                  <Label class="m-5" row="1" col="1" textAlignment="center" :text="getMoment(task.dueDate).fromNow()"></Label>
                 </GridLayout>
               </v-template>
             </ListView>
@@ -50,6 +64,7 @@
       return {
         searchText: '',
         isLoaded: false,
+        mineOnly:true,
         Reminders:[]
       }
     },
@@ -64,30 +79,61 @@
       }
     },
     methods: {
-      pageLoaded() {
-        http.getJSON(this.$store.state.settings.baseLink + "/tasks/all/" + this.$store.state.user.id).then((result) => {
-          this.Reminders = result;
-  
-        }).catch(err => {
-          this.$feedback.error({
-            title: "Error while loading reminders",
-            message: err,
+      pageLoaded(mineOnly = true) {
+        this.mineOnly = mineOnly;
+        if(this.mineOnly){
+          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.user.id).then((result) => {
+            this.Reminders = result;
+    
+            pullRefresh.refreshing = false;
+          }).catch(err => {
+            this.$feedback.error({
+              title: "Error while loading reminders",
+              message: err,
+            });
           });
-        });
+        }else{
+          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all").then((result) => {
+            this.Reminders = result;
+    
+          }).catch(err => {
+            this.$feedback.error({
+              title: "Error while loading reminders",
+              message: err,
+            });
+          });
+          
+        }
       },
       refreshList(args) {
         var pullRefresh = args.object;
-        http.getJSON(this.$store.state.settings.baseLink + "/tasks/all/" + this.$store.state.user.id).then((result) => {
-          this.Reminders = result;
-  
-          pullRefresh.refreshing = false;
-        }).catch(err => {
-          this.$feedback.error({
-            title: "Error while loading reminders",
-            message: err,
+        if(this.mineOnly){
+          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.user.id).then((result) => {
+            this.Reminders = result;
+    
+            pullRefresh.refreshing = false;
+          }).catch(err => {
+            this.$feedback.error({
+              title: "Error while loading reminders",
+              message: err,
+            });
+            pullRefresh.refreshing = false;
           });
-          pullRefresh.refreshing = false;
-        });
+        }else{
+          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all").then((result) => {
+            this.Reminders = result;
+    
+            pullRefresh.refreshing = false;
+          }).catch(err => {
+            this.$feedback.error({
+              title: "Error while loading reminders",
+              message: err,
+            });
+            pullRefresh.refreshing = false;
+          });
+          
+        }
+        
   
       },
       onSearchReminders() {
