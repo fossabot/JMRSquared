@@ -85,7 +85,6 @@
           http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.user.id).then((result) => {
             this.Reminders = result;
     
-            pullRefresh.refreshing = false;
           }).catch(err => {
             this.$feedback.error({
               title: "Error while loading reminders",
