@@ -218,12 +218,6 @@
                                 }
                             )
                 */
-    
-                this.$feedback.info({
-                    title: 'Not Implemented',
-                    message: "This is not functional yet"
-                });
-                return;
                 //TODO : Make this go to student profile.
     
                 this.$router.push('/admin/fulham/student/profile/' + event.item.id);

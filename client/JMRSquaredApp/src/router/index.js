@@ -164,11 +164,16 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   console.log(to.path);
+  
   console.log(from.path);
-
-  console.log("Navigating ..... ");
-
-  next();
+  if(to.name == 'studentProfile'){
+    to.meta.user = to.params.profileID + ' is the profile ID';
+    
+    alert("Going to profile huh???");
+    next();
+  }else{
+    next();
+  }
 })
 
 

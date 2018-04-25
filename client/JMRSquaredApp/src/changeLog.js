@@ -8,6 +8,16 @@ var Logs = [
 
 2. Reminders are being read from the DB.
 `
+    },
+    {
+        version:'0.2',
+        text:
+`
+
+1. Added Tenant Dashboard.
+
+2. Fixed the Tenant profile page.
+`
     }
 ];
 

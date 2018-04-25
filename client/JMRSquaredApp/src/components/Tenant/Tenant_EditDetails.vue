@@ -141,10 +141,9 @@
                     <StackLayout width="100%" class="hr-light"></StackLayout>
     
                      <StackLayout v-show="changePassword" class="p-5" width="100%">
-                            <GridLayout width="75%" textAlignment="center" rows="auto,auto" columns="auto,*">
-                                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-lock-outline' | fonticon"></label>
-                                <label textAlignment="center" row="0" col="1" class="h3 font-weight-bold text-mute" text="Old Password"></label>
-                                <TextField textAlignment="center" row="1" col="1" secure="true" returnKeyType="next" v-model="oldPassword"></TextField>
+                            <GridLayout width="75%" textAlignment="center" rows="auto,auto" columns="s*">
+                                 <label textAlignment="center" row="0" class="h3 font-weight-bold text-mute" text="Old Password"></label>
+                                <TextField textAlignment="center" row="1" secure="true" returnKeyType="next" v-model="oldPassword"></TextField>
                             </GridLayout>
                         </StackLayout>
     
@@ -212,6 +211,7 @@
         methods: {
             pageLoaded() {
                 this.isLoaded = true;
+                
             },
             SaveProfileChanges() {
     
