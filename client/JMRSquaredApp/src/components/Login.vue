@@ -108,6 +108,8 @@
           .action("What type of user are you?", "cancel", ["Student", "Admin"])
           .then(userType => {
             if (userType == "Student") {
+              self.$router.push("/tenant/dashboard");
+              return;
               http
                 .request({
                   url: this.$store.state.settings.baseLink + "/s/login",

@@ -10,6 +10,8 @@ import Login from '../components/Login.vue'
 
 import Admin_DashboardVue from '../components/Admin/Admin_Dashboard.vue'
 
+import Tenant_DashboardVue from '../components/Tenant/Tenant_Dashboard.vue'
+
 import Fulham_HomeVue from '../components/Admin/Fulham_Home.vue'
 import EditDetails from '../components/Admin/EditDetails.vue'
 
@@ -21,6 +23,11 @@ import DocumentList from '../components/Admin/DocumentList.vue'
 import RemindersList from '../components/Admin/RemindersList.vue'
 
 import AddStudent from '../components/Admin/Fulham/AddStudent.vue'
+
+
+import Students from '../components/Admin/Fulham/Students.vue'
+
+import Tenant_EditDetails from '../components/Tenant/Tenant_EditDetails.vue'
 
 const router = new VueRouter({
   pageRouting: true,
@@ -53,7 +60,41 @@ const router = new VueRouter({
       meta: {
         title: 'Login',
       },
-    },{
+    },
+    /**
+     * Tenant staff START
+     */
+    {
+      name:'tenantDashboard',
+      path: '/tenant/dashboard',
+      component: Tenant_DashboardVue,
+      meta: {
+        title: 'Tenant Dashboard',
+      },
+    },
+    {
+      name:'studentList',
+      path: '/admin/fulham/students',
+      component: Students,
+      meta: {
+        title: 'Student List',
+      },
+    },
+    {
+      name:'tenantProfileEdit',
+      path: '/tenant/profile/edit',
+      component: Tenant_EditDetails,
+      meta: {
+        title: 'Student Edit Profile',
+      },
+    },
+     /**
+      * Tenant staff END
+      */
+    /**
+     * Admin stuff START
+     */
+    {
       name:'adminProfileEdit',
       path: '/admin/profile/edit',
       component: EditDetails,
