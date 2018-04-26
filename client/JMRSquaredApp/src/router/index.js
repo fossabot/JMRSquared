@@ -31,6 +31,8 @@ import Tenant_EditDetails from '../components/Tenant/Tenant_EditDetails.vue'
 
 const http = require("http");
 
+import store from '../store';
+
 import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
 var feedBack = new Feedback();
 
@@ -172,7 +174,11 @@ router.beforeEach((to, from, next) => {
   
   console.log(from.path);
   if(to.name == 'studentProfile'){
-    http.getJSON(this.$store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
+    alert(to.params.profileID + ' is the id to - ' + store.state.settings.baseLink);
+    http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
+      alert("Back with student");
+      alert("..." + student._id);
+
       to.meta.user = student;
       next();
     }).catch(err=>{

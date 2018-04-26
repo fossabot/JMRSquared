@@ -220,7 +220,7 @@
                 */
                 //TODO : Make this go to student profile.
     
-                this.$router.push('/admin/fulham/student/profile/' + event.item.id);
+                this.$router.push('/admin/fulham/student/profile/' + event.item._id);
     
     
             },
