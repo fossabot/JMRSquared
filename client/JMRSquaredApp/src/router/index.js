@@ -176,9 +176,7 @@ router.beforeEach((to, from, next) => {
       to.meta.user = student;
       next();
     }).catch(err=>{
-        feedback.error({
-          message:err
-        });
+        alert(err);
     });
   }else{
     next();

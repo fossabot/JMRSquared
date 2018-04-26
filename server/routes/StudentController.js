@@ -29,7 +29,7 @@ router.get('/students/all/names', function(req, res) {
 
 router.get('/:id/get', function(req, res) {
     let id = req.params.id;
-    if (isNaN(id)) {
+    if (id == null) {
         res.status(404);
         res.send("Invalid ID - " + id);
     } else {
