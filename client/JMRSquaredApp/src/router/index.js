@@ -174,11 +174,7 @@ router.beforeEach((to, from, next) => {
   
   console.log(from.path);
   if(to.name == 'studentProfile'){
-    alert(to.params.profileID + ' is the id to - ' + store.state.settings.baseLink);
     http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
-      alert("Back with student");
-      alert("..." + student._id);
-
       to.meta.user = student;
       next();
     }).catch(err=>{
