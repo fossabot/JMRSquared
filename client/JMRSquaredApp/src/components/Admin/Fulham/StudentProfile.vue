@@ -28,9 +28,10 @@
     
                     <StackLayout width="100%" class="hr-light"></StackLayout>
                     <GridLayout class="m-10" rows="auto" columns="*,auto">
-                        <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" :text="'Tenant information ' + $route.meta.user"></label>
+                        <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Tenant information"></label>
                     </GridLayout>
     
+                    <Label class="m-10" textWrap="true" :text="JSON.stringify($route.meta.user)"></Label>
                     <StackLayout width="100%" class="p-5">
                         <GridLayout width="75%" textAlignment="center" rows="auto,auto" columns="auto,*">
                             <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>

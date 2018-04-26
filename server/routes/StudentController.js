@@ -34,7 +34,7 @@ router.get('/:id/get', function(req, res) {
         res.send("Invalid ID - " + id);
     } else {
         Student.findById(id).then((student) => {
-            if (answer == null) {
+            if (student == null) {
                 res.status(404);
                 res.send("No student with id : " + id);
             } else {

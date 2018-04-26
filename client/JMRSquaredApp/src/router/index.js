@@ -2,7 +2,7 @@ import Vue from 'nativescript-vue';
 import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
-
+    
 import Home from '../components/Home.vue'
 import Register from '../components/Register.vue'
 import Explore from '../components/Explore.vue'
@@ -28,6 +28,11 @@ import AddStudent from '../components/Admin/Fulham/AddStudent.vue'
 import Students from '../components/Admin/Fulham/Students.vue'
 
 import Tenant_EditDetails from '../components/Tenant/Tenant_EditDetails.vue'
+
+const http = require("http");
+
+import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
+var feedBack = new Feedback();
 
 const router = new VueRouter({
   pageRouting: true,
@@ -167,10 +172,14 @@ router.beforeEach((to, from, next) => {
   
   console.log(from.path);
   if(to.name == 'studentProfile'){
-    to.meta.user = to.params.profileID + ' is the profile ID';
-    
-    alert("Going to profile huh???");
-    next();
+    http.getJSON(this.$store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
+      to.meta.user = student;
+      next();
+    }).catch(err=>{
+        feedback.error({
+          message:err
+        });
+    });
   }else{
     next();
   }
