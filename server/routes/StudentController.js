@@ -82,7 +82,7 @@ router.post('/login', function(req, res) {
     if(req.body.useEmail){
         Student.findOne({
             email: req.body.email,
-            pass: req.body.pass
+            password: req.body.pass
         }).then((student) => {
             if (student == null) {
                 res.status(500)
@@ -93,8 +93,8 @@ router.post('/login', function(req, res) {
         })
     }else{
         Student.findOne({
-            numbers: req.body.numbers,
-            pass: req.body.pass
+            contactNumbers: req.body.numbers,
+            password: req.body.pass
         }).then((student) => {
             if (student == null) {
                 res.status(500)
