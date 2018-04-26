@@ -286,6 +286,19 @@ Vue.mixin({
       self.$store.dispatch("PopulateTasks", {
         tasks: result.notifications.filter((v) => v.dueDate != null)
       });
+    },
+    logOut() {
+      dialogs.confirm({
+                title: 'Confirm log out',
+                message: 'You want to log out?',
+                okButtonText: 'Yes',
+                cancelButtonText: 'No'
+              }).then(result => {
+                  if (result) {
+                      this.$store.commit('logout', this);
+                      this.$router.replace('/login');
+                  }
+              })
     }
   }
 });

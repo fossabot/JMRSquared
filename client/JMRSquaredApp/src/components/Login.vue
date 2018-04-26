@@ -108,7 +108,6 @@
           .action("What type of user are you?", "cancel", ["Student", "Admin"])
           .then(userType => {
             if (userType == "Student") {
-              return;
               http
                 .request({
                   url: this.$store.state.settings.baseLink + "/s/login",
@@ -123,31 +122,25 @@
                     pass: this.user.password
                   })
                 })
-                .then(
-                  function(response) {
-                    self.isLoading = false;
-
+                .then(response => {
                     var statusCode = response.statusCode;
                     if (statusCode == 200) {
                       var result = response.content.toJSON();
                       appSettings.setNumber("authLevel",1);
-                      // TODO : DO staff correctly
-                      self.$router.push("/tenant/dashboard");
+                      this.$router.push("/tenant/dashboard");
                     } else {
                       var error = response.content.toString();
-                      dialogs
-                        .alert("Error : " + statusCode + " " + error)
-                        .then(() => {
-                          console.log(result);
-                        });
+                      this.$feedback.error({
+                        message:error
+                      });
+                      this.isLoading = false;
                     }
-                  },
-                  function(e) {
-                    dialogs.alert(e).then(() => {
-                      console.log("Error occurred " + e);
+                  }).catch(err => {
+                    this.$feedback.error({
+                        message:err
                     });
   
-                    self.isLoading = false;
+                    this.isLoading = false;
                   }
                 );
             } else if (userType == "Admin") {
@@ -169,11 +162,7 @@
                         email: this.user.email,
                         pass: this.user.password
                       })
-                    })
-                    .then(
-                      function(response) {
-                        self.isLoading = false;
-  
+                    }).then(response => {
                         var statusCode = response.statusCode;
                         if (statusCode == 200) {
                           var result = response.content.toJSON();
@@ -182,46 +171,41 @@
                           let documentID = appSettings.getString("loginResponse");
   
                           if (documentID == null) {
-  
-                            var doc = self.$db.createDocument({
+                            var doc = this.$db.createDocument({
                               "date": new Date(),
                               "result": result
                             });
   
                             appSettings.setString("loginResponse", doc);
-                            console.log("Document did not existed , we created it " + doc);
                           } else {
   
-                            self.$db.updateDocument(documentID, {
+                            this.$db.updateDocument(documentID, {
                               "date": new Date(),
                               "result": result
                             });
   
                             console.log("Document exists , " + documentID + " , we Updated");
-                            // console.log(self.$db.getDocument(documentID));
                           }
   
-                          self.loginAdmin(self, result);
+                          this.loginAdmin(self, result);
   
-                          self.$router.push("/admin/dashboard");
+                          this.$router.push("/admin/dashboard");
   
                         } else {
                           var error = response.content.toString();
-                          dialogs
-                            .alert("Error : " + statusCode + " " + error)
-                            .then(() => {
-                              console.log(result + " answer ");
-                            });
+                          
+                          this.$feedback.error({
+                            message:error
+                          });
+                          this.isLoading = false;
                         }
-                      },
-                      function(e) {
-                        dialogs.alert("There is an error!!").then(() => {
-                          console.log("Error occurred " + e);
+                      }).catch(err => {
+                        this.$feedback.error({
+                          message:err
                         });
   
-                        self.isLoading = false;
-                      }
-                    );
+                        this.isLoading = false;
+                      });
   
                   break;
                 case connectivity.connectionType.none:
