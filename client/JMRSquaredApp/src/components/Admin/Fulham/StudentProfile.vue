@@ -26,8 +26,8 @@
                     
                     <StackLayout width="100%" class="hr-light"></StackLayout>
                     <GridLayout rows="auto" columns="*,*" class="m-x-20 p-20">
-                        <Ripple col="0" textAlignment="center">
-                            <StackLayout verticalAlignment="center" textAlignment="center" @tap="ComeOver()">
+                        <Ripple col="1" class="p-10" borderRadius="100%" textAlignment="center" @tap="ComeOver()">
+                            <StackLayout verticalAlignment="center" textAlignment="center">
                                 <Label textAlignment="center" fontSize="35%" class="mdi p-5 text-dark-blue" :text="'mdi-directions-run' | fonticon"></Label>                    
                                 <Label textAlignment="center" class="text-mute" text="Come over"></Label>
                             </StackLayout>
