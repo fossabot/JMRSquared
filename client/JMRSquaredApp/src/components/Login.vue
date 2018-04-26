@@ -108,7 +108,6 @@
           .action("What type of user are you?", "cancel", ["Student", "Admin"])
           .then(userType => {
             if (userType == "Student") {
-              self.$router.push("/tenant/dashboard");
               return;
               http
                 .request({
@@ -127,11 +126,13 @@
                 .then(
                   function(response) {
                     self.isLoading = false;
-  
+
                     var statusCode = response.statusCode;
                     if (statusCode == 200) {
                       var result = response.content.toJSON();
-  
+                      appSettings.setNumber("authLevel",1);
+                      // TODO : DO staff correctly
+                      self.$router.push("/tenant/dashboard");
                     } else {
                       var error = response.content.toString();
                       dialogs
@@ -177,6 +178,7 @@
                         if (statusCode == 200) {
                           var result = response.content.toJSON();
   
+                          appSettings.setNumber("authLevel",3);
                           let documentID = appSettings.getString("loginResponse");
   
                           if (documentID == null) {
@@ -236,6 +238,7 @@
                     self.isLoading = false;
                   } else {
   
+                    appSettings.setNumber("authLevel",3);
                     var documentsID = appSettings.getString("loginResponse");
   
                     console.log(documentID + " found in your storage");

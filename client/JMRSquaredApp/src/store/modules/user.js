@@ -26,6 +26,7 @@ const mutations = {
    },
    logout (state,self) {
 
+    appSettings.setNumber("authLevel",0);
     for(var obj in state.cacheStrings){
       let documentID = appSettings.getString(obj);
   

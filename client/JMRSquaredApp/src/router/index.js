@@ -33,6 +33,7 @@ const http = require("http");
 
 import store from '../store';
 
+var appSettings = require("application-settings");
 import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
 var feedBack = new Feedback();
 
@@ -45,6 +46,7 @@ const router = new VueRouter({
       component: Home,
       meta: {
         title: 'Home',
+        authLevel:0
       },
     },
     {
@@ -52,6 +54,7 @@ const router = new VueRouter({
       component: Register,
       meta: {
         title: 'Register',
+        authLevel:0
       },
     },
     {
@@ -59,6 +62,7 @@ const router = new VueRouter({
       component: Explore,
       meta: {
         title: 'Explore',
+        authLevel:0
       },
     },
     {
@@ -66,6 +70,7 @@ const router = new VueRouter({
       component: Login,
       meta: {
         title: 'Login',
+        authLevel:0
       },
     },
     /**
@@ -77,6 +82,7 @@ const router = new VueRouter({
       component: Tenant_DashboardVue,
       meta: {
         title: 'Tenant Dashboard',
+        authLevel:1
       },
     },
     {
@@ -85,6 +91,7 @@ const router = new VueRouter({
       component: Students,
       meta: {
         title: 'Student List',
+        authLevel:0
       },
     },
     {
@@ -93,6 +100,7 @@ const router = new VueRouter({
       component: Tenant_EditDetails,
       meta: {
         title: 'Student Edit Profile',
+        authLevel:2
       },
     },
      /**
@@ -107,6 +115,7 @@ const router = new VueRouter({
       component: EditDetails,
       meta: {
         title: 'ProfileEdit',
+        authLevel:3
       },
     },
     {
@@ -115,6 +124,7 @@ const router = new VueRouter({
       component: DocumentList,
       meta: {
         title: 'Documents',
+        authLevel:3
       },
     },
     {
@@ -123,6 +133,7 @@ const router = new VueRouter({
       component: RemindersList,
       meta: {
         title: 'Reminders',
+        authLevel:3
       },
     },
     {
@@ -131,6 +142,7 @@ const router = new VueRouter({
       component: Admin_DashboardVue,
       meta: {
         title: 'Admin Dashboard',
+        authLevel:3
       },
     },
     {
@@ -139,6 +151,7 @@ const router = new VueRouter({
       component:Fulham_HomeVue,
       meta: {
         title: 'Fulham Home',
+        authLevel:3
       },
     },
     {
@@ -147,6 +160,7 @@ const router = new VueRouter({
         component:BottomNav,
         meta: {
           title: 'Fulham Home',
+        authLevel:3
         },
     },
     {
@@ -155,6 +169,7 @@ const router = new VueRouter({
           component:AddStudent,
           meta: {
             title: 'Add Students',
+            authLevel:3
           },
     },
     {
@@ -163,6 +178,7 @@ const router = new VueRouter({
       component:StudentProfile,
       meta: {
         title: 'StudentProfile',
+        authLevel:1
       },
   },
     {path: '*', redirect: '/home'},
@@ -170,9 +186,32 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  console.log(to.path);
   
-  console.log(from.path);
+  let authLevel = appSettings.getNumber("authLevel");
+  if(isNaN(authLevel)) authLevel = 0;
+
+  alert(authLevel + " <- authLevel");
+  switch(to.meta.authLevel){
+    case 1:
+      if(authLevel < 1){
+        alert("Error you are not Authorized to access this page!");
+        return;
+      }
+    break;
+    case 2:
+      if(authLevel < 2){
+          alert("Error you are not Authorized to access this page!");
+          return;
+        }
+    break;
+    case 3:
+      if(authLevel < 3){
+        alert("Error you are not Authorized to access this page!");
+        return;
+      }
+    break;
+  }
+
   if(to.name == 'studentProfile'){
     http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
       to.meta.user = student;
@@ -183,6 +222,7 @@ router.beforeEach((to, from, next) => {
   }else{
     next();
   }
+  
 })
 
 

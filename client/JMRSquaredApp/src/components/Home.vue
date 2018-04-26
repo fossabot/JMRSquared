@@ -58,6 +58,7 @@
           if (documentID != null) {
             let admin = this.$db.getDocument(documentID);
             if (admin != null) {
+              appSettings.setNumber("authLevel",3);
               this.loginAdmin(this, admin.result);
   
             }
