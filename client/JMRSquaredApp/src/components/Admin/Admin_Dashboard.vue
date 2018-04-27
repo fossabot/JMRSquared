@@ -196,20 +196,6 @@
                     console.log("This is it")
                 });
             },
-            logOut() {
-                dialogs.confirm({
-                        title: 'Confirm log out',
-                        message: 'You want to log out?',
-                        okButtonText: 'Yes',
-                        cancelButtonText: 'No'
-                    })
-                    .then(result => {
-                        if (result) {
-                            this.$store.commit('logout', this);
-                            this.$router.replace('/login');
-                        }
-                    })
-            },
             switchPage(card) {
                 dialogs.alert("Going to " + card.redirect).then(() => {
                     console.log(card.redirect);

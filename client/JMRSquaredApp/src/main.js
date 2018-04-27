@@ -43,6 +43,8 @@ Vue.filter('fonticon', fonticon);
 Vue.prototype.$db = new Couchbase("jmrdb");
 Vue.prototype.$feedback = new Feedback();
 
+const dialogs = require('ui/dialogs');
+
 import * as Toast from "nativescript-toast";
 import * as fs from "tns-core-modules/file-system";
 import * as ChangeLog from './changeLog'

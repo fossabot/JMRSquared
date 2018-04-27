@@ -190,7 +190,7 @@ router.beforeEach((to, from, next) => {
   let authLevel = appSettings.getNumber("authLevel");
   if(isNaN(authLevel)) authLevel = 0;
 
-  alert(authLevel + " <- authLevel");
+  alert(authLevel + " <- authLevel , going to " + to.meta.authLevel + " zone");
   switch(to.meta.authLevel){
     case 1:
       if(authLevel < 1){
