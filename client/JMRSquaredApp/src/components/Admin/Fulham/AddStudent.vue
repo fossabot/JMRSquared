@@ -393,7 +393,7 @@
                 var connectionType = connectivity.getConnectionType();
                 if (connectionType == connectivity.connectionType.none) {
                     self.$feedback.error({
-                        title: "Error (NO INTERNET CONNECTION)",
+                        title: "NO INTERNET CONNECTION",
                         duration: 4000,
                         message: "Please switch on your data/wifi.",
                     });

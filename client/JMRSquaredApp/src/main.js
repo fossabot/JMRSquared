@@ -49,6 +49,7 @@ import * as Toast from "nativescript-toast";
 import * as fs from "tns-core-modules/file-system";
 import * as ChangeLog from './changeLog'
 
+var appSettings = require("application-settings");
 Vue.mixin({
   methods: {
     showChangeLog(){
@@ -267,6 +268,28 @@ Vue.mixin({
     getMoment(val) {
         return moment(val);
     },
+    loginTenant(self, result){
+      self.$store.commit("login", {
+        id: result._id,
+        userName: result.username,
+        pass: result.password,
+        email: result.email,
+        numbers: result.contactNumbers,
+        profilePic: result.profilePic,
+        role: null,
+        isLoggedIn: true,
+        isAdmin: false
+      });
+
+      self.$store.commit("cacheUser",{
+        db:self.$db,
+        appSettings:appSettings,
+        user:result,
+        isAdmin:false
+      });
+
+      appSettings.setNumber("authLevel", 1);
+    },
     loginAdmin(self, result) {
   
       self.$store.commit("login", {
@@ -280,6 +303,15 @@ Vue.mixin({
         isLoggedIn: true,
         isAdmin: true
       });
+      
+      self.$store.commit("cacheUser",{
+        db:self.$db,
+        appSettings:appSettings,
+        user:result,
+        isAdmin:true
+      });
+
+      appSettings.setNumber("authLevel", 3);
 
       self.$store.dispatch("PopulateNotifications", {
         notifications: result.notifications.filter((v) => v.dueDate == null)
@@ -297,6 +329,7 @@ Vue.mixin({
                 cancelButtonText: 'No'
               }).then(result => {
                   if (result) {
+                      appSettings.setNumber("authLevel", 0);
                       this.$store.commit('logout', this);
                       this.$router.replace('/login');
                   }

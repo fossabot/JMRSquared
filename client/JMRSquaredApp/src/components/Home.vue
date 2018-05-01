@@ -15,13 +15,16 @@
         </GridLayout>
       </FlexboxLayout>
       <FlexboxLayout justifyContent="flex-end" flexDirection="column">
+        <GridLayout textAlginment="center">
+          <Button class="btn btn-primary" @tap="$router.push('/explore')" textAlignment="center" borderColor="$blueDarkColor" text="Explore"></Button>
+        </GridLayout>
         <GridLayout v-show="!$store.state.user.isLoggedIn" justifyContent="flex-end" columns="*,*" rows="*" height="70">
           <Button @tap="$router.push('/register')" col="0" row="0" text="Register"></Button>
           <Button @tap="$router.push('/login')" col="1" row="0" text="Login"></Button>
         </GridLayout>
         <GridLayout v-show="$store.state.user.isLoggedIn" justifyContent="flex-end" columns="*" rows="*" height="70">
           <ActivityIndicator :busy="isLoading"></ActivityIndicator>
-          <Button v-show="!isLoading" @tap="loadAdminData()" :text="$store.state.user.userName + '\'s Dashboard'"></Button>
+          <Button v-show="!isLoading" @tap="loadData()" :text="$store.state.user.userName + '\'s Dashboard'"></Button>
         </GridLayout>
       </FlexboxLayout>
     </FlexboxLayout>
@@ -50,6 +53,11 @@
     },
     methods: {
       pageLoaded() {
+        this.$store.commit("refreshCache", {
+          db: self.$db,
+          appSettings: appSettings
+        });
+
         var logged = this.$store.state.user.isLoggedIn;
         if (!logged) {
   
@@ -58,12 +66,17 @@
           if (documentID != null) {
             let admin = this.$db.getDocument(documentID);
             if (admin != null) {
-              appSettings.setNumber("authLevel",3);
               this.loginAdmin(this, admin.result);
-  
             }
           }
   
+        }
+      },
+      loadData() {
+        if (appSettings.getNumber("authLevel") == 1) {
+  
+        } else if (appSettings.getNumber("authLevel") == 3) {
+          this.loadAdminData();
         }
       },
       loadAdminData() {
@@ -81,63 +94,33 @@
                   "Content-Type": "application/json"
                 }
               })
-              .then(
-                function(response) {
-                  self.isLoading = false;
+              .then(response => {
+                self.isLoading = false;
   
-                  var statusCode = response.statusCode;
-                  if (statusCode == 200) {
-                    var result = response.content.toJSON();
+                var statusCode = response.statusCode;
+                if (statusCode == 200) {
+                  var result = response.content.toJSON();
+                  this.loginAdmin(this, result);
+                  this.$router.push("/admin/dashboard");
   
-                    let documentID = appSettings.getString("loginResponse");
-  
-                    if (documentID == null) {
-  
-                      var doc = self.$db.createDocument({
-                        "date": new Date(),
-                        "result": result
-                      });
-  
-                      appSettings.setString("loginResponse", doc);
-                      console.log("Document did not existed , we created it " + doc);
-                    } else {
-  
-                      self.$db.updateDocument(documentID, {
-                        "date": new Date(),
-                        "result": result
-                      });
-  
-                      console.log("Document exists , " + documentID + " , we Updated");
-                      // console.log(self.$db.getDocument(documentID));
-                    }
-  
-                    self.loginAdmin(self, result);
-  
-                    self.$router.push("/admin/dashboard");
-  
-                  } else {
-                    var error = response.content.toString();
-                    dialogs
-                      .alert("Error : " + statusCode + " " + error)
-                      .then(() => {
-                        console.log(result + " answer ");
-                      });
-  
-                    self.isLoading = false;
-                  }
-                },
-                function(e) {
-                  dialogs.alert(e).then(() => {
-                    console.log("Error occurred " + e);
+                } else {
+                  var error = response.content.toString();
+                  this.$feedback.error({
+                    message: error
                   });
   
-                  self.isLoading = false;
+                  this.isLoading = false;
                 }
-              );
+              }).catch(err => {
+                this.$feedback.error({
+                  message: error
+                });
+                this.isLoading = false;
+              });
   
             break;
           case connectivity.connectionType.none:
-  
+            
             var documentID = appSettings.getString("loginResponse");
             if (documentID == null) {
   
@@ -154,21 +137,6 @@
             }
   
             self.$router.push("/admin/dashboard");
-            break;
-          case connectivity.connectionType.mobile:
-  
-            dialogs
-              .action("You are about to use your data", "cancel", ["Yes , it is fine", "No , load from cache"])
-              .then(useData => {
-                if (useData == "Yes , it is fine") {
-                  dialogs.alert("TODO : go to database ...");
-                  self.$router.push("/admin/dashboard");
-                } else {
-                  dialogs.alert("TODO : load from cache ...");
-                  self.$router.push("/admin/dashboard");
-                }
-              });
-  
             break;
         }
       }

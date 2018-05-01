@@ -84,9 +84,9 @@
                         col: 1
                     },
                     {
-                        id: "bugReport",
-                        icon: "bug-report",
-                        title: "Bug report",
+                        id: "proofOfResidence",
+                        icon: "assignment",
+                        title: "Proof Of Residence",
                         row: 1,
                         col: 2
                     },
@@ -150,8 +150,6 @@
             onItemTap(item) {
                 if (item.id == 'housemates') {
                     this.$router.push('/admin/fulham/students');
-                } else if (item.id == 'bugReport') {
-                    this.reportBug();
                 } else if (item.id == 'documents') {
                     this.$router.push('/admin/documents');
                 } else if (item.id == 'reminders') {

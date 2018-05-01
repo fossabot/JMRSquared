@@ -17,6 +17,10 @@ var Logs = [
 1. Added Tenant Dashboard.
 
 2. Fixed the Tenant profile page.
+
+3. Fixed using data and loading from cache
+
+4. Enabled logging in as a tenant
 `
     }
 ];

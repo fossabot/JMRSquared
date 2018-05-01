@@ -188,9 +188,11 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   
   let authLevel = appSettings.getNumber("authLevel");
-  if(isNaN(authLevel)) authLevel = 0;
-
-  alert(authLevel + " <- authLevel , going to " + to.meta.authLevel + " zone");
+  if(isNaN(authLevel)) {
+    authLevel = 0;
+    appSettings.setNumber("authLevel",authLevel);
+  }
+  
   switch(to.meta.authLevel){
     case 1:
       if(authLevel < 1){
@@ -224,9 +226,6 @@ router.beforeEach((to, from, next) => {
   }
   
 })
-
-
-
 
 router.replace('/home');
 

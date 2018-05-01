@@ -85,29 +85,31 @@
         }
       };
     },
-    beforeDestroy() {
-      Toast.makeText("Destroy login").show();
-      this.pageLoaded();
-    },
     created() {
-      Toast.makeText("Mounted login").show();
       this.pageLoaded();
     },
     methods: {
       pageLoaded() {
-        var logged = this.$store.state.user.isLoggedIn;
-        if (logged) {
-          //this.$router.push('/home');
-        }
+  
       },
       submit() {
         var self = this;
         this.isLoading = true;
   
+        var connectionType = connectivity.getConnectionType();
+        if (connectionType == connectivity.connectionType.none) {
+          this.$feedback.error({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "Please switch on your data/wifi.",
+          });
+          return;
+        }
+  
         dialogs
-          .action("What type of user are you?", "cancel", ["Student", "Admin"])
+          .action("What type of user are you?", "cancel", ["Tenant", "Admin"])
           .then(userType => {
-            if (userType == "Student") {
+            if (userType == "Tenant") {
               http
                 .request({
                   url: this.$store.state.settings.baseLink + "/s/login",
@@ -123,129 +125,61 @@
                   })
                 })
                 .then(response => {
-                    var statusCode = response.statusCode;
-                    if (statusCode == 200) {
-                      var result = response.content.toJSON();
-                      appSettings.setNumber("authLevel",1);
-                      this.$router.push("/tenant/dashboard");
-                    } else {
-                      var error = response.content.toString();
-                      this.$feedback.error({
-                        message:error
-                      });
-                      this.isLoading = false;
-                    }
-                  }).catch(err => {
+                  var statusCode = response.statusCode;
+                  if (statusCode == 200) {
+                    var result = response.content.toJSON();
+                    this.loginTenant(this, result);
+                    this.$router.push("/tenant/dashboard");
+                  } else {
+                    var error = response.content.toString();
                     this.$feedback.error({
-                        message:err
+                      message: error
                     });
-  
                     this.isLoading = false;
                   }
-                );
+                }).catch(err => {
+                  this.$feedback.error({
+                    message: err
+                  });
+  
+                  this.isLoading = false;
+                });
             } else if (userType == "Admin") {
-  
-              var connectionType = connectivity.getConnectionType();
-              switch (connectionType) {
-                case connectivity.connectionType.wifi:
-  
-                  http
-                    .request({
-                      url: this.$store.state.settings.baseLink + "/a/login",
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json"
-                      },
-                      content: JSON.stringify({
-                        useEmail: this.isEnterEmail,
-                        numbers: this.user.numbers,
-                        email: this.user.email,
-                        pass: this.user.password
-                      })
-                    }).then(response => {
-                        var statusCode = response.statusCode;
-                        if (statusCode == 200) {
-                          var result = response.content.toJSON();
-  
-                          appSettings.setNumber("authLevel",3);
-                          let documentID = appSettings.getString("loginResponse");
-  
-                          if (documentID == null) {
-                            var doc = this.$db.createDocument({
-                              "date": new Date(),
-                              "result": result
-                            });
-  
-                            appSettings.setString("loginResponse", doc);
-                          } else {
-  
-                            this.$db.updateDocument(documentID, {
-                              "date": new Date(),
-                              "result": result
-                            });
-  
-                            console.log("Document exists , " + documentID + " , we Updated");
-                          }
-  
-                          this.loginAdmin(self, result);
-  
-                          this.$router.push("/admin/dashboard");
-  
-                        } else {
-                          var error = response.content.toString();
-                          
-                          this.$feedback.error({
-                            message:error
-                          });
-                          this.isLoading = false;
-                        }
-                      }).catch(err => {
-                        this.$feedback.error({
-                          message:err
-                        });
-  
-                        this.isLoading = false;
-                      });
-  
-                  break;
-                case connectivity.connectionType.none:
-  
-                  var documentID = appSettings.getString("loginResponse");
-                  if (documentID == null) {
-  
-                    this.$feedback.error({
-                      title: "Error (NO INTERNET CONNECTION)",
-                      duration: 4000,
-                      message: "Please switch on your data/wifi.",
-                    });
-  
-                    self.isLoading = false;
-                  } else {
-  
-                    appSettings.setNumber("authLevel",3);
-                    var documentsID = appSettings.getString("loginResponse");
-  
-                    console.log(documentID + " found in your storage");
-                    let admin = self.$db.getDocument(documentID);
-                    this.loginAdmin(this, admin.result);
-  
+              http
+                .request({
+                  url: this.$store.state.settings.baseLink + "/a/login",
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  content: JSON.stringify({
+                    useEmail: this.isEnterEmail,
+                    numbers: this.user.numbers,
+                    email: this.user.email,
+                    pass: this.user.password
+                  })
+                }).then(response => {
+                  var statusCode = response.statusCode;
+                  if (statusCode == 200) {
+                    var result = response.content.toJSON();
+                    this.loginAdmin(self, result);
                     this.$router.push("/admin/dashboard");
-                  }
   
-                  break;
-                case connectivity.connectionType.mobile:
-  
-                  dialogs
-                    .action("You are about to use your data", "cancel", ["Yes , it is fine", "No , load from cache"])
-                    .then(useData => {
-                      if (useData == "Yes , it is fine") {
-                        dialogs.alert("TODO : go to database ...");
-                      } else {
-                        dialogs.alert("TODO : load from cache ...");
-                      }
+                  } else {
+                    var error = response.content.toString();
+                    this.$feedback.error({
+                      message: error
                     });
-                  break;
-              }
+                    this.isLoading = false;
+                  }
+                }).catch(err => {
+                  this.$feedback.error({
+                    message: err
+                  });
+  
+                  this.isLoading = false;
+                });
+  
             }
           });
       }
