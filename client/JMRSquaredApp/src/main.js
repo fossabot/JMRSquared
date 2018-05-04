@@ -51,6 +51,11 @@ import * as ChangeLog from './changeLog'
 
 var appSettings = require("application-settings");
 Vue.mixin({
+  data(){
+    return{
+      isLoading: false
+    }
+  },
   methods: {
     showChangeLog(){
       var log = ChangeLog.GetLogs('0.1');
@@ -331,7 +336,7 @@ Vue.mixin({
                   if (result) {
                       appSettings.setNumber("authLevel", 0);
                       this.$store.commit('logout', this);
-                      this.$router.replace('/login');
+                      this.$router.push('/home');
                   }
               })
     }

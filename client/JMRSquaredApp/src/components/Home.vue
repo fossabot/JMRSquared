@@ -3,6 +3,9 @@
     <ActionBar>
       <GridLayout rows="auto" columns="*,auto" orientation="horizontal">
         <Label col="0" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Home"></Label>
+        <Ripple v-show="$route.meta.userAuthLevel > 0" class="p-x-15" @tap="logOut()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" text="Log out"></Label>
+        </Ripple>
       </GridLayout>
     </ActionBar>
     <FlexboxLayout justifyContent="space-between" width="100%" height="100%" flexDirection="column">
@@ -18,13 +21,13 @@
         <GridLayout rows="auto" columns="*" textAlginment="center">
           <Button backgroundColor="transparent" width="50%" selfAlign="center" @tap="$router.push('/explore')" textAlignment="center" borderColor="$blueDarkColor" text="Explore"></Button>
         </GridLayout>
-        <GridLayout v-show="!$store.state.user.isLoggedIn" justifyContent="flex-end" columns="*,*" rows="*" height="70">
+        <GridLayout v-show="$route.meta.userAuthLevel == 0" justifyContent="flex-end" columns="*,*" rows="*" height="70">
           <Button @tap="$router.push('/register')" col="0" row="0" text="Register"></Button>
           <Button @tap="$router.push('/login')" col="1" row="0" text="Login"></Button>
         </GridLayout>
         <GridLayout v-show="$route.meta.userAuthLevel > 0" justifyContent="flex-end" columns="*" rows="*" height="70">
           <ActivityIndicator :busy="isLoading"></ActivityIndicator>
-          <Button v-show="!isLoading" @tap="loadData($route.meta.userAuthLevel)" :text="$store.state.user.userName + '\'s Dashboard'"></Button>
+          <Button v-show="!isLoading" @tap="loadData($route.meta.userAuthLevel)" text="My Dashboard"></Button>
         </GridLayout>
       </FlexboxLayout>
     </FlexboxLayout>
@@ -41,7 +44,6 @@
   export default {
     data() {
       return {
-        isLoading: false,
         introTxt: 'JMRSqaured is a company that deals with blah blah blah blah ......'
       }
     },
@@ -51,8 +53,15 @@
     mounted() {
       this.pageLoaded();
     },
-    beforeDestroy(){
+    beforeDestroy() {
       this.isLoading = false;
+    },
+    Destroy() {
+      this.isLoading = false;
+    },
+    beforeRouteLeave: (to, from, next) => {
+      this.isLoading = false;
+      alert("Before router leave");
     },
     methods: {
       pageLoaded() {
@@ -60,20 +69,6 @@
           db: this.$db,
           appSettings: appSettings
         });
-  
-        var logged = this.$store.state.user.isLoggedIn;
-        if (!logged) {
-  
-          let documentID = appSettings.getString("loginResponse");
-  
-          if (documentID != null) {
-            let admin = this.$db.getDocument(documentID);
-            if (admin != null) {
-              this.loginAdmin(this, admin.result);
-            }
-          }
-  
-        }
       },
       loadData(userAuthLevel) {
         if (userAuthLevel == 1) {
@@ -82,9 +77,9 @@
           this.loadAdminData();
         }
       },
-      loadTenantData(){
+      loadTenantData() {
         this.$feedback.info({
-          message:"Logging in as a tenant"
+          message: "Logging in as a tenant"
         })
       },
       loadAdminData() {

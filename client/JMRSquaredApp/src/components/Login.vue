@@ -76,7 +76,6 @@
     name: "login",
     data() {
       return {
-        isLoading: false,
         isEnterEmail: false,
         user: {
           numbers: "",

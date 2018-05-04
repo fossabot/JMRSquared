@@ -244,7 +244,6 @@
         Amount: '',
         users: [],
         hasImage: false,
-        isLoading: false,
         selectedImage: null,
         selectedType: "All",
         transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],

@@ -37,7 +37,6 @@
     export default {
         data() {
             return {
-                isLoading: false,
                 isMainScreen: false,
                 selectedScreen: '',
                 txtSearch: '',

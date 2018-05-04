@@ -184,7 +184,6 @@
             return {
                 isLoaded: false,
                 //Edit profile staff --START
-                isLoading: false,
                 txtError: '',
                 userName: this.$store.state.user.userName,
                 email: this.$store.state.user.email,
