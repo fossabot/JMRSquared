@@ -68,9 +68,18 @@
         }
       },
       loadTenantData() {
-        this.$feedback.info({
-          message: "Logging in as a tenant"
-        })
+        this.isLoading = true;
+        var user = this.$store.state.cache.cachedTenant;
+        if (user != null) {
+          this.loginTenant(this, user);
+          this.$router.push("/tenant/dashboard");
+        } else {
+           this.$feedback.error({
+            title: "Error not expected",
+            duration: 4000,
+            message: "Report this as (Error : VVPAOS09)",
+          });
+        }
       },
       loadAdminData() {
         this.isLoading = true;
@@ -80,11 +89,10 @@
           this.$router.push("/admin/dashboard");
         } else {
           this.$feedback.error({
-            title: "NO INTERNET CONNECTION",
+            title: "Error not expected",
             duration: 4000,
-            message: "Please switch on your data/wifi.",
+            message: "Report this as (Error : RVPAOS09)",
           });
-         // this.isLoading = false;
         }
       }
     }

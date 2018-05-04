@@ -25,7 +25,7 @@
             </Ripple>
             <GridLayout class="m-20" rows="*,*" columns="*,*,*">
                 <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
-                    <CardView radius="100" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
+                    <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
                         <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
                             <Label class="mdi" textAlignment="center" fontSize="25%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
                         </Ripple>
@@ -34,45 +34,6 @@
                 </StackLayout>
             </GridLayout>
         </StackLayout>
-        <!--
-                                        <StackLayout>
-                                            <GridLayout class="p-10" columns="*,*,*" rows="auto">
-                                                <StackLayout @tap="selectedScreen = 0" :class="{'bottom-line-blue':selectedScreen == 0}" row="0" col="0">
-                                                    <Label text="2" class="h2" textAlignment="center"></Label>
-                                                    <Label text="Properties" class="h3" textAlignment="center"></Label>
-                                                </StackLayout>
-                                                <StackLayout @tap="selectedScreen = 1" :class="{'bottom-line-blue':selectedScreen == 1}" row="0" col="1">
-                                                    <Label :text="Reminders.length" class="h2" textAlignment="center"></Label>
-                                                    <Label text="Reminders" class="h3" textAlignment="center"></Label>
-                                                </StackLayout>
-                                                <StackLayout @tap="selectedScreen = 2" :class="{'bottom-line-blue':selectedScreen == 2}" row="0" col="2">
-                                                    <Label text="12" class="h2" textAlignment="center"></Label>
-                                                    <Label text="Documents" class="h3" textAlignment="center"></Label>
-                                                </StackLayout>
-                                            </GridLayout>
-                                            <StackLayout width="100%" class="hr-light"></StackLayout>
-                                            <WrapLayout v-show="selectedScreen == 0">
-                                                <CardView class="bottom-line-blue" margin="10" elevation="30" width="40%" height="30%" v-for="(item,j) in properties" :key="j" radius="20" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                                                    <Image stretch="aspectFill" :src="item.img" width="70" height="70" />
-                                                    <Label verticalAlignment="center" textAlignment="center" selfAlign="center" textWrap="true" :text="item.text"></Label>
-                                                </CardView>
-                                            </WrapLayout>
-                                            <ListView v-show="selectedScreen == 1" for="task in Reminders">
-                                                <v-template>
-                                                    <GridLayout backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
-                                                        <Label @tap="RemoveFeed(task)" row="0" col="2" textAlignment="center" alignSelf="center" class="mdi h2 text-light-red m-5" :text="'mdi-close' | fonticon"></Label>
-                                                        <StackLayout @tap="DoneFeed(task)" textAlignment="center" verticalAlignment="center" row="0" col="0" rowSpan="3">
-                                                            <Label textAlignment="center" class="mdi h1 text-light-green" :text="'mdi-done' | fonticon"></Label>
-                                                        </StackLayout>
-                                                        <Label class="m-5" row="1" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
-                                                        <Label class="m-5" row="2" col="2" textAlignment="right" alignSelf="right" :text="getMoment(task.dueDate).fromNow()"></Label>
-                                                    </GridLayout>
-                                                </v-template>
-                                            </ListView>
-                                            <Documents v-show="selectedScreen == 2"></Documents>
-                                    
-                                        </StackLayout>
-                                       -->
     </page>
 </template>
 
