@@ -51,8 +51,8 @@
               <Button text="Login" :isEnabled="!isLoading" class="submit-button" @tap="submit()"></Button>
             </StackLayout>
   
-            <GridLayout v-show="$store.state.user.isLoggedIn" justifyContent="flex-end" columns="*" rows="auto">
-              <Button @tap="$router.push('/admin/dashboard')" :text="'Continue as '+ $store.state.user.userName"></Button>
+            <GridLayout v-show="$route.meta.userAuthLevel > 0" justifyContent="flex-end" columns="*" rows="auto">
+              <Button v-if="$route.meta.userAuthLevel == 1 || $route.meta.userAuthLevel == 3" @tap="$route.meta.userAuthLevel == 1 ? $router.push('/tenant/dashboard') : $router.push('/admin/dashboard')" :text="'Continue as '+ $store.state.user.userName"></Button>
             </GridLayout>
   
           </FlexboxLayout>
@@ -85,8 +85,17 @@
         }
       };
     },
+    mounted() {
+      this.pageLoaded();
+    },
     created() {
       this.pageLoaded();
+    },
+    beforeDestroy(){
+      this.isLoading = false;
+    },
+    Destroy(){
+      this.isLoading = false;
     },
     methods: {
       pageLoaded() {
@@ -160,6 +169,9 @@
                   })
                 }).then(response => {
                   var statusCode = response.statusCode;
+                   this.$feedback.info({
+                    message: statusCode
+                  });
                   if (statusCode == 200) {
                     var result = response.content.toJSON();
                     this.loginAdmin(self, result);

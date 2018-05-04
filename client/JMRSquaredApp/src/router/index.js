@@ -66,6 +66,7 @@ const router = new VueRouter({
       },
     },
     {
+      name:'login',
       path: '/login',
       component: Login,
       meta: {
@@ -223,6 +224,14 @@ router.beforeEach((to, from, next) => {
     });
   }else{
     next();
+  }
+
+  if(to.name == 'login'){
+    to.meta.userAuthLevel = authLevel;
+  }
+
+  if(to.name == 'home'){
+    to.meta.userAuthLevel = authLevel;
   }
   
 })

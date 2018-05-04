@@ -15,16 +15,16 @@
         </GridLayout>
       </FlexboxLayout>
       <FlexboxLayout justifyContent="flex-end" flexDirection="column">
-        <GridLayout textAlginment="center">
-          <Button class="btn btn-primary" @tap="$router.push('/explore')" textAlignment="center" borderColor="$blueDarkColor" text="Explore"></Button>
+        <GridLayout rows="auto" columns="*" textAlginment="center">
+          <Button backgroundColor="transparent" width="50%" selfAlign="center" @tap="$router.push('/explore')" textAlignment="center" borderColor="$blueDarkColor" text="Explore"></Button>
         </GridLayout>
         <GridLayout v-show="!$store.state.user.isLoggedIn" justifyContent="flex-end" columns="*,*" rows="*" height="70">
           <Button @tap="$router.push('/register')" col="0" row="0" text="Register"></Button>
           <Button @tap="$router.push('/login')" col="1" row="0" text="Login"></Button>
         </GridLayout>
-        <GridLayout v-show="$store.state.user.isLoggedIn" justifyContent="flex-end" columns="*" rows="*" height="70">
+        <GridLayout v-show="$route.meta.userAuthLevel > 0" justifyContent="flex-end" columns="*" rows="*" height="70">
           <ActivityIndicator :busy="isLoading"></ActivityIndicator>
-          <Button v-show="!isLoading" @tap="loadData()" :text="$store.state.user.userName + '\'s Dashboard'"></Button>
+          <Button v-show="!isLoading" @tap="loadData($route.meta.userAuthLevel)" :text="$store.state.user.userName + '\'s Dashboard'"></Button>
         </GridLayout>
       </FlexboxLayout>
     </FlexboxLayout>
@@ -51,13 +51,16 @@
     mounted() {
       this.pageLoaded();
     },
+    beforeDestroy(){
+      this.isLoading = false;
+    },
     methods: {
       pageLoaded() {
         this.$store.commit("refreshCache", {
-          db: self.$db,
+          db: this.$db,
           appSettings: appSettings
         });
-
+  
         var logged = this.$store.state.user.isLoggedIn;
         if (!logged) {
   
@@ -72,12 +75,17 @@
   
         }
       },
-      loadData() {
-        if (appSettings.getNumber("authLevel") == 1) {
-  
-        } else if (appSettings.getNumber("authLevel") == 3) {
+      loadData(userAuthLevel) {
+        if (userAuthLevel == 1) {
+          this.loadTenantData()
+        } else if (userAuthLevel == 3) {
           this.loadAdminData();
         }
+      },
+      loadTenantData(){
+        this.$feedback.info({
+          message:"Logging in as a tenant"
+        })
       },
       loadAdminData() {
         var connectionType = connectivity.getConnectionType();
@@ -95,8 +103,6 @@
                 }
               })
               .then(response => {
-                self.isLoading = false;
-  
                 var statusCode = response.statusCode;
                 if (statusCode == 200) {
                   var result = response.content.toJSON();
@@ -120,23 +126,18 @@
   
             break;
           case connectivity.connectionType.none:
-            
-            var documentID = appSettings.getString("loginResponse");
-            if (documentID == null) {
-  
-              self.isLoading = false;
-  
+            var user = this.$store.state.cache.cachedAdmin;
+            if (user != null) {
+              this.loginAdmin(this, user);
+              this.$router.push("/admin/dashboard");
             } else {
-  
-              var documentsID = appSettings.getString("loginResponse");
-  
-              console.log(documentID + " found in your storage");
-              let admin = self.$db.getDocument(documentID);
-              this.loginAdmin(this, admin.result);
-  
+              this.$feedback.error({
+                title: "NO INTERNET CONNECTION",
+                duration: 4000,
+                message: "Please switch on your data/wifi.",
+              });
+              this.isLoading = false;
             }
-  
-            self.$router.push("/admin/dashboard");
             break;
         }
       }
