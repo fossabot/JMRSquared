@@ -21,7 +21,6 @@ const mutations = {
         var user = obj.db.getDocument(documentID);
         state.cachedTenant = user.result;
     }
-    
    
    },
    cacheUser(state,obj){

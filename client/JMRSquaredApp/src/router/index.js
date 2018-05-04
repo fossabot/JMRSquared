@@ -31,54 +31,6 @@ import Tenant_EditDetails from '../components/Tenant/Tenant_EditDetails.vue'
 
 const http = require("http");
 
-router.beforeEach((to, from, next) => {
-  let authLevel = appSettings.getNumber("authLevel");
-  appSettings.setBoolean("isLoading",false);
-  
-  if(isNaN(authLevel)) {
-    authLevel = 0;
-    appSettings.setNumber("authLevel",authLevel);
-  }
-  
-  switch(to.meta.authLevel){
-    case 1:
-      if(authLevel < 1){
-        alert("Error you are not Authorized to access this page!");
-        return;
-      }
-    break;
-    case 2:
-      if(authLevel < 2){
-          alert("Error you are not Authorized to access this page!");
-          return;
-        }
-    break;
-    case 3:
-      if(authLevel < 3){
-        alert("Error you are not Authorized to access this page!");
-        return;
-      }
-    break;
-  }
-
-  to.meta.userAuthLevel = authLevel;
-
-  if(to.name == 'studentProfile'){
-    http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
-      to.meta.user = student;
-      next();
-    }).catch(err=>{
-        alert(err);
-    });
-  }else if(to.name == 'login'){
-    next();
-  }else if(to.name == 'home'){
-    next();
-  }else{
-    next();
-  }
-})
-
 import store from '../store';
 
 var appSettings = require("application-settings");
@@ -237,9 +189,10 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   let authLevel = appSettings.getNumber("authLevel");
   appSettings.setBoolean("isLoading",false);
-  alert("going to " + to.name);
-  
-  if(isNaN(authLevel)) {
+
+  let documentID = appSettings.getString(store.state.cache.adminLoggedInString) != null ? appSettings.getString(store.state.cache.adminLoggedInString) : appSettings.getString(store.state.cache.tenantLoggedInString);
+   
+  if(isNaN(authLevel) || documentID == null) {
     authLevel = 0;
     appSettings.setNumber("authLevel",authLevel);
   }

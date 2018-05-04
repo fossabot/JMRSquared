@@ -84,7 +84,7 @@
             duration: 4000,
             message: "Please switch on your data/wifi.",
           });
-          this.isLoading = false;
+         // this.isLoading = false;
         }
       }
     }

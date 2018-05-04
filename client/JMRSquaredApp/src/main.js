@@ -287,6 +287,8 @@ Vue.mixin({
         return moment(val);
     },
     loginTenant(self, result){
+      appSettings.setNumber("authLevel", 1);
+    
       self.$store.commit("login", {
         id: result._id,
         userName: result.username,
@@ -306,10 +308,11 @@ Vue.mixin({
         isAdmin:false
       });
 
-      appSettings.setNumber("authLevel", 1);
     },
     loginAdmin(self, result) {
-  
+
+      appSettings.setNumber("authLevel", 3);
+
       self.$store.commit("login", {
         id: result._id,
         userName: result.userName,
@@ -328,8 +331,6 @@ Vue.mixin({
         user:result,
         isAdmin:true
       });
-
-      appSettings.setNumber("authLevel", 3);
 
       self.$store.dispatch("PopulateNotifications", {
         notifications: result.notifications.filter((v) => v.dueDate == null)
