@@ -53,7 +53,20 @@ var appSettings = require("application-settings");
 Vue.mixin({
   data(){
     return{
-      isLoading: false
+
+    }
+  },
+  computed:{
+    isLoading:{
+      get(){
+
+        alert("Getting val ");
+        return appSettings.getBoolean("isLoading");
+      },
+      set(val){
+        alert("Setting val " + val);
+        return appSettings.setBoolean("isLoading",val);
+      }
     }
   },
   methods: {
@@ -332,13 +345,12 @@ Vue.mixin({
                 message: 'You want to log out?',
                 okButtonText: 'Yes',
                 cancelButtonText: 'No'
-              }).then(result => {
-                  if (result) {
-                      appSettings.setNumber("authLevel", 0);
-                      this.$store.commit('logout', this);
-                      this.$router.push('/home');
-                  }
-              })
+      }).then(result => {
+          if (result) {
+            appSettings.setNumber("authLevel",0);
+            this.$router.replace('/home');
+          }
+      });
     }
   }
 });

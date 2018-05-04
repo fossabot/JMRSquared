@@ -53,16 +53,6 @@
     mounted() {
       this.pageLoaded();
     },
-    beforeDestroy() {
-      this.isLoading = false;
-    },
-    Destroy() {
-      this.isLoading = false;
-    },
-    beforeRouteLeave: (to, from, next) => {
-      this.isLoading = false;
-      alert("Before router leave");
-    },
     methods: {
       pageLoaded() {
         this.$store.commit("refreshCache", {
@@ -83,57 +73,18 @@
         })
       },
       loadAdminData() {
-        var connectionType = connectivity.getConnectionType();
-        var self = this;
         this.isLoading = true;
-        switch (connectionType) {
-          case connectivity.connectionType.wifi:
-  
-            http
-              .request({
-                url: this.$store.state.settings.baseLink + "/a/getById/" + this.$store.state.user.id,
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json"
-                }
-              })
-              .then(response => {
-                var statusCode = response.statusCode;
-                if (statusCode == 200) {
-                  var result = response.content.toJSON();
-                  this.loginAdmin(this, result);
-                  this.$router.push("/admin/dashboard");
-  
-                } else {
-                  var error = response.content.toString();
-                  this.$feedback.error({
-                    message: error
-                  });
-  
-                  this.isLoading = false;
-                }
-              }).catch(err => {
-                this.$feedback.error({
-                  message: error
-                });
-                this.isLoading = false;
-              });
-  
-            break;
-          case connectivity.connectionType.none:
-            var user = this.$store.state.cache.cachedAdmin;
-            if (user != null) {
-              this.loginAdmin(this, user);
-              this.$router.push("/admin/dashboard");
-            } else {
-              this.$feedback.error({
-                title: "NO INTERNET CONNECTION",
-                duration: 4000,
-                message: "Please switch on your data/wifi.",
-              });
-              this.isLoading = false;
-            }
-            break;
+        var user = this.$store.state.cache.cachedAdmin;
+        if (user != null) {
+          this.loginAdmin(this, user);
+          this.$router.push("/admin/dashboard");
+        } else {
+          this.$feedback.error({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "Please switch on your data/wifi.",
+          });
+          this.isLoading = false;
         }
       }
     }

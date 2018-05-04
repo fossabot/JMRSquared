@@ -47,7 +47,7 @@
           title: 'Not Implemented',
           message: "This is not functional yet"
         });
-        this.router.push('/home');  
+        this.$router.replace('/home');  
       }
     }
   }
