@@ -1,27 +1,40 @@
 <template>
-    <GridLayout class="page" rows="auto,auto,*" @loaded="pageLoaded">
-        <CardView focus="true" row="0" margin="10" height="40" elevation="10" @tap="AddStudents()" backgroundColor="grey" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-            <label verticalAlignment="center" textAlignment="center" textWrap="true" text="Add new tenant"></label>
-        </CardView>
-        <SearchBar row="1" hint="Search for a student..." v-model="txtSearch"></SearchBar>
-        <PullToRefresh row="2" @refresh="refreshList($event)">
-            <ListView for="student in searchedStudents" @itemTap="onStudentTap">
-                <v-template>
-                    <CardView margin="3" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                        <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
-                            <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="(student.profilePic && student.profilePic.length > 2) ? student.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70"
-                                borderRadius="50%" />
-                            <Label row="0" col="1" textAlignment="center" class="h2" :text="student.username"></Label>
-                            <Label row="1" col="1" textAlignment="center" :text="student.email"></Label>
-                            <Label row="2" col="1" textAlignment="center" :text="'Room : ' + student.room"></Label>
-                            <Label row="0" col="2" textAlignment="center" verticalAlignment="center" :class="{'text-dark-blue':student.hasPaid,'text-light-red':!student.hasPaid}" class="mdi h2 m-10" :text="'mdi-attach-money' | fonticon"></Label>
-                            <Label row="2" col="2" textAlignment="center" verticalAlignment="center" class="fa h2 m-10" :text="'fa-' + student.gender | fonticon"></Label>
-                        </GridLayout>
-                    </CardView>
-                </v-template>
-            </ListView>
-        </PullToRefresh>
-    </GridLayout>
+    <page>
+        <ActionBar>
+            <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
+                <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+                </Ripple>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Student List"></Label>
+                <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+                </Ripple>
+            </GridLayout>
+        </ActionBar>
+        <GridLayout class="page" rows="auto,auto,*" @loaded="pageLoaded">
+            <CardView focus="true" row="0" margin="10" height="40" elevation="10" @tap="AddStudents()" backgroundColor="grey" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                <label verticalAlignment="center" textAlignment="center" textWrap="true" text="Add new tenant"></label>
+            </CardView>
+            <SearchBar row="1" hint="Search for a student..." v-model="txtSearch"></SearchBar>
+            <PullToRefresh row="2" @refresh="refreshList($event)">
+                <ListView for="student in searchedStudents" @itemTap="onStudentTap">
+                    <v-template>
+                        <CardView margin="3" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                            <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
+                                <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="(student.profilePic && student.profilePic.length > 2) ? student.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70"
+                                    borderRadius="50%" />
+                                <Label row="0" col="1" textAlignment="center" class="h2" :text="student.username"></Label>
+                                <Label row="1" col="1" textAlignment="center" :text="student.email"></Label>
+                                <Label row="2" col="1" textAlignment="center" :text="'Room : ' + student.room"></Label>
+                                <Label row="0" col="2" textAlignment="center" verticalAlignment="center" :class="{'text-dark-blue':student.hasPaid,'text-light-red':!student.hasPaid}" class="mdi h2 m-10" :text="'mdi-attach-money' | fonticon"></Label>
+                                <Label row="2" col="2" textAlignment="center" verticalAlignment="center" class="fa h2 m-10" :text="'fa-' + student.gender | fonticon"></Label>
+                            </GridLayout>
+                        </CardView>
+                    </v-template>
+                </ListView>
+            </PullToRefresh>
+        </GridLayout>
+    </page>
 </template>
 
 <script>
@@ -170,53 +183,53 @@
             onStudentTap(event) {
     
                 /*
-                            LocalNotifications.hasPermission().then(
-                                function(granted) {
-                                    dialogs.alert("Permission " + granted).then(() => {
-                                        console.log("card.redirect");
-                                    });
-                                }
-                            )
-        
-                            LocalNotifications.schedule([{
-                                id: event.item.id,
-                                title: 'Hello ' + event.item.username,
-                                body: 'Recurs every minute until cancelled',
-                                ticker: 'The ticker',
-                                badge: 1,
-                                groupedMessages: ["The first", "Second", "Keep going", "one more..", "OK Stop"], //android only
-                                groupSummary: "Summary of the grouped messages above", //android only
-                                smallIcon: 'res://icon.png',
-                                interval: 'minute',
-                                sound: "customsound-ios.wav", // falls back to the default sound on Android
-                                at: new Date(new Date().getTime() + (10 * 1000)) // 10 seconds from now
-                            }]).then(
-                                function() {
-                                    dialogs.alert("Notification scheduled").then(() => {
-                                        console.log("card.redirect");
-                                    });
-                                },
-                                function(error) {
-                                    dialogs.alert("Error while scheduling").then(() => {
-                                        console.log(error);
-                                    });
-                                }
-                            )
-        
-                            LocalNotifications.addOnMessageReceivedCallback(
-                                function(notification) {
-                                    dialogs.alert("Notification clicked " + notification.id).then(() => {
-                                        console.log("card.redirect");
-                                    });
-                                }
-                            ).then(
-                                function() {
-                                    dialogs.alert("Listener added").then(() => {
-                                        console.log(error);
-                                    });
-                                }
-                            )
-                */
+                                LocalNotifications.hasPermission().then(
+                                    function(granted) {
+                                        dialogs.alert("Permission " + granted).then(() => {
+                                            console.log("card.redirect");
+                                        });
+                                    }
+                                )
+            
+                                LocalNotifications.schedule([{
+                                    id: event.item.id,
+                                    title: 'Hello ' + event.item.username,
+                                    body: 'Recurs every minute until cancelled',
+                                    ticker: 'The ticker',
+                                    badge: 1,
+                                    groupedMessages: ["The first", "Second", "Keep going", "one more..", "OK Stop"], //android only
+                                    groupSummary: "Summary of the grouped messages above", //android only
+                                    smallIcon: 'res://icon.png',
+                                    interval: 'minute',
+                                    sound: "customsound-ios.wav", // falls back to the default sound on Android
+                                    at: new Date(new Date().getTime() + (10 * 1000)) // 10 seconds from now
+                                }]).then(
+                                    function() {
+                                        dialogs.alert("Notification scheduled").then(() => {
+                                            console.log("card.redirect");
+                                        });
+                                    },
+                                    function(error) {
+                                        dialogs.alert("Error while scheduling").then(() => {
+                                            console.log(error);
+                                        });
+                                    }
+                                )
+            
+                                LocalNotifications.addOnMessageReceivedCallback(
+                                    function(notification) {
+                                        dialogs.alert("Notification clicked " + notification.id).then(() => {
+                                            console.log("card.redirect");
+                                        });
+                                    }
+                                ).then(
+                                    function() {
+                                        dialogs.alert("Listener added").then(() => {
+                                            console.log(error);
+                                        });
+                                    }
+                                )
+                    */
                 //TODO : Make this go to student profile.
     
                 this.$router.push('/admin/fulham/student/profile/' + event.item._id);

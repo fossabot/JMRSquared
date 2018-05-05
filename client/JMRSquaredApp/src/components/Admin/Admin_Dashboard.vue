@@ -1,5 +1,5 @@
 <template>
-    <page @@loaded="pageLoaded()">
+    <page @loaded="pageLoaded()">
         <ActionBar>
             <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
                 <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">

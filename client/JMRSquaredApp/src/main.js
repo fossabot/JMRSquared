@@ -59,13 +59,10 @@ Vue.mixin({
   computed:{
     isLoading:{
       get(){
-
-        alert("Getting val ");
         return appSettings.getBoolean("isLoading");
       },
       set(val){
-        alert("Setting val " + val);
-        return appSettings.setBoolean("isLoading",val);
+        appSettings.setBoolean("isLoading",val);
       }
     }
   },
