@@ -35,7 +35,7 @@ import store from '../store';
 
 var appSettings = require("application-settings");
 import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
-var feedBack = new Feedback();
+var feedback = new Feedback();
 
 const router = new VueRouter({
   pageRouting: true,
@@ -200,19 +200,19 @@ router.beforeEach((to, from, next) => {
   switch(to.meta.authLevel){
     case 1:
       if(authLevel < 1){
-        alert("Error you are not Authorized to access this page!");
+        feedback.error({ title : "You are not Authorized to access this page!"});
         return;
       }
     break;
     case 2:
       if(authLevel < 2){
-          alert("Error you are not Authorized to access this page!");
+        feedback.error({ title : "You are not Authorized to access this page!"});
           return;
         }
     break;
     case 3:
       if(authLevel < 3){
-        alert("Error you are not Authorized to access this page!");
+        feedback.error({ title : "You are not Authorized to access this page!"});
         return;
       }
     break;
