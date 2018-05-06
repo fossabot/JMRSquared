@@ -55,7 +55,7 @@ var appSettings = require("application-settings");
 Vue.mixin({
   data(){
     return{
-
+      toggleSearch:false
     }
   },
   computed:{

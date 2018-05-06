@@ -1,7 +1,7 @@
 <template>
-    <page>
+    <page @loaded="pageLoaded">
         <ActionBar>
-            <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
+            <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
                 <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
@@ -9,14 +9,15 @@
                 <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
+                <Ripple class="p-x-15" @tap="toggleSearch = !toggleSearch" verticalAlignment="center" col="3" height="100%" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-search' | fonticon"></Label>
+                </Ripple>
             </GridLayout>
         </ActionBar>
-        <GridLayout class="page" rows="auto,auto,*" @loaded="pageLoaded">
-            <CardView focus="true" row="0" margin="10" height="40" elevation="10" @tap="AddStudents()" backgroundColor="grey" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                <label verticalAlignment="center" textAlignment="center" textWrap="true" text="Add new tenant"></label>
-            </CardView>
-            <SearchBar row="1" hint="Search for a student..." v-model="txtSearch"></SearchBar>
-            <PullToRefresh row="2" @refresh="refreshList($event)">
+        <GridLayout class="page" rows="auto,*">
+            <Label row="0" v-show="!toggleSearch" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+            <SearchBar row="0" v-show="toggleSearch" @clear="toggleSearch = !toggleSearch" hint="Search for a student..." v-model="txtSearch"></SearchBar>
+            <PullToRefresh row="1" @refresh="refreshList($event)">
                 <ListView for="student in searchedStudents" @itemTap="onStudentTap">
                     <v-template>
                         <CardView margin="3" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
@@ -33,7 +34,7 @@
                     </v-template>
                 </ListView>
             </PullToRefresh>
-            <Fab row="2" @tap="fabTap()" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
+            <Fab row="1" @tap="AddStudents()" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
         </GridLayout>
     </page>
 </template>
