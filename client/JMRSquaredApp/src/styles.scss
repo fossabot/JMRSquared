@@ -6,6 +6,17 @@
 // @see https://docs.nativescript.org/ui/styling
 @import 'assets/variables';
 
+.fab-button {
+  height: 55;
+  width: 55; /// this is required on iOS - Android does not require width so you might need to adjust styles 
+  background-color: $blueLightColor;
+  horizontal-align: right;
+  align-content: flex-end;
+  align-self: flex-end;  
+  margin:30;
+  vertical-align: bottom; 
+}
+
 .bgBlueDark{
   background-color: $blueDarkColor;
 }

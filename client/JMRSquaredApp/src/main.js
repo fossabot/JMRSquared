@@ -38,6 +38,8 @@ Vue.registerElement('Ripple', () => require('nativescript-ripple').Ripple)
 
 Vue.registerElement('PullToRefresh', () => require('nativescript-pulltorefresh').PullToRefresh)
 
+Vue.registerElement("Fab", () => require("nativescript-floatingactionbutton").Fab);
+
 Vue.filter('fonticon', fonticon);
 
 Vue.prototype.$db = new Couchbase("jmrdb");

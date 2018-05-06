@@ -33,6 +33,7 @@
                     </v-template>
                 </ListView>
             </PullToRefresh>
+            <Fab row="2" @tap="fabTap()" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
         </GridLayout>
     </page>
 </template>
@@ -76,6 +77,9 @@
             }
         },
         methods: {
+            fabTap() {
+                alert("Fab tapped");
+            },
             pageLoaded() {
                 this.isLoading = true;
                 var connectionType = connectivity.getConnectionType();
@@ -183,53 +187,53 @@
             onStudentTap(event) {
     
                 /*
-                                LocalNotifications.hasPermission().then(
-                                    function(granted) {
-                                        dialogs.alert("Permission " + granted).then(() => {
-                                            console.log("card.redirect");
-                                        });
-                                    }
-                                )
-            
-                                LocalNotifications.schedule([{
-                                    id: event.item.id,
-                                    title: 'Hello ' + event.item.username,
-                                    body: 'Recurs every minute until cancelled',
-                                    ticker: 'The ticker',
-                                    badge: 1,
-                                    groupedMessages: ["The first", "Second", "Keep going", "one more..", "OK Stop"], //android only
-                                    groupSummary: "Summary of the grouped messages above", //android only
-                                    smallIcon: 'res://icon.png',
-                                    interval: 'minute',
-                                    sound: "customsound-ios.wav", // falls back to the default sound on Android
-                                    at: new Date(new Date().getTime() + (10 * 1000)) // 10 seconds from now
-                                }]).then(
-                                    function() {
-                                        dialogs.alert("Notification scheduled").then(() => {
-                                            console.log("card.redirect");
-                                        });
-                                    },
-                                    function(error) {
-                                        dialogs.alert("Error while scheduling").then(() => {
-                                            console.log(error);
-                                        });
-                                    }
-                                )
-            
-                                LocalNotifications.addOnMessageReceivedCallback(
-                                    function(notification) {
-                                        dialogs.alert("Notification clicked " + notification.id).then(() => {
-                                            console.log("card.redirect");
-                                        });
-                                    }
-                                ).then(
-                                    function() {
-                                        dialogs.alert("Listener added").then(() => {
-                                            console.log(error);
-                                        });
-                                    }
-                                )
-                    */
+                                    LocalNotifications.hasPermission().then(
+                                        function(granted) {
+                                            dialogs.alert("Permission " + granted).then(() => {
+                                                console.log("card.redirect");
+                                            });
+                                        }
+                                    )
+                    
+                                    LocalNotifications.schedule([{
+                                        id: event.item.id,
+                                        title: 'Hello ' + event.item.username,
+                                        body: 'Recurs every minute until cancelled',
+                                        ticker: 'The ticker',
+                                        badge: 1,
+                                        groupedMessages: ["The first", "Second", "Keep going", "one more..", "OK Stop"], //android only
+                                        groupSummary: "Summary of the grouped messages above", //android only
+                                        smallIcon: 'res://icon.png',
+                                        interval: 'minute',
+                                        sound: "customsound-ios.wav", // falls back to the default sound on Android
+                                        at: new Date(new Date().getTime() + (10 * 1000)) // 10 seconds from now
+                                    }]).then(
+                                        function() {
+                                            dialogs.alert("Notification scheduled").then(() => {
+                                                console.log("card.redirect");
+                                            });
+                                        },
+                                        function(error) {
+                                            dialogs.alert("Error while scheduling").then(() => {
+                                                console.log(error);
+                                            });
+                                        }
+                                    )
+                    
+                                    LocalNotifications.addOnMessageReceivedCallback(
+                                        function(notification) {
+                                            dialogs.alert("Notification clicked " + notification.id).then(() => {
+                                                console.log("card.redirect");
+                                            });
+                                        }
+                                    ).then(
+                                        function() {
+                                            dialogs.alert("Listener added").then(() => {
+                                                console.log(error);
+                                            });
+                                        }
+                                    )
+                        */
                 //TODO : Make this go to student profile.
     
                 this.$router.push('/admin/fulham/student/profile/' + event.item._id);
