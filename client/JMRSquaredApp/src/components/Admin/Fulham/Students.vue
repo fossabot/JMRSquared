@@ -1,42 +1,26 @@
 <template>
-    <page @loaded="pageLoaded">
-        <ActionBar>
-            <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
-                <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
-                </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Student List"></Label>
-                <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
-                </Ripple>
-                <Ripple class="p-x-15" @tap="toggleSearch = !toggleSearch" verticalAlignment="center" col="3" height="100%" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-search' | fonticon"></Label>
-                </Ripple>
-            </GridLayout>
-        </ActionBar>
-        <GridLayout class="page" rows="auto,*">
-            <Label row="0" v-show="!toggleSearch" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
-            <SearchBar row="0" v-show="toggleSearch" @clear="toggleSearch = !toggleSearch" hint="Search for a student..." v-model="txtSearch"></SearchBar>
-            <PullToRefresh row="1" @refresh="refreshList($event)">
-                <ListView for="student in searchedStudents" @itemTap="onStudentTap">
-                    <v-template>
-                        <CardView margin="3" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                            <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
-                                <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="(student.profilePic && student.profilePic.length > 2) ? student.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70"
-                                    borderRadius="50%" />
-                                <Label row="0" col="1" textAlignment="center" class="h2" :text="student.username"></Label>
-                                <Label row="1" col="1" textAlignment="center" :text="student.email"></Label>
-                                <Label row="2" col="1" textAlignment="center" :text="'Room : ' + student.room"></Label>
-                                <Label row="0" col="2" textAlignment="center" verticalAlignment="center" :class="{'text-dark-blue':student.hasPaid,'text-light-red':!student.hasPaid}" class="mdi h2 m-10" :text="'mdi-attach-money' | fonticon"></Label>
-                                <Label row="2" col="2" textAlignment="center" verticalAlignment="center" class="fa h2 m-10" :text="'fa-' + student.gender | fonticon"></Label>
-                            </GridLayout>
-                        </CardView>
-                    </v-template>
-                </ListView>
-            </PullToRefresh>
-            <Fab row="1" @tap="AddStudents()" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
-        </GridLayout>
-    </page>
+    <GridLayout class="page" rows="auto,*">
+        <Label row="0" v-show="!toggleSearch" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+        <SearchBar row="0" v-show="toggleSearch" @clear="toggleSearch = !toggleSearch" hint="Search for a student..." v-model="txtSearch"></SearchBar>
+        <PullToRefresh row="1" @refresh="refreshList($event)">
+            <ListView for="student in searchedStudents" @itemTap="onStudentTap">
+                <v-template>
+                    <CardView margin="3" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                        <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
+                            <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="(student.profilePic && student.profilePic.length > 2) ? student.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70"
+                                borderRadius="50%" />
+                            <Label row="0" col="1" textAlignment="center" class="h2" :text="student.username"></Label>
+                            <Label row="1" col="1" textAlignment="center" :text="student.email"></Label>
+                            <Label row="2" col="1" textAlignment="center" :text="'Room : ' + student.room"></Label>
+                            <Label row="0" col="2" textAlignment="center" verticalAlignment="center" :class="{'text-dark-blue':student.hasPaid,'text-light-red':!student.hasPaid}" class="mdi h2 m-10" :text="'mdi-attach-money' | fonticon"></Label>
+                            <Label row="2" col="2" textAlignment="center" verticalAlignment="center" class="fa h2 m-10" :text="'fa-' + student.gender | fonticon"></Label>
+                        </GridLayout>
+                    </CardView>
+                </v-template>
+            </ListView>
+        </PullToRefresh>
+        <Fab row="1" @tap="AddStudents()" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
+    </GridLayout>
 </template>
 
 <script>

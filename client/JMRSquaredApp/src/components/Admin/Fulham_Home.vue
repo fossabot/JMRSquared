@@ -1,20 +1,35 @@
 <template>
-  <page actionBarHidden="true" @loaded="pageLoaded">
-    <TabView @tabChange="eventChanged($event)" id="bottomNav" :selectedIndex="currentTab" selectedTabTextColor="$blueColor" androidSelectedTabHighlightColor="$blueDarkColor" tabBackgroundColor="transparent">
-      <TabViewItem v-for="(tab,i) in tabs" :key="i" :iconSource="tab.icon">
-        <StackLayout>
-          <component v-if="tab.isLoaded" :is="tab.view"></component>
-          <ActivityIndicator verticalAlignment="center" :busy="!tab.isLoaded"></ActivityIndicator>
-        </StackLayout>
-      </TabViewItem>
-    </TabView>
-  </page>
+  <page @loaded="pageLoaded">
+    <ActionBar>
+      <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
+        <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+        </Ripple>
+        <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="tabs[currentTab].text"></Label>
+        <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+        </Ripple>
+        <Ripple class="p-x-15" @tap="toggleSearch = !toggleSearch" verticalAlignment="center" col="3" height="100%" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-search' | fonticon"></Label>
+        </Ripple>
+      </GridLayout>
+    </ActionBar>
+  
+    <GridLayout rows="*,auto" columns="*">
+      <StackLayout row="0">
+        <component :is="tabs[currentTab].view"></component>
+        <ActivityIndicator verticalAlignment="center" :busy="!tabs[currentTab].isLoaded"></ActivityIndicator>
+      </StackLayout>
+      <SegmentedBar row="1" #tabs borderColor="$blueDarkColor" class="mdi" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
+        <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" style="font-size:25%" :title="tab.icon | fonticon"></SegmentedBarItem>
+      </SegmentedBar>
+  </GridLayout>
+</page>
 </template>
 
 <script>
   const dialogs = require('ui/dialogs')
   import * as Toast from 'nativescript-toast';
-  import TabView from 'ui/tab-view'
   
   import Students from './Fulham/Students.vue'
   import Notifications from './Fulham/Notifications.vue'
@@ -33,30 +48,30 @@
     data() {
       return {
         count: 20,
-        currentTab: 0,
-        isLoaded:false,
+        currentTab: 1,
+        isLoaded: false,
         tabs: [{
             text: 'Notifications',
-            icon: 'res://ic_notifications_black_24dp',
+            icon: 'mdi-notifications',
             view: 'Notifications',
-            isLoaded:false
+            isLoaded: false
           }, {
             text: 'Students',
-            icon: 'res://ic_people_black_24dp',
+            icon: 'mdi-people',
             view: 'Students',
-            isLoaded:false
+            isLoaded: false
           },
           {
             text: 'Transactions',
-            icon: 'res://ic_receipt_black_24dp',
+            icon: 'mdi-receipt',
             view: 'Transactions',
-            isLoaded:false
+            isLoaded: false
           },
           {
             text: 'Stats',
-            icon: 'res://ic_equalizer_black_24dp',
+            icon: 'mdi-equalizer',
             view: 'Stats',
-            isLoaded:false
+            isLoaded: false
           }
         ]
       }
@@ -73,7 +88,7 @@
     },
     methods: {
       eventChanged(args) {
-        if(!this.tabs[args].isLoaded){
+        if (!this.tabs[args].isLoaded) {
           this.tabs[args].isLoaded = true;
         }
       },

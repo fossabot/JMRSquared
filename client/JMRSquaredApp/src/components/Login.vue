@@ -1,12 +1,12 @@
 <template>
   <page @loaded="pageLoaded()">
     <ActionBar>
-      <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
+      <GridLayout rows="auto" columns="auto,*,*,auto" orientation="horizontal">
         <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
           <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
         </Ripple>
         <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Login"></Label>
-        <Ripple class="p-x-15 font-weight-bold" @tap="isEnterEmail = !isEnterEmail" verticalAlignment="center" col="2">
+        <Ripple class="p-x-15 font-weight-bold" @tap="isEnterEmail = !isEnterEmail" textAlignment="right" verticalAlignment="center" col="2">
           <Label verticalAlignment="center" :text="isEnterEmail ? 'Use numbers' : 'Use email'"></Label>
         </Ripple>
         <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="3" height="100%" borderRadius="50%">
