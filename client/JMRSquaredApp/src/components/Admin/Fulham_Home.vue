@@ -87,11 +87,6 @@
       }
     },
     methods: {
-      eventChanged(args) {
-        if (!this.tabs[args].isLoaded) {
-          this.tabs[args].isLoaded = true;
-        }
-      },
       pageLoaded() {
         var connectionType = connectivity.getConnectionType();
         if (connectionType == connectivity.connectionType.none) {
