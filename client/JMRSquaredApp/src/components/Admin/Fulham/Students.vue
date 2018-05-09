@@ -1,6 +1,6 @@
 <template>
     <GridLayout class="page" rows="auto,*">
-        <Label row="0" v-show="!toggleSearch" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+        <Label row="0" @tap="toggleSearch = !toggleSearch" v-show="!toggleSearch" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
         <SearchBar row="0" v-show="toggleSearch" @clear="toggleSearch = !toggleSearch" hint="Search for a student..." v-model="txtSearch"></SearchBar>
         <PullToRefresh row="1" @refresh="refreshList($event)">
             <ListView for="student in searchedStudents" @itemTap="onStudentTap">
@@ -12,8 +12,7 @@
                             <Label row="0" col="1" textAlignment="center" class="h2" :text="student.username"></Label>
                             <Label row="1" col="1" textAlignment="center" :text="student.email"></Label>
                             <Label row="2" col="1" textAlignment="center" :text="'Room : ' + student.room"></Label>
-                            <Label row="0" col="2" textAlignment="center" verticalAlignment="center" :class="{'text-dark-blue':student.hasPaid,'text-light-red':!student.hasPaid}" class="mdi h2 m-10" :text="'mdi-attach-money' | fonticon"></Label>
-                            <Label row="2" col="2" textAlignment="center" verticalAlignment="center" class="fa h2 m-10" :text="'fa-' + student.gender | fonticon"></Label>
+                            <Label row="2" col="2" textAlignment="center" verticalAlignment="center" :class="{'text-dark-blue':student.hasPaid,'text-light-red':!student.hasPaid}" :text="student.hasPaid ? 'Paid' : 'Not Paid'"></Label>
                         </GridLayout>
                     </CardView>
                 </v-template>

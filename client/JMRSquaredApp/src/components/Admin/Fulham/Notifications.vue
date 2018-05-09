@@ -1,7 +1,8 @@
 <template>
     <GridLayout class="page" rows="auto,*" @loaded="pageLoaded">
-        <SearchBar row="0" hint="Search for a Notification..." v-model="txtSearch"></SearchBar>
-        <Label textAlignment="center" class="text-muted p-20" text="Pull to refresh"></Label>
+        <Label row="0" @tap="toggleSearch = !toggleSearch" v-show="!toggleSearch" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+        <SearchBar row="0" v-show="toggleSearch" @clear="toggleSearch = !toggleSearch" hint="Search for a Notification..." v-model="txtSearch"></SearchBar>
+        
         <PullToRefresh row="1" @refresh="refreshList($event)">
             <ScrollView>
                 <StackLayout>
