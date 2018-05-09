@@ -29,7 +29,7 @@ router.get('/search/:searchText', function(req, res) {
 
 router.get('/all/for/:userId', function(req, res) {
     var receiver = req.params.userId;
-    Notification.find({ to: receiver }).then((notifications) => {
+    Notification.find({ toId: receiver }).then((notifications) => {
         if (notifications == null) res.send("Error : 9032egrrtu834g9erbo");
         res.json(notifications);
     });
