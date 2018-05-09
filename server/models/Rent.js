@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 const RentSchema = new mongoose.Schema({
     _id:  { type: Schema.Types.ObjectId, default :mongoose.Types.ObjectId() },
-    StudentID:{ type: Schema.Types.ObjectId, ref: 'Student' }, // ForeignKey
+    studentID:{ type: Schema.Types.ObjectId, ref: 'Student' }, // ForeignKey
     datePaid:Date,
     monthOfPayment:String,
     amount:Number,

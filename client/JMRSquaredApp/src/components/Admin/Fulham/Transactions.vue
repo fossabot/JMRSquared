@@ -242,6 +242,7 @@
         transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
         rentMonthIndex: new Date().getMonth(),
         rentMonths: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        rentTenantID: '',
         rentTenantName: '',
         isRent: false,
         description: '',
@@ -363,6 +364,7 @@
                 adminID: this.$store.state.user.id, //ForeignKey
                 amount: this.Amount,
                 type: this.isRent ? 'Rent' : (this.isWithdraw ? 'Withdraw' : 'Deposit'),
+                rentTenantID: this.isRent ? this.users.filter(u => u.text == this.rentTenantName)[0].id : false,
                 rentTenantName: this.rentTenantName,
                 rentMonth: this.rentMonths[this.rentMonthIndex],
                 description: this.description,

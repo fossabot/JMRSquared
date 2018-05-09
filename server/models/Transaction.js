@@ -7,6 +7,7 @@ const TransactionSchema = new mongoose.Schema({
     amount: String,
     //Withdraw , Deposit , Rent
     type: { type: String, default: "Deposit" },
+    rentTenantID:String,
     rentTenantName:String,
     rentMonth:String,
     description: String,

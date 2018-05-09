@@ -6,6 +6,8 @@ import Admin from '../models/Admin';
 import Document from '../models/Document';
 import Transaction from '../models/Transaction';
 import Bug from '../models/Bug';
+import Rent from '../models/Rent';
+
 
 /*
   TODO : Add admin
@@ -196,6 +198,7 @@ router.post('/transaction/add', function(req, res) {
         adminID:req.body.adminID, //ForeignKey
         amount: req.body.amount,
         type: req.body.type,
+        rentTenantID:req.body.rentTenantID,
         rentTenantName: req.body.rentTenantName,
         rentMonth: req.body.rentMonth,
         description: req.body.description,
@@ -211,7 +214,20 @@ router.post('/transaction/add', function(req, res) {
             admin.transactions.push(transaction._id);
             admin.save(function(err){
                 if (err)  { console.log(err); return; };
-                res.send("Transaction successfully saved");
+
+                if(transaction.rentTenantID){
+                    var rent = new Rent();
+                    rent.studentID = req.body.rentTenantID;
+                    rent.datePaid = req.body.date;
+                    rent.monthOfPayment = req.body.rentMonth;
+                    rent.amount = req.body.amount;
+                    rent.save(function(err){
+                        if (err)  { console.log(err); return; };
+                        res.send("Rent payment successfully saved");
+                    });
+                }else{
+                    res.send("Transaction successfully saved");
+                }
             });
         });
     })
