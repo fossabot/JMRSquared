@@ -56,7 +56,16 @@
                     });
                 },
                 set(value) {
-                    this.students = value;
+                    this.students = [];
+                    var now = new Date();
+                    value.map(student => {
+                        var hasPaid = false;
+                        if (student.rents.length > 0) {
+                           hasPaid = student.rents.filter((r) => this.getMoment(r.datePaid).isSame(now, 'month')).length > 0;
+                        }
+                        student.hasPaid = hasPaid;
+                        this.students.push(student);
+                    });
                 }
             }
         },

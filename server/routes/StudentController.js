@@ -25,14 +25,7 @@ router.get('/rents/all', function(req, res) {
 router.get('/students/all', function(req, res) {
     Student.find().populate(['rents']).then((students) => {
         if (students == null) res.send("Error : 9032rtu834g9erbo");
-        var resultingStudents = [];
-        students.map(student => {
-            let now = new Date();
-            let hasPaid = student.rents.filter(r => r.datePaid.getFullYear() == now.getFullYear() && r.datePaid.getMonth() == now.getMonth()).length > 0;
-            student.hasPaid = hasPaid;
-            resultingStudents.push(student);
-        });
-        res.json(resultingStudents);
+        res.json(students);
     });
 });
 
