@@ -377,7 +377,7 @@
               if (statusCode == 200) {
   
                 this.$feedback.success({
-                  title: "Transaction successfully added",
+                  title: response.content.toString(),
                   duration: 4000,
                   onTap: () => {
                     this.currentPage = 0;
