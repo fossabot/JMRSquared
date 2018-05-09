@@ -216,11 +216,13 @@ router.post('/transaction/add', function(req, res) {
                 if (err)  { console.log(err); return; };
 
                 if(transaction.rentTenantID){
-                    var rent = new Rent();
-                    rent.studentID = req.body.rentTenantID;
-                    rent.datePaid = req.body.date;
-                    rent.monthOfPayment = req.body.rentMonth;
-                    rent.amount = req.body.amount;
+                    var rent = new Rent({
+                        studentID = req.body.rentTenantID,
+                        datePaid = req.body.date,
+                        monthOfPayment = req.body.rentMonth,
+                        amount = req.body.amount
+                    });
+                   
                     rent.save(function(err){
                         if (err)  { console.log(err); return; };
                         res.send("Rent payment successfully saved");
