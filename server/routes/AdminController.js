@@ -215,7 +215,7 @@ router.post('/transaction/add', function(req, res) {
             admin.save(function(err){
                 if (err)  { console.log(err); return; };
 
-                if(transaction.type == 'Rent'){
+                if(req.body.type == 'Rent'){
                     var rent = new Rent({
                         studentID :req.body.rentTenantID,
                         datePaid :req.body.date,
