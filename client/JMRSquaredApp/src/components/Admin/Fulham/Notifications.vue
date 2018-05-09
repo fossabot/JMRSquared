@@ -1,11 +1,8 @@
 <template>
-    <GridLayout class="page" rows="auto,auto,*" @loaded="pageLoaded">
-        <CardView focus="true" margin="10" elevation="10" height="40" @tap="SendNotification()" backgroundColor="grey" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-            <label verticalAlignment="center" textAlignment="center" text="Send new notification"></label>
-        </CardView>
-        <SearchBar row="1" hint="Search for a Notification..." v-model="txtSearch"></SearchBar>
+    <GridLayout class="page" rows="auto,*" @loaded="pageLoaded">
+        <SearchBar row="0" hint="Search for a Notification..." v-model="txtSearch"></SearchBar>
         <Label textAlignment="center" class="text-muted p-20" text="Pull to refresh"></Label>
-        <PullToRefresh row="2" @refresh="refreshList($event)">
+        <PullToRefresh row="1" @refresh="refreshList($event)">
             <ScrollView>
                 <StackLayout>
                     <CardView v-for="(notify,i) in searchedNotifications" :key="i" class="p-20 bg-white" margin="3" elevation="20" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
@@ -30,6 +27,7 @@
                 </StackLayout>
             </ScrollView>
         </PullToRefresh>
+        <Fab row="1" col="0" @tap="SendNotification()" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
     </GridLayout>
 </template>
 
@@ -85,7 +83,7 @@
                 var connectionType = connectivity.getConnectionType();
                 if (connectionType == connectivity.connectionType.none) {
                     this.$feedback.error({
-                        title: "Error (NO INTERNET CONNECTION)",
+                        title: "NO INTERNET CONNECTION",
                         duration: 4000,
                         message: "Please switch on your data/wifi.",
                     });

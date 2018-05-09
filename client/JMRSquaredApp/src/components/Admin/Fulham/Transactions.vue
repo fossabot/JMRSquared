@@ -1,47 +1,39 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
     <GridLayout rows="auto,*">
+      <ScrollView row="0" v-show="currentPage == 0" orientation="horizontal">
+        <StackLayout orientation="horizontal">
+          <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
+            <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
+          </Ripple>
+        </StackLayout>
+      </ScrollView>
+      <PullToRefresh v-show="currentPage == 0" row="1" col="0" @refresh="refreshList($event)">
+        <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
+          <v-template>
+            <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
+              <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
+                <Label row="0" col="0" textAlignment="center" class="m-5" :text="transaction.type"></Label>
+                <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
+                <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
   
-      <CardView row="0" margin="10" elevation="10" height="40" @tap="ShowNewTransaction(1)" backgroundColor="grey" v-show="currentPage == 0" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-        <label verticalAlignment="center" textAlignment="center" text="Create a new transaction"></label>
-      </CardView>
+                <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
   
+                <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
+                <Label row="1" col="1" v-show="transaction.type == 'Rent'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
   
-      <StackLayout row="1" v-show="currentPage == 0">
-        <ScrollView orientation="horizontal">
-          <StackLayout orientation="horizontal">
-            <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
-              <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
-            </Ripple>
-          </StackLayout>
-        </ScrollView>
-        <PullToRefresh row="1" col="0" @refresh="refreshList($event)">
+                <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
+                <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
   
-          <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
-            <v-template>
-              <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-                  <Label row="0" col="0" textAlignment="center" class="m-5" :text="transaction.type"></Label>
-                  <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
-                  <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
-  
-                  <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
-                  
-                  <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
-                  <Label row="1" col="1" v-show="transaction.type == 'Rent'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
-                
-                  <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
-                  <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
-  
-                </GridLayout>
-              </CardView>
-              </v-template>
-          </ListView>
-        </PullToRefresh>
-      </StackLayout>
+              </GridLayout>
+            </CardView>
+          </v-template>
+        </ListView>
+      </PullToRefresh>
+      <Fab v-show="currentPage == 0" row="1" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
   
       <!-- This is the first step -->
-      <CardView row="1" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
+      <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
         <ScrollView>
           <StackLayout class="form">
             <Label row="0" col="1" @tap="ShowNewTransaction(0)" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
@@ -140,7 +132,7 @@
         </ScrollView>
       </CardView>
       <!-- This is the second step -->
-      <CardView row="1" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 2">
+      <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 2">
         <ScrollView>
           <StackLayout class="form">
             <Label row="0" col="1" @tap="ShowNewTransaction(1)" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10 text-light-red" :text="'mdi-keyboard-backspace' | fonticon"></Label>
@@ -244,7 +236,6 @@
         Amount: '',
         users: [],
         hasImage: false,
-        isLoading: false,
         selectedImage: null,
         selectedType: "All",
         transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
@@ -309,7 +300,7 @@
           });
   
         });
-        
+  
         var connectionType = connectivity.getConnectionType();
         if (connectionType == connectivity.connectionType.none) {
           this.$feedback.error({
@@ -447,14 +438,14 @@
         var self = this;
         this.$showModal({
           template: ` 
-                  <Page>
-                      <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                          <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                          <DatePicker row="1" v-model="selectedDueDate" />
-                          <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                      </GridLayout>
-                  </Page>
-                  `,
+                    <Page>
+                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                            <DatePicker row="1" v-model="selectedDueDate" />
+                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                        </GridLayout>
+                    </Page>
+                    `,
           data: function() {
             return {
               selectedDueDate: new Date()

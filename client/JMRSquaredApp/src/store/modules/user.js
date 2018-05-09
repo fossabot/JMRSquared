@@ -26,16 +26,6 @@ const mutations = {
    },
    logout (state,self) {
 
-    for(var obj in state.cacheStrings){
-      let documentID = appSettings.getString(obj);
-  
-      if (documentID != null) {
-        var isDeleted = self.$db.deleteDocument(documentID);
-        appSettings.remove(obj);
-        console.log("Deleted ? " + isDeleted);
-      }
-    }
-
     state.id = null;
     state.userName = null;
     state.pass= null;

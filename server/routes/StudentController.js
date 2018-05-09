@@ -31,7 +31,7 @@ router.get('/:id/get', function(req, res) {
     let id = req.params.id;
     if (id == null) {
         res.status(404);
-        res.send("Invalid ID - " + id);
+        res.send("Invalid ID > " + id);
     } else {
         Student.findById(id).then((student) => {
             if (student == null) {

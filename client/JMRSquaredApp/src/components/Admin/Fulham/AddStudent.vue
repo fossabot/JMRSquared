@@ -9,7 +9,7 @@
                                 <label class="h3" text="Adding a tenant for : "></label>
                                 <label class="h4 m-l-20" text="Fulham 86"></label>
                             </StackLayout>
-                            <Button row="0" col="1" @tap="$router.go(-1)" selfAlign="right" text="Cancel"></Button>
+                            <Button row="0" col="1" @tap="$router.back()" selfAlign="right" text="Cancel"></Button>
                         </GridLayout>
                     </CardView>
                     <Progress clas="m-y-10" :value="(currentPage + 1) * 20"></Progress>
@@ -312,7 +312,6 @@
     export default {
         data() {
             return {
-                isLoading: false,
                 txtError: '',
                 currentPage: 0,
                 tenantName: '',
@@ -393,7 +392,7 @@
                 var connectionType = connectivity.getConnectionType();
                 if (connectionType == connectivity.connectionType.none) {
                     self.$feedback.error({
-                        title: "Error (NO INTERNET CONNECTION)",
+                        title: "NO INTERNET CONNECTION",
                         duration: 4000,
                         message: "Please switch on your data/wifi.",
                     });

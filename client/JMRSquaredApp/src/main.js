@@ -38,16 +38,36 @@ Vue.registerElement('Ripple', () => require('nativescript-ripple').Ripple)
 
 Vue.registerElement('PullToRefresh', () => require('nativescript-pulltorefresh').PullToRefresh)
 
+Vue.registerElement("Fab", () => require("nativescript-floatingactionbutton").Fab);
+
 Vue.filter('fonticon', fonticon);
 
 Vue.prototype.$db = new Couchbase("jmrdb");
 Vue.prototype.$feedback = new Feedback();
 
+const dialogs = require('ui/dialogs');
+
 import * as Toast from "nativescript-toast";
 import * as fs from "tns-core-modules/file-system";
 import * as ChangeLog from './changeLog'
 
+var appSettings = require("application-settings");
 Vue.mixin({
+  data(){
+    return{
+      toggleSearch:false
+    }
+  },
+  computed:{
+    isLoading:{
+      get(){
+        return appSettings.getBoolean("isLoading");
+      },
+      set(val){
+        appSettings.setBoolean("isLoading",val);
+      }
+    }
+  },
   methods: {
     showChangeLog(){
       var log = ChangeLog.GetLogs('0.1');
@@ -265,8 +285,33 @@ Vue.mixin({
     getMoment(val) {
         return moment(val);
     },
+    loginTenant(self, result){
+      appSettings.setNumber("authLevel", 1);
+    
+      self.$store.commit("login", {
+        id: result._id,
+        userName: result.username,
+        pass: result.password,
+        email: result.email,
+        numbers: result.contactNumbers,
+        profilePic: result.profilePic,
+        role: null,
+        isLoggedIn: true,
+        isAdmin: false
+      });
+
+      self.$store.commit("cacheUser",{
+        db:self.$db,
+        appSettings:appSettings,
+        user:result,
+        isAdmin:false
+      });
+
+    },
     loginAdmin(self, result) {
-  
+
+      appSettings.setNumber("authLevel", 3);
+
       self.$store.commit("login", {
         id: result._id,
         userName: result.userName,
@@ -278,6 +323,13 @@ Vue.mixin({
         isLoggedIn: true,
         isAdmin: true
       });
+      
+      self.$store.commit("cacheUser",{
+        db:self.$db,
+        appSettings:appSettings,
+        user:result,
+        isAdmin:true
+      });
 
       self.$store.dispatch("PopulateNotifications", {
         notifications: result.notifications.filter((v) => v.dueDate == null)
@@ -285,6 +337,19 @@ Vue.mixin({
 
       self.$store.dispatch("PopulateTasks", {
         tasks: result.notifications.filter((v) => v.dueDate != null)
+      });
+    },
+    logOut() {
+      dialogs.confirm({
+                title: 'Confirm log out',
+                message: 'You want to log out?',
+                okButtonText: 'Yes',
+                cancelButtonText: 'No'
+      }).then(result => {
+          if (result) {
+            appSettings.setNumber("authLevel",0);
+            this.$router.replace('/home');
+          }
       });
     }
   }
