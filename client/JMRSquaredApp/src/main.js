@@ -55,22 +55,23 @@ var appSettings = require("application-settings");
 Vue.mixin({
   data(){
     return{
+      _isLoading:appSettings.getBoolean("isLoading") == true,
       toggleSearch:false
     }
   },
   computed:{
     isLoading:{
       get(){
-        return appSettings.getBoolean("isLoading");
+        return this._isLoading;
       },
       set(val){
-        appSettings.setBoolean("isLoading",val);
+        this._isLoading = val;
       }
     }
   },
   methods: {
     showChangeLog(){
-      var log = ChangeLog.GetLogs('0.1');
+      var log = ChangeLog.GetLogs('0.2');
       if(log != null && log != undefined){
         this.$feedback.info({
           title:'Change log ( v' + log.version +  ' )',

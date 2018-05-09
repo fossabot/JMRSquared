@@ -25,7 +25,7 @@ import RemindersList from '../components/Admin/RemindersList.vue'
 import AddStudent from '../components/Admin/Fulham/AddStudent.vue'
 
 
-import Students from '../components/Admin/Fulham/Students.vue'
+import StudentList from '../components/StudentList.vue'
 
 import Tenant_EditDetails from '../components/Tenant/Tenant_EditDetails.vue'
 
@@ -89,7 +89,7 @@ const router = new VueRouter({
     {
       name:'studentList',
       path: '/admin/fulham/students',
-      component: Students,
+      component: StudentList,
       meta: {
         title: 'Student List',
         authLevel:0
