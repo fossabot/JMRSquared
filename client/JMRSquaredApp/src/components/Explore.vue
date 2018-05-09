@@ -45,7 +45,7 @@
         layouts: [{
             id: "housemates",
             icon: "people",
-            title: "House mates",
+            title: "Tenants",
             row: 0,
             col: 0
           },

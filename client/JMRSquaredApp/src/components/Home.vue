@@ -19,7 +19,7 @@
       </FlexboxLayout>
       <FlexboxLayout justifyContent="flex-end" flexDirection="column">
         <GridLayout rows="auto" columns="*" textAlginment="center">
-          <Button backgroundColor="transparent" width="50%" selfAlign="center" @tap="$router.push('/explore')" textAlignment="center" borderColor="$blueDarkColor" text="Explore"></Button>
+          <Button backgroundColor="transparent" width="50%" selfAlign="center" @tap="$router.push('/explore')" textAlignment="center" borderWidth="5px" borderColor="#0093a4" text="Explore"></Button>
         </GridLayout>
         <GridLayout v-show="$route.meta.userAuthLevel == 0" justifyContent="flex-end" columns="*,*" rows="*" height="70">
           <Button @tap="$router.push('/register')" col="0" row="0" text="Register"></Button>

@@ -6,6 +6,10 @@
 // @see https://docs.nativescript.org/ui/styling
 @import 'assets/variables';
 
+CardView{
+  border:5px solid #0093a4;
+}
+
 .fab-button {
   height: 55;
   width: 55; /// this is required on iOS - Android does not require width so you might need to adjust styles 

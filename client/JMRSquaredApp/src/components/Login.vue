@@ -1,16 +1,16 @@
 <template>
   <page @loaded="pageLoaded()">
     <ActionBar>
-      <GridLayout rows="auto" columns="auto,*,*,auto" orientation="horizontal">
-        <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
-          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+      <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
+        <Ripple class="p-10" @tap="$router.push('/home')" verticalAlignment="center" col="0" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-home' | fonticon"></Label>
         </Ripple>
         <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Login"></Label>
-        <Ripple  class="p-10 font-weight-bold" @tap="isEnterEmail = !isEnterEmail" textAlignment="right" verticalAlignment="center" col="2">
-          <Label verticalAlignment="center" :text="isEnterEmail ? 'Use numbers' : 'Use email'"></Label>
-        </Ripple>
-        <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="3" borderRadius="50%">
+        <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
           <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+        </Ripple>
+        <Ripple  class="p-20 m-x-20 font-weight-bold" @tap="isEnterEmail = !isEnterEmail" textAlignment="right" verticalAlignment="center" col="3">
+          <Label verticalAlignment="center" textWrap="true" :text="isEnterEmail ? 'Use numbers' : 'Use email'"></Label>
         </Ripple>
       </GridLayout>
     </ActionBar>
