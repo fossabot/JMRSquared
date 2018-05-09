@@ -103,8 +103,10 @@
                         }
                         this.searchedStudents = result;
                         this.isLoading = false;
-                    }, function(e) {
-                        Toast.makeText("We got an error").show();
+                    }).catch(e => {
+                        this.$feedback.error({
+                            message: e
+                        });
                         this.isLoading = false;
                     });
                 }
@@ -149,88 +151,19 @@
                         this.searchedStudents = result;
     
                         pullRefresh.refreshing = false;
-                    }, function(e) {
-                        Toast.makeText("We got an error").show();
-                        pullRefresh.refreshing = false;
+                    }).catch(e => {
+                        this.$feedback.error({
+                            message: e
+                        });
+                        this.isLoading = false;
                     });
                 }
             },
             AddStudents() {
                 this.$router.push('/admin/students/add');
             },
-            RemoveStudents() {
-                dialogs.alert('Remove student').then(() => {
-                    console.log("FIne");
-                });
-            },
-            ModifyStudents() {
-                dialogs.alert('MOdify student').then(() => {
-                    console.log("FIne");
-                });
-            },
             onStudentTap(event) {
-    
-                /*
-                                    LocalNotifications.hasPermission().then(
-                                        function(granted) {
-                                            dialogs.alert("Permission " + granted).then(() => {
-                                                console.log("card.redirect");
-                                            });
-                                        }
-                                    )
-                    
-                                    LocalNotifications.schedule([{
-                                        id: event.item.id,
-                                        title: 'Hello ' + event.item.username,
-                                        body: 'Recurs every minute until cancelled',
-                                        ticker: 'The ticker',
-                                        badge: 1,
-                                        groupedMessages: ["The first", "Second", "Keep going", "one more..", "OK Stop"], //android only
-                                        groupSummary: "Summary of the grouped messages above", //android only
-                                        smallIcon: 'res://icon.png',
-                                        interval: 'minute',
-                                        sound: "customsound-ios.wav", // falls back to the default sound on Android
-                                        at: new Date(new Date().getTime() + (10 * 1000)) // 10 seconds from now
-                                    }]).then(
-                                        function() {
-                                            dialogs.alert("Notification scheduled").then(() => {
-                                                console.log("card.redirect");
-                                            });
-                                        },
-                                        function(error) {
-                                            dialogs.alert("Error while scheduling").then(() => {
-                                                console.log(error);
-                                            });
-                                        }
-                                    )
-                    
-                                    LocalNotifications.addOnMessageReceivedCallback(
-                                        function(notification) {
-                                            dialogs.alert("Notification clicked " + notification.id).then(() => {
-                                                console.log("card.redirect");
-                                            });
-                                        }
-                                    ).then(
-                                        function() {
-                                            dialogs.alert("Listener added").then(() => {
-                                                console.log(error);
-                                            });
-                                        }
-                                    )
-                        */
-                //TODO : Make this go to student profile.
-    
                 this.$router.push('/admin/fulham/student/profile/' + event.item._id);
-    
-    
-            },
-            switchPage(card) {
-                dialogs.alert("Going to " + card.redirect).then(() => {
-                    console.log(card.redirect);
-                });
-                this.$router.push({
-                    path: card.redirect
-                });
             }
         }
     }
