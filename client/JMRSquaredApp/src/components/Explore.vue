@@ -2,11 +2,11 @@
   <page @loaded="pageLoaded()">
     <ActionBar>
       <GridLayout rows="auto" columns="auto,*,auto" orientation="horizontal">
-        <Ripple class="p-x-15" @tap="$router.back()" verticalAlignment="center" col="0" height="100%" borderRadius="50%">
+        <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
           <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
         </Ripple>
         <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Explore"></Label>
-        <Ripple class="p-x-15" @tap="reportBug()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
+        <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
           <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
         </Ripple>
       </GridLayout>

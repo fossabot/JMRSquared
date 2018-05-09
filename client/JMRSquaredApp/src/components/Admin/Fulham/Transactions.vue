@@ -1,14 +1,15 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
-    <GridLayout rows="auto,*">
-      <ScrollView row="0" v-show="currentPage == 0" orientation="horizontal">
-        <StackLayout orientation="horizontal">
+    <GridLayout rows="auto,auto,*">
+      <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
+        <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
             <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
           </Ripple>
         </StackLayout>
       </ScrollView>
-      <PullToRefresh v-show="currentPage == 0" row="1" col="0" @refresh="refreshList($event)">
+      <PullToRefresh v-show="currentPage == 0" row="2" col="0" @refresh="refreshList($event)">
         <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
@@ -30,7 +31,7 @@
           </v-template>
         </ListView>
       </PullToRefresh>
-      <Fab v-show="currentPage == 0" row="1" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
+      <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
   
       <!-- This is the first step -->
       <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
