@@ -214,8 +214,10 @@ router.post('/transaction/add', function(req, res) {
             admin.transactions.push(transaction._id);
             admin.save(function(err){
                 if (err)  { console.log(err); return; };
-
+                    console.log("Type = " + req.body.type);
                 if(req.body.type == 'Rent'){
+
+                    console.log("We in .... ");
                     var rent = new Rent({
                         studentID :req.body.rentTenantID,
                         datePaid :req.body.date,
@@ -223,11 +225,15 @@ router.post('/transaction/add', function(req, res) {
                         amount :req.body.amount
                     });
                    
+                    console.log("Logging rent .... ");
+                    console.log(rent);
                     rent.save(function(err){
                         if (err)  { console.log(err); return; };
                         res.send("Rent payment successfully saved");
                     });
                 }else{
+
+                    console.log("On else");
                     res.send("Transaction successfully saved");
                 }
             });
