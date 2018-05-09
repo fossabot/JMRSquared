@@ -217,10 +217,10 @@ router.post('/transaction/add', function(req, res) {
 
                 if(transaction.rentTenantID){
                     var rent = new Rent({
-                        studentID = req.body.rentTenantID,
-                        datePaid = req.body.date,
-                        monthOfPayment = req.body.rentMonth,
-                        amount = req.body.amount
+                        studentID :req.body.rentTenantID,
+                        datePaid :req.body.date,
+                        monthOfPayment :req.body.rentMonth,
+                        amount :req.body.amount
                     });
                    
                     rent.save(function(err){
