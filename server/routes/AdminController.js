@@ -7,6 +7,7 @@ import Document from '../models/Document';
 import Transaction from '../models/Transaction';
 import Bug from '../models/Bug';
 import Rent from '../models/Rent';
+import Student from '../models/Student';
 
 
 /*
@@ -224,7 +225,14 @@ router.post('/transaction/add', function(req, res) {
                    
                     rent.save(function(err){
                         if (err)  { console.log(err); return; };
-                        res.send("Rent payment successfully saved");
+                        Student.findById(req.body.rentTenantID,function(err,student){
+                            if (err || student == null)  { console.log(err); return; };
+                            student.rents.push(rent._id);
+                            student.save(function(err){
+                                if (err)  { console.log(err); return; };
+                                res.send("Rent payment successfully saved");
+                            });
+                        });
                     });
                 }else{
 
