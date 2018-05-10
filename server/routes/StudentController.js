@@ -141,7 +141,7 @@ router.post('/add', function(req, res) {
                         res.send(err);
                     
                     }
-                    res.send(req.body.username + " was successfully saved!");
+                    res.send(student._id);
                 });
             }
 
