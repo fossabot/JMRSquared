@@ -17,9 +17,8 @@
         <StackLayout>
             <ScrollView>
                 <StackLayout>
-
                     <StackLayout class="p-y-20" alignSelf="center" width="100%">
-                        <Image alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="tenant.profilePic ? tenant.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
+                        <Image @tap="$router.push('/tenant/profile/edit/' + tenant._id)" alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="tenant.profilePic ? tenant.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
                     </StackLayout>
     
                     <Label class="h2 font-weight-bold text-mute text-dark-blue" textAlignment="center" :text="tenant.username"></Label>

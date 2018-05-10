@@ -20,9 +20,6 @@
                 <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.username"></label>
                 <Label class="h3 m-5" textAlignment="center" :text="user.email"></Label>
             </StackLayout>
-            <Ripple @tap="$router.push('/tenant/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
-                <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
-            </Ripple>
             <GridLayout class="m-20" rows="*,*" columns="*,*,*">
                 <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
                     <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">

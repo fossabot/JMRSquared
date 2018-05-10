@@ -97,7 +97,7 @@ const router = new VueRouter({
     },
     {
       name:'tenantProfileEdit',
-      path: '/tenant/profile/edit',
+      path: '/tenant/profile/edit/:profileID',
       component: Tenant_EditDetails,
       meta: {
         title: 'Student Edit Profile',
@@ -210,7 +210,7 @@ router.beforeEach((to, from, next) => {
       if(authLevel < 2){
         feedback.error({ title : "You are not Authorized to access this page!"});
           return;
-        }
+      }
     break;
     case 3:
       if(authLevel < 3){
@@ -222,7 +222,7 @@ router.beforeEach((to, from, next) => {
 
   to.meta.userAuthLevel = authLevel;
 
-  if(to.name == 'studentProfile'){
+  if(to.name == 'studentProfile' || to.name == 'tenantProfileEdit'){
     http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
       to.meta.user = student;
       next();

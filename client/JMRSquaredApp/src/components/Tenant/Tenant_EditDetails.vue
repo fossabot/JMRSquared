@@ -5,7 +5,7 @@
                 <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + $store.state.cache.cachedTenant.username + '\'s details'"></Label>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + tenant.username + '\'s details'"></Label>
                 <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
@@ -185,16 +185,21 @@
                 isLoaded: false,
                 //Edit profile staff --START
                 txtError: '',
-                userName: this.$store.state.cache.cachedTenant.username,
-                email: this.$store.state.cache.cachedTenant.email,
-                numbers: this.$store.state.cache.cachedTenant.numbers ? '0' + this.$store.state.cache.cachedTenant.numbers : '',
+                userName: this.$route.meta.user.username,
+                email: this.$route.meta.user.email,
+                numbers: this.$route.meta.user.numbers ? '0' + this.$route.meta.user.numbers : '',
                 newPassword: '',
                 confirmNewPassword: '',
                 oldPassword: '',
-                selectedImage: this.$store.state.cache.cachedTenant.profilePic,
+                selectedImage: this.$route.meta.user.profilePic,
                 hasImage: false,
                 changePassword: false
                 //Edit profile staff --END
+            }
+        },
+        computed: {
+            tenant() {
+                return this.$route.meta.user
             }
         },
         created() {
@@ -214,40 +219,6 @@
             },
             SaveProfileChanges() {
     
-                this.txtError = '';
-                this.isLoading = true;
-    
-                if (this.userName.length < 2) {
-                    this.txtError = 'User name too short.';
-                    this.isLoading = false;
-                    return;
-                }
-    
-                if (this.email.length < 2) {
-                    this.txtError = 'Email too short.';
-                    this.isLoading = false;
-                    return;
-                }
-    
-                if (this.numbers.length != 10 || isNaN(this.numbers)) {
-                    this.txtError = 'Contact numbers must have 10 digits.';
-                    this.isLoading = false;
-                    return;
-                }
-    
-                if (this.oldPassword.length > 3) {
-                    if (this.newPassword.length < 5) {
-                        this.txtError = 'Password too short.';
-                        this.isLoading = false;
-                        return;
-                    }
-    
-                    if (this.newPassword != this.confirmNewPassword) {
-                        this.txtError = 'Passwords do not match.';
-                        this.isLoading = false;
-                        return;
-                    }
-                }
                 this.$feedback.info({
                     title: 'Not Implemented',
                     message: "This is not functional yet"
@@ -264,7 +235,7 @@
                         "Content-Type": "application/json"
                     },
                     content: JSON.stringify({
-                        id: this.$store.state.cache.cachedTenant._id,
+                        id: this.$route.meta.user._id,
                         userName: this.userName,
                         email: this.email,
                         numbers: this.numbers,
