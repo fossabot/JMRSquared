@@ -367,8 +367,8 @@
                                             "Content-Type": "application/json"
                                         },
                                         content: JSON.stringify({
-                                            fromId: self.$store.state.user.id,
-                                            from: self.$store.state.user.userName,
+                                            fromId: self.$store.state.cache.cachedAdmin._id,
+                                            from: self.$store.state.cache.cachedAdmin.userName,
                                             to: victims.map(t => t.text)[i],
                                             toId: victims.map(t => t.id)[i],
                                             msg: this.description,

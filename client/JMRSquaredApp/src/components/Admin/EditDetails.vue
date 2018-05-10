@@ -5,7 +5,7 @@
                 <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + $store.state.user.userName + '\'s details'"></Label>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + user.userName + '\'s details'"></Label>
                 <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
@@ -91,15 +91,22 @@
                 isLoaded: false,
                 //Edit profile staff --START
                 txtError: '',
-                userName: this.$store.state.user.userName,
-                email: this.$store.state.user.email,
-                numbers: this.$store.state.user.numbers ? '0' + this.$store.state.user.numbers : '',
+                userName: this.$store.state.cache.cachedAdmin.userName,
+                email: this.$store.state.cache.cachedAdmin.email,
+                numbers: this.$store.state.cache.cachedAdmin.numbers ? '0' + this.$store.state.cache.cachedAdmin.numbers : '',
                 newPassword: '',
                 confirmNewPassword: '',
                 oldPassword: '',
-                selectedImage: this.$store.state.user.profilePic,
+                selectedImage: this.$store.state.cache.cachedAdmin.profilePic,
                 hasImage: false,
                 //Edit profile staff --END
+            }
+        },
+        computed: {
+            user: {
+                get() {
+                    return this.$store.state.cache.cachedAdmin
+                }
             }
         },
         created() {
@@ -168,7 +175,7 @@
                         "Content-Type": "application/json"
                     },
                     content: JSON.stringify({
-                        id: this.$store.state.user.id,
+                        id: this.user.id,
                         userName: this.userName,
                         email: this.email,
                         numbers: this.numbers,

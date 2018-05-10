@@ -45,7 +45,7 @@
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transacter"></label>
-              <label row="1" col="1" :text="$store.state.user.userName" class="h4"></label>
+              <label row="1" col="1" :text="$store.state.cache.cachedAdmin.userName" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
@@ -144,7 +144,7 @@
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transacter"></label>
-              <label row="1" col="1" :text="$store.state.user.userName" class="h4"></label>
+              <label row="1" col="1" :text="$store.state.cache.cachedAdmin.userName" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
@@ -361,7 +361,7 @@
                 "Content-Type": "application/json"
               },
               content: JSON.stringify({
-                adminID: this.$store.state.user.id, //ForeignKey
+                adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
                 amount: this.Amount,
                 type: this.isRent ? 'Rent' : (this.isWithdraw ? 'Withdraw' : 'Deposit'),
                 rentTenantID: this.isRent ? this.users.filter(u => u.text == this.rentTenantName)[0].id : false,

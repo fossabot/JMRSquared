@@ -5,7 +5,7 @@
                 <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + $store.state.user.userName"></Label>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + user.userName"></Label>
                 <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
@@ -119,7 +119,7 @@
         computed: {
             user: {
                 get() {
-                    return this.$store.state.user;
+                    return this.$store.state.cache.cachedAdmin;
                 }
             },
             Reminders: {
@@ -145,11 +145,6 @@
                 if (firstTime != true) {
                     this.showChangeLog();
                     appSettings.setBoolean("shownChangeLog", true);
-                }
-    
-                var logged = this.$store.state.user.isLoggedIn;
-                if (!logged) {
-                    this.$router.push('/home');
                 }
             },
             eventChanged(event) {

@@ -405,7 +405,7 @@
                                 "Content-Type": "application/json"
                             },
                             content: JSON.stringify({
-                                addedBy: this.$store.state.user.id,
+                                addedBy: this.$store.state.cache.cachedAdmin._id,
                                 username: this.tenantUserName,
                                 firstName: this.tenantName.split(" ")[1],
                                 surname: this.tenantName.split(" ")[0],
