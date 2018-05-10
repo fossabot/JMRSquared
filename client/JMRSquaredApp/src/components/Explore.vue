@@ -19,7 +19,7 @@
           </GridLayout>
         </FlexboxLayout>
       </StackLayout>
-      <GridLayout class="m-20" rows="*,*" columns="*,*,*">
+      <GridLayout class="m-20" verticalAlignment="bottom" rows="*" columns="*,*,*">
         <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
           <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
             <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
@@ -48,42 +48,7 @@
             title: "Tenants",
             row: 0,
             col: 0
-          },
-          {
-            id: "notifications",
-            icon: "notifications",
-            title: "Notifications",
-            row: 0,
-            col: 1
-          },
-          {
-            id: "rent",
-            icon: "attach-money",
-            title: "Rent",
-            row: 0,
-            col: 2
-          },
-          {
-            id: "lease",
-            icon: "library-books",
-            title: "Lease Agreement",
-            row: 1,
-            col: 0
-          },
-          {
-            id: "info",
-            icon: "info",
-            title: "Info and help",
-            row: 1,
-            col: 1
-          },
-          {
-            id: "proofOfResidence",
-            icon: "assignment",
-            title: "Proof Of Residence",
-            row: 1,
-            col: 2
-          },
+          }
         ],
         isLoaded: false
       }
