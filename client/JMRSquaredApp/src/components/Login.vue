@@ -44,7 +44,8 @@
             </StackLayout>
   
             <GridLayout v-show="$route.meta.userAuthLevel > 0" justifyContent="flex-end" columns="*" rows="auto">
-              <Button v-if="$route.meta.userAuthLevel == 1 || $route.meta.userAuthLevel == 3" @tap="$route.meta.userAuthLevel == 1 ? $router.push('/tenant/dashboard') : $router.push('/admin/dashboard')" :text="'Continue as '+ $store.state.user.userName"></Button>
+              <Button v-if="$route.meta.userAuthLevel == 1" @tap="$router.push('/tenant/dashboard')" :text="'Continue as ' + $store.state.cache.cachedTenant.username"></Button>
+              <Button v-if="$route.meta.userAuthLevel == 3" @tap="$router.push('/admin/dashboard')" :text="'Continue as ' + $store.state.cache.cachedAdmin.userName"></Button>
             </GridLayout>
   
           </FlexboxLayout>

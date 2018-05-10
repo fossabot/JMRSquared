@@ -32,16 +32,16 @@
             <ListView for="task in Reminders">
               <v-template>
                 <GridLayout class="m-10 p-10" backgroundColor="white" columns="auto,*,auto" rows="auto,auto,auto">
-                  <Label v-show="task.to != $store.state.user.userName" text="TO" row="0" col="0" verticalAlignment="center" textAlignment="center" class="text-muted t-10"></Label>
-                  <Label v-show="task.to != $store.state.user.userName" :text="task.to" row="1" col="0"  textAlignment="center"  fontWeight="bold" class="text-mute t-12 text-dark-blue"></Label>
-                  <Ripple v-show="task.from == $store.state.user.userName" @tap="RemoveFeed(task)" verticalAlignment="center" textAlignment="center" row="0" col="2" rowSpan="3">
+                  <Label v-show="task.to != $store.state.cache.cachedAdmin.userName" text="TO" row="0" col="0" verticalAlignment="center" textAlignment="center" class="text-muted t-10"></Label>
+                  <Label v-show="task.to != $store.state.cache.cachedAdmin.userName" :text="task.to" row="1" col="0"  textAlignment="center"  fontWeight="bold" class="text-mute t-12 text-dark-blue"></Label>
+                  <Ripple v-show="task.from == $store.state.cache.cachedAdmin.userName" @tap="RemoveFeed(task)" verticalAlignment="center" textAlignment="center" row="0" col="2" rowSpan="3">
                     <Label fontSize="25%" class="mdi text-light-red p-10" :text="'mdi-close' | fonticon"></Label>
                   </Ripple>
-                  <Ripple v-show="task.to == $store.state.user.userName" @tap="DoneFeed(task)" verticalAlignment="center" textAlignment="center" row="0" col="0" rowSpan="3">
+                  <Ripple v-show="task.to == $store.state.cache.cachedAdmin.userName" @tap="DoneFeed(task)" verticalAlignment="center" textAlignment="center" row="0" col="0" rowSpan="3">
                    <Label fontSize="25%" class="mdi text-light-green p-10" :text="'mdi-done' | fonticon"></Label>
                   </Ripple>
-                  <Label v-show="task.from != $store.state.user.userName" text="FROM" row="0" col="2" verticalAlignment="center" textAlignment="center" class="text-muted t-10"></Label>
-                  <Label v-show="task.from != $store.state.user.userName" :text="task.from" row="1" col="2"  fontWeight="bold" textAlignment="center" class="text-mute t-12 text-dark-blue"></Label>
+                  <Label v-show="task.from != $store.state.cache.cachedAdmin.userName" text="FROM" row="0" col="2" verticalAlignment="center" textAlignment="center" class="text-muted t-10"></Label>
+                  <Label v-show="task.from != $store.state.cache.cachedAdmin.userName" :text="task.from" row="1" col="2"  fontWeight="bold" textAlignment="center" class="text-mute t-12 text-dark-blue"></Label>
                  
                   <Label class="m-5" row="0" col="1" textAlignment="center" verticalAlignment="center" fontWeight="bold" :text="task.msg" textWrap="true"></Label>
                   <Label class="m-5" row="1" col="1" textAlignment="center" :text="getMoment(task.dueDate).fromNow()"></Label>
@@ -83,7 +83,7 @@
       pageLoaded(mineOnly = true) {
         this.mineOnly = mineOnly;
         if(this.mineOnly){
-          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.user.id).then((result) => {
+          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.cache.cachedAdmin._id).then((result) => {
             this.Reminders = result;
     
           }).catch(err => {
@@ -108,7 +108,7 @@
       refreshList(args) {
         var pullRefresh = args.object;
         if(this.mineOnly){
-          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.user.id).then((result) => {
+          http.getJSON(this.$store.state.settings.baseLink + "/n/tasks/all/" + this.$store.state.cache.cachedAdmin._id).then((result) => {
             this.Reminders = result;
     
             pullRefresh.refreshing = false;

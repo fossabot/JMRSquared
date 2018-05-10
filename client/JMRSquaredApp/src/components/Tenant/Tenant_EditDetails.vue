@@ -5,7 +5,7 @@
                 <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + $store.state.user.userName + '\'s details'"></Label>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + $store.state.cache.cachedTenant.username + '\'s details'"></Label>
                 <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
@@ -185,13 +185,13 @@
                 isLoaded: false,
                 //Edit profile staff --START
                 txtError: '',
-                userName: this.$store.state.user.userName,
-                email: this.$store.state.user.email,
-                numbers: this.$store.state.user.numbers ? '0' + this.$store.state.user.numbers : '',
+                userName: this.$store.state.cache.cachedTenant.username,
+                email: this.$store.state.cache.cachedTenant.email,
+                numbers: this.$store.state.cache.cachedTenant.numbers ? '0' + this.$store.state.cache.cachedTenant.numbers : '',
                 newPassword: '',
                 confirmNewPassword: '',
                 oldPassword: '',
-                selectedImage: this.$store.state.user.profilePic,
+                selectedImage: this.$store.state.cache.cachedTenant.profilePic,
                 hasImage: false,
                 changePassword: false
                 //Edit profile staff --END
@@ -264,7 +264,7 @@
                         "Content-Type": "application/json"
                     },
                     content: JSON.stringify({
-                        id: this.$store.state.user.id,
+                        id: this.$store.state.cache.cachedTenant._id,
                         userName: this.userName,
                         email: this.email,
                         numbers: this.numbers,

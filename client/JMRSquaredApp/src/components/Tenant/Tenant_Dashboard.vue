@@ -5,7 +5,7 @@
                 <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + $store.state.user.userName"></Label>
+                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + user.username"></Label>
                 <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
                     <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
@@ -17,7 +17,7 @@
         <StackLayout>
             <StackLayout class="p-y-20" alignSelf="center" width="100%">
                 <Image alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
-                <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.userName"></label>
+                <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.username"></label>
                 <Label class="h3 m-5" textAlignment="center" :text="user.email"></Label>
             </StackLayout>
             <Ripple @tap="$router.push('/tenant/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
@@ -101,7 +101,7 @@
         computed: {
             user: {
                 get() {
-                    return this.$store.state.user;
+                    return this.$store.state.cache.cachedTenant;
                 }
             },
             Reminders: {
@@ -127,11 +127,6 @@
                 if (firstTime != true) {
                     this.showChangeLog();
                     appSettings.setBoolean("shownChangeLog", true);
-                }
-    
-                var logged = this.$store.state.user.isLoggedIn;
-                if (!logged) {
-                    this.$router.push('/home');
                 }
             },
             eventChanged(event) {
