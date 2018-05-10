@@ -13,6 +13,7 @@ const mutations = {
     if (documentID != null) {
         var user = obj.db.getDocument(documentID);
         state.cachedAdmin = user.result;
+        state.lastUpdated = user.date;
     }
 
     documentID = obj.appSettings.getString(state.tenantLoggedInString);
@@ -20,6 +21,7 @@ const mutations = {
     if (documentID != null) {
         var user = obj.db.getDocument(documentID);
         state.cachedTenant = user.result;
+        state.lastUpdated = user.date;
     }
    
    },

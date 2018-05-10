@@ -8,8 +8,7 @@ const state = {
   role:'admin',
   profilePic : null,
   isLoggedIn:false,
-  isAdmin:false,
-  cacheStrings:['loginResponse','studentsResponse']
+  isAdmin:false
 };
 
 const mutations = {
