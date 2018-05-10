@@ -302,7 +302,7 @@ Vue.mixin({
     loginAdmin(self, result) {
 
       appSettings.setNumber("authLevel", 3);
-
+      
       self.$store.commit("login", {
         id: result._id,
         userName: result.userName,
@@ -377,7 +377,7 @@ Vue.mixin({
                 cancelButtonText: 'No'
       }).then(result => {
           if (result) {
-            appSettings.setNumber("authLevel",0);
+            appSettings.setNumber("authLevel",-1);
             this.$router.replace('/home');
           }
       });

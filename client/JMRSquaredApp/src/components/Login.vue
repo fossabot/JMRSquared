@@ -98,13 +98,12 @@
       submit() {
         var self = this;
         this.isLoading = true;
-  
         var connectionType = connectivity.getConnectionType();
         if (connectionType == connectivity.connectionType.none) {
-          if (this.$route.meta.userAuthLevel == 1) {
-            this.loadTenantData();
-          } else if (this.$route.meta.userAuthLevel == 3) {
+          if (this.$route.meta.userAuthLevel == -1) {
             this.loadAdminData();
+          } else if (this.$route.meta.userAuthLevel == -2) {
+            this.loadTenantData();
           } else {
             this.$feedback.error({
               title: "NO INTERNET CONNECTION",

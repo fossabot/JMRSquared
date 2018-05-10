@@ -191,8 +191,11 @@ router.beforeEach((to, from, next) => {
 
   let documentID = appSettings.getString(store.state.cache.adminLoggedInString) != null ? appSettings.getString(store.state.cache.adminLoggedInString) : appSettings.getString(store.state.cache.tenantLoggedInString);
    
-  if(isNaN(authLevel) || documentID == null) {
+  if(isNaN(authLevel) && documentID == null) {
     authLevel = 0;
+    appSettings.setNumber("authLevel",authLevel);
+  }else if(documentID != null && authLevel < 0){
+    authLevel = appSettings.getString(store.state.cache.adminLoggedInString) != null ? -1 : -2;
     appSettings.setNumber("authLevel",authLevel);
   }
   
