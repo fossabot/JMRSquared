@@ -188,7 +188,6 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   let authLevel = appSettings.getNumber("authLevel");
-  appSettings.setBoolean("isLoading",false);
 
   let documentID = appSettings.getString(store.state.cache.adminLoggedInString) != null ? appSettings.getString(store.state.cache.adminLoggedInString) : appSettings.getString(store.state.cache.tenantLoggedInString);
    
