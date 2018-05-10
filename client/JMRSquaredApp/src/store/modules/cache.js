@@ -11,7 +11,7 @@ const mutations = {
     let documentID = obj.appSettings.getString(state.adminLoggedInString);
     
     if (documentID != null) {
-        var user = obj.db.getDocument(documentID);
+        let user = obj.db.getDocument(documentID);
         state.cachedAdmin = user.result;
         state.lastUpdated = user.date;
     }
@@ -19,7 +19,7 @@ const mutations = {
     documentID = obj.appSettings.getString(state.tenantLoggedInString);
 
     if (documentID != null) {
-        var user = obj.db.getDocument(documentID);
+        let user = obj.db.getDocument(documentID);
         state.cachedTenant = user.result;
         state.lastUpdated = user.date;
     }
@@ -48,8 +48,10 @@ const mutations = {
 
     if(obj.isAdmin){
       state.cachedAdmin = obj.user;
+      state.lastUpdated = new Date();
     }else{
       state.cachedTenant = obj.user;
+      state.lastUpdated = new Date();
     }
     
   }
