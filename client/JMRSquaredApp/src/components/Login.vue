@@ -9,7 +9,7 @@
         <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
           <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
         </Ripple>
-        <Ripple  class="p-20 m-x-20 font-weight-bold" @tap="isEnterEmail = !isEnterEmail" textAlignment="right" verticalAlignment="center" col="3">
+        <Ripple class="p-20 m-x-20 font-weight-bold" @tap="isEnterEmail = !isEnterEmail" textAlignment="right" verticalAlignment="center" col="3">
           <Label verticalAlignment="center" textWrap="true" :text="isEnterEmail ? 'Use numbers' : 'Use email'"></Label>
         </Ripple>
       </GridLayout>
@@ -18,7 +18,7 @@
       <CardView verticalAlignment="center" padding="10" margin="4" elevation="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
         <GridLayout width="100%">
           <FlexboxLayout class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
-           
+  
             <GridLayout v-show="!isEnterEmail" class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-phone' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Contact numbers"></label>
@@ -82,15 +82,18 @@
     created() {
       this.pageLoaded();
     },
-    beforeDestroy(){
+    beforeDestroy() {
       this.isLoading = false;
     },
-    Destroy(){
+    Destroy() {
       this.isLoading = false;
     },
     methods: {
       pageLoaded() {
-  
+        this.$store.commit("refreshCache", {
+          db: this.$db,
+          appSettings: appSettings
+        });
       },
       submit() {
         var self = this;
@@ -98,13 +101,18 @@
   
         var connectionType = connectivity.getConnectionType();
         if (connectionType == connectivity.connectionType.none) {
-          this.$feedback.error({
-            title: "NO INTERNET CONNECTION",
-            duration: 4000,
-            message: "Please switch on your data/wifi.",
-          });
-          return;
-        }
+          if (this.$route.meta.userAuthLevel == 1) {
+            this.loadTenantData();
+          } else if (this.$route.meta.userAuthLevel == 3) {
+            this.loadAdminData();
+          } else {
+            this.$feedback.error({
+              title: "NO INTERNET CONNECTION",
+              duration: 4000,
+              message: "Please switch on your data/wifi.",
+            });
+          }
+        }else{
   
         dialogs
           .action("What type of user are you?", "cancel", ["Tenant", "Admin"])
@@ -161,7 +169,7 @@
                   })
                 }).then(response => {
                   var statusCode = response.statusCode;
-                   this.$feedback.info({
+                  this.$feedback.info({
                     message: statusCode
                   });
                   if (statusCode == 200) {
@@ -185,12 +193,12 @@
                   this.isLoading = false;
                 });
   
-            }else{
+            } else {
               //WHen they press cancel
               this.isLoading = false;
             }
           });
-      }
+      }}
     }
   };
 </script>
