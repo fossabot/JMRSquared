@@ -129,6 +129,7 @@
                   if (statusCode == 200) {
                     var result = response.content.toJSON();
                     this.loginTenant(this, result);
+                    this.isLoading = false;
                     this.$router.push("/tenant/dashboard");
                   } else {
                     var error = response.content.toString();
@@ -166,6 +167,7 @@
                   if (statusCode == 200) {
                     var result = response.content.toJSON();
                     this.loginAdmin(self, result);
+                    this.isLoading = false;
                     this.$router.push("/admin/dashboard");
   
                   } else {
