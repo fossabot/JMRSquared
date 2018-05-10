@@ -430,8 +430,7 @@
                         })
                         .then(
                             function(response) {
-                                self.isLoading = false;
-    
+                               
                                 var statusCode = response.statusCode;
                                 var result = response.content.toString();
     
@@ -440,25 +439,22 @@
     
                                     self.$feedback.success({
                                         title: self.tenantUserName + " successfully added",
-                                        message: "Click me to go to " + self.tenantUserName + "'s profile",
-                                        duration: 4000,
+                                        duration: 30000,
                                         onTap: () => {
-                                            dialogs.alert("TODO : Take them to " + self.tenantUserName + "'s profile");
+                                          self.$router.replace('/admin/fulham/student/profile/' + result);
                                         }
+                                    }).then(()=>{
+                                        self.router.replace('/admin/dashboard');
                                     });
-                                    self.isLoading = true;
-                                    self.router.push('/admin/dashboard');
                                 } else {
                                     self.$feedback.error({
                                         title: "Error (" + statusCode + ")",
                                         duration: 4000,
-                                        message: result,
-                                        onTap: () => {
-                                            dialogs.alert("TODO : Handle the error");
-                                        }
+                                        message: result
                                     });
     
                                 }
+                                self.isLoading = false;
                             },
                             function(e) {
                                 dialogs.alert(e).then(() => {
@@ -476,6 +472,7 @@
                                     dialogs.alert("TODO : Handle the error");
                                 }
                             });
+                            self.isLoading = false;
                         });
     
                 }

@@ -55,18 +55,8 @@ var appSettings = require("application-settings");
 Vue.mixin({
   data(){
     return{
-      _isLoading:appSettings.getBoolean("isLoading") == true,
+      isLoading:false,
       toggleSearch:false
-    }
-  },
-  computed:{
-    isLoading:{
-      get(){
-        return this._isLoading;
-      },
-      set(val){
-        this._isLoading = val;
-      }
     }
   },
   methods: {

@@ -227,10 +227,6 @@ router.beforeEach((to, from, next) => {
     }).catch(err=>{
         alert(err);
     });
-  }else if(to.name == 'login'){
-    next();
-  }else if(to.name == 'home'){
-    next();
   }else{
     next();
   }

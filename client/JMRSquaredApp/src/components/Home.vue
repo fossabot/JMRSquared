@@ -71,13 +71,15 @@
         var user = this.$store.state.cache.cachedTenant;
         if (user != null) {
           this.loginTenant(this, user);
+          this.isLoading = false;
           this.$router.push("/tenant/dashboard");
         } else {
-           this.$feedback.error({
+          this.$feedback.error({
             title: "Error not expected",
             duration: 4000,
             message: "Report this as (Error : VVPAOS09)",
           });
+          this.isLoading = false;
         }
       },
       loadAdminData() {
@@ -85,6 +87,7 @@
         var user = this.$store.state.cache.cachedAdmin;
         if (user != null) {
           this.loginAdmin(this, user);
+          this.isLoading = false;
           this.$router.push("/admin/dashboard");
         } else {
           this.$feedback.error({
@@ -92,6 +95,7 @@
             duration: 4000,
             message: "Report this as (Error : RVPAOS09)",
           });
+          this.isLoading = false;
         }
       }
     }
