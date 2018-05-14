@@ -221,7 +221,7 @@ router.beforeEach((to, from, next) => {
   }
 
   to.meta.userAuthLevel = authLevel;
-
+  
   if(to.name == 'studentProfile' || to.name == 'tenantProfileEdit'){
     http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
       to.meta.user = student;

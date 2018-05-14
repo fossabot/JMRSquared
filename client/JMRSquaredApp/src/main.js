@@ -83,7 +83,7 @@ Vue.mixin({
                               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                   <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
                                   <label row="0" col="1" class="h3 font-weight-bold text-mute" text="You are logging the bug as"></label>
-                                  <label row="1" col="1" class="h4" :text="$store.state.user.userName" ></label>
+                                  <label row="1" col="1" class="h4" :text="$route.meta.userAuthLevel == 1 ? $store.state.cache.cachedTenant.username : $store.state.cache.cachedAdmin.userName"></label>
                               </GridLayout>
                               
                               <StackLayout width="100%" class="hr-light"></StackLayout>
@@ -189,8 +189,8 @@ Vue.mixin({
                     "Content-Type": "application/json"
                   },
                   content: JSON.stringify({
-                    senderName: this.$store.state.user.userName,
-                    senderPic: this.$store.state.user.profilePic,
+                    senderName: this.$route.meta.userAuthLevel == 1 ? this.$store.state.cache.cachedTenant.username : this.$store.state.cache.cachedAdmin.userName,
+                    senderPic: this.$route.meta.userAuthLevel == 1 ? this.$store.state.cache.cachedTenant.profilePic : this.$store.state.cache.cachedAdmin.profilePic,
                     bugText: this.txtBug
                   })
                 }).then(response => {
