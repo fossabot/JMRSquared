@@ -46,7 +46,7 @@ router.get('/search/:searchText', function (req, res) {
 
 router.get('/all/for/:userId', function (req, res) {
     var receiver = req.params.userId;
-    _Notification2.default.find({ to: receiver }).then(function (notifications) {
+    _Notification2.default.find({ toId: receiver }).then(function (notifications) {
         if (notifications == null) res.send("Error : 9032egrrtu834g9erbo");
         res.json(notifications);
     });
@@ -63,6 +63,18 @@ router.get('/all/:userId', function (req, res) {
             res.send("Error : 9032egrrtu834g9erbo");
         }
 
+        res.json(result);
+    });
+});
+
+router.get('/tasks/all', function (req, res) {
+    _Notification2.default.find({
+        dueDate: { $ne: null }
+    }).then(function (result) {
+        if (result == null) {
+            res.status(400);
+            res.send("Error : 9032egrrtu834g9erbo");
+        }
         res.json(result);
     });
 });
@@ -98,7 +110,6 @@ router.post('/add', function (req, res) {
         if (err) {
             console.log(err);return;
         };
-        console.log("Passed for : " + notification._id);
         _Admin2.default.findById(req.body.fromId, function (err, admin) {
             if (err || admin == null) {
                 console.log(err);return;

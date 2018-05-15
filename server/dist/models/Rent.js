@@ -10,7 +10,7 @@ var Schema = _mongoose2.default.Schema;
 
 var RentSchema = new _mongoose2.default.Schema({
     _id: { type: Schema.Types.ObjectId, default: _mongoose2.default.Types.ObjectId() },
-    StudentID: { type: Schema.Types.ObjectId, ref: 'Student' }, // ForeignKey
+    studentID: { type: Schema.Types.ObjectId, ref: 'Student' }, // ForeignKey
     datePaid: Date,
     monthOfPayment: String,
     amount: Number,

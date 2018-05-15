@@ -4,6 +4,10 @@ var _Student = require('../models/Student');
 
 var _Student2 = _interopRequireDefault(_Student);
 
+var _Rent = require('../models/Rent');
+
+var _Rent2 = _interopRequireDefault(_Rent);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -21,8 +25,15 @@ var router = express.Router();
         Login student
 */
 
+router.get('/rents/all', function (req, res) {
+    _Rent2.default.find().then(function (rents) {
+        if (rents == null) res.send("Error : 90ty32rtu834g9erbo");
+        res.json(rents);
+    });
+});
+
 router.get('/students/all', function (req, res) {
-    _Student2.default.find().then(function (students) {
+    _Student2.default.find().populate(['rents']).then(function (students) {
         if (students == null) res.send("Error : 9032rtu834g9erbo");
         res.json(students);
     });
@@ -37,12 +48,12 @@ router.get('/students/all/names', function (req, res) {
 
 router.get('/:id/get', function (req, res) {
     var id = req.params.id;
-    if (isNaN(id)) {
+    if (id == null) {
         res.status(404);
-        res.send("Invalid ID - " + id);
+        res.send("Invalid ID > " + id);
     } else {
         _Student2.default.findById(id).then(function (student) {
-            if (answer == null) {
+            if (student == null) {
                 res.status(404);
                 res.send("No student with id : " + id);
             } else {
@@ -83,7 +94,7 @@ router.post('/login', function (req, res) {
     if (req.body.useEmail) {
         _Student2.default.findOne({
             email: req.body.email,
-            pass: req.body.pass
+            password: req.body.pass
         }).then(function (student) {
             if (student == null) {
                 res.status(500);
@@ -94,8 +105,8 @@ router.post('/login', function (req, res) {
         });
     } else {
         _Student2.default.findOne({
-            numbers: req.body.numbers,
-            pass: req.body.pass
+            contactNumbers: req.body.numbers,
+            password: req.body.pass
         }).then(function (student) {
             if (student == null) {
                 res.status(500);
@@ -131,7 +142,7 @@ router.post('/add', function (req, res) {
                         res.status(402);
                         res.send(err);
                     }
-                    res.send(req.body.username + " was successfully saved!");
+                    res.send(student._id);
                 });
             }
         } else {

@@ -43,22 +43,8 @@ app.use(function (req, res, next) {
     next();
 });
 // Local Host
-
-_mongoose2.default.connect("mongodb://localhost:27017/JMRdb", {
-    reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-    reconnectInterval: 500, // Reconnect every 500ms
-    dbName: 'JMRdb'
-}).then(function (answer) {
-    console.log("Successfully connected to MONGO!");
-});
-
 /*
-    Server
-mongoose.connect("mongodb://cluster0-shard-00-00-xbjvr.mongodb.net:27017,cluster0-shard-00-01-xbjvr.mongodb.net:27017,cluster0-shard-00-02-xbjvr.mongodb.net:27017/JMRdb?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin", {
-    auth: {
-        user: "mulavhe",
-        password: "Mulavhelesi@1"
-    },
+mongoose.connect("mongodb://localhost:27017/JMRdb", {
     reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
     reconnectInterval: 500, // Reconnect every 500ms
     dbName: 'JMRdb'
@@ -66,6 +52,20 @@ mongoose.connect("mongodb://cluster0-shard-00-00-xbjvr.mongodb.net:27017,cluster
     console.log("Successfully connected to MONGO!");
 });
 */
+
+//    Server
+
+_mongoose2.default.connect("mongodb://localhost:27017/JMRLivedb?authSource=admin", {
+    auth: {
+        user: "admin",
+        password: "Mulavhelesi@1"
+    },
+    reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+    reconnectInterval: 500, // Reconnect every 500ms
+    dbName: 'JMRLivedb'
+}).then(function (answer) {
+    console.log("Successfully connected to MONGO!");
+});
 
 app.use('/s', _StudentController2.default);
 app.use('/a', _AdminController2.default);

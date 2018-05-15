@@ -40,14 +40,14 @@ mongoose.connect("mongodb://localhost:27017/JMRdb", {
 
 //    Server
 
-mongoose.connect("mongodb://localhost:27017/JMRdb?authSource=admin", {
+mongoose.connect("mongodb://localhost:27017/JMRLivedb?authSource=admin", {
     auth: {
         user: "admin",
         password: "Mulavhelesi@1"
     },
     reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
     reconnectInterval: 500, // Reconnect every 500ms
-    dbName: 'JMRdb'
+    dbName: 'JMRLivedb'
 }).then((answer) => {
     console.log("Successfully connected to MONGO!");
 });
