@@ -1,0 +1,9 @@
+# JetBrains project files
+.idea
+.babelrc
+
+# NPM
+node_modules
+
+# NativeScript application
+/dist

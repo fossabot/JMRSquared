@@ -72,6 +72,3 @@ typings/
 
 # dotenv environment variables file
 .env
-
-
-server/dist/
