@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
+import mongoose from "mongoose";
 // import the models
 import Admin from "../models/Admin";
 import Document from "../models/Document";

@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+import mongoose from "mongoose";
 
 import Student from "../models/Student";
 
