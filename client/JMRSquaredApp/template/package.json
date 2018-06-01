@@ -1,8 +1,8 @@
 {
-  "name": "jmrsquaredapp",
+  "name": "jmrsquared",
   "description": "An app for JMRSquared to use for all the logistics",
   "license": "MIT",
-  "readme": "JMRSquaredApp",
+  "readme": "JMRSquared",
   "nativescript": {
     "id": "com.jmrsquared.app"
   },
