@@ -23,167 +23,184 @@
 </template>
 
 <script>
-    const dialogs = require('ui/dialogs')
-    
-    import * as LocalNotifications from "nativescript-local-notifications";
-    
-    import * as Toast from "nativescript-toast";
-    const http = require("http");
-    
-    var appSettings = require("application-settings");
-    import * as connectivity from "tns-core-modules/connectivity";
-    export default {
-        data() {
-            return {
-                isMainScreen: false,
-                selectedScreen: '',
-                txtSearch: '',
-                students: []
-            }
-        },
-        mounted() {
-            this.pageLoaded();
-        },
-        created() {
-            this.pageLoaded();
-        },
-        computed: {
-            searchedStudents: {
-                get() {
-                    var self = this;
-                    return this.students.filter(function(student) {
-                        return self.txtSearch.length < 1 || student.username.toLowerCase().indexOf(self.txtSearch.toLowerCase()) >= 0;
-                    });
-                },
-                set(value) {
-                    this.students = [];
-                    var now = new Date();
-                    value.map(student => {
-                        var hasPaid = false;
-                        if (student.rents.length > 0) {
-                           hasPaid = student.rents.filter((r) => this.getMoment(r.datePaid).isSame(now, 'month')).length > 0;
-                        }
-                        student.hasPaid = hasPaid;
-                        this.students.push(student);
-                    });
-                }
-            }
-        },
-        methods: {
-            fabTap() {
-                alert("Fab tapped");
-            },
-            pageLoaded() {
-                this.isLoading = true;
-                var connectionType = connectivity.getConnectionType();
-                if (connectionType == connectivity.connectionType.none) {
-                    // TODO : LOAD FROM LOCAL DB
-                    let documentID = appSettings.getString("studentsResponse");
-    
-                    if (documentID == null) {
-                        this.$feedback.warning({
-                            title: "NO INTERNET CONNECTION",
-                            duration: 4000,
-                            message: "No data is cached , please connect to the internet."
-                        });
-                    } else {
-                        var t = this.$db.getDocument(documentID);
-                        this.searchedStudents = t.result;
-                    }
-    
-                    this.isLoading = false;
-                } else {
-                    http.getJSON(this.$store.state.settings.baseLink + "/s/students/all").then((result) => {
-                        let documentID = appSettings.getString("studentsResponse");
-    
-                        if (documentID == null) {
-                            var doc = this.$db.createDocument({
-                                "date": new Date(),
-                                "result": result
-                            });
-    
-                            appSettings.setString("studentsResponse", doc);
-    
-                        } else {
-                            this.$db.updateDocument(documentID, {
-                                "date": new Date(),
-                                "result": result
-                            });
-                        }
-                        this.searchedStudents = result;
-                        this.isLoading = false;
-                    }).catch(e => {
-                        this.$feedback.error({
-                            message: e
-                        });
-                        this.isLoading = false;
-                    });
-                }
-            },
-            refreshList(args) {
-                var pullRefresh = args.object;
-                var connectionType = connectivity.getConnectionType();
-                if (connectionType == connectivity.connectionType.none) {
-                    // TODO : LOAD FROM LOCAL DB
-                    let documentID = appSettings.getString("studentsResponse");
-    
-                    if (documentID == null) {
-                        this.$feedback.warning({
-                            title: "NO INTERNET CONNECTION",
-                            duration: 4000,
-                            message: "No data is cached , please connect to the internet."
-                        });
-                    } else {
-                        this.searchedStudents = this.$db.getDocument(documentID).result;
-                    }
-    
-                    pullRefresh.refreshing = false;
-                } else {
-                    http.getJSON(this.$store.state.settings.baseLink + "/s/students/all").then((result) => {
-    
-                        let documentID = appSettings.getString("studentsResponse");
-    
-                        if (documentID == null) {
-                            var doc = this.$db.createDocument({
-                                "date": new Date(),
-                                "result": result
-                            });
-    
-                            appSettings.setString("studentsResponse", doc);
-    
-                        } else {
-                            this.$db.updateDocument(documentID, {
-                                "date": new Date(),
-                                "result": result
-                            });
-                        }
-                        this.searchedStudents = result;
-    
-                        pullRefresh.refreshing = false;
-                    }).catch(e => {
-                        this.$feedback.error({
-                            message: e
-                        });
-                        this.isLoading = false;
-                    });
-                }
-            },
-            AddStudents() {
-                this.$router.push('/admin/students/add');
-            },
-            onStudentTap(event) {
-                this.$router.push('/admin/fulham/student/profile/' + event.item._id);
-            }
-        }
+const dialogs = require("ui/dialogs");
+
+import * as LocalNotifications from "nativescript-local-notifications";
+
+import * as Toast from "nativescript-toast";
+const http = require("http");
+
+var appSettings = require("application-settings");
+import * as connectivity from "tns-core-modules/connectivity";
+export default {
+  data() {
+    return {
+      isMainScreen: false,
+      selectedScreen: "",
+      txtSearch: "",
+      students: []
+    };
+  },
+  mounted() {
+    this.pageLoaded();
+  },
+  created() {
+    this.pageLoaded();
+  },
+  computed: {
+    searchedStudents: {
+      get() {
+        var self = this;
+        return this.students.filter(function(student) {
+          return (
+            self.txtSearch.length < 1 ||
+            student.username
+              .toLowerCase()
+              .indexOf(self.txtSearch.toLowerCase()) >= 0
+          );
+        });
+      },
+      set(value) {
+        this.students = [];
+        var now = new Date();
+
+        value.map(student => {
+          var hasPaid = false;
+          if (student.rents.length > 0) {
+            hasPaid =
+              student.rents.filter(
+                r =>
+                  r.monthOfPayment.toLowerCase() ==
+                    this.getMoment(now)
+                      .format("MMMM")
+                      .toLowerCase() &&
+                  this.getMoment(r.datePaid).isSame(now, "year")
+              ).length > 0;
+          }
+          student.hasPaid = hasPaid;
+          this.students.push(student);
+        });
+      }
     }
+  },
+  methods: {
+    fabTap() {
+      alert("Fab tapped");
+    },
+    pageLoaded() {
+      this.isLoading = true;
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        // TODO : LOAD FROM LOCAL DB
+        let documentID = appSettings.getString("studentsResponse");
+
+        if (documentID == null) {
+          this.$feedback.warning({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "No data is cached , please connect to the internet."
+          });
+        } else {
+          var t = this.$db.getDocument(documentID);
+          this.searchedStudents = t.result;
+        }
+
+        this.isLoading = false;
+      } else {
+        http
+          .getJSON(this.$store.state.settings.baseLink + "/s/students/all")
+          .then(result => {
+            let documentID = appSettings.getString("studentsResponse");
+
+            if (documentID == null) {
+              var doc = this.$db.createDocument({
+                date: new Date(),
+                result: result
+              });
+
+              appSettings.setString("studentsResponse", doc);
+            } else {
+              this.$db.updateDocument(documentID, {
+                date: new Date(),
+                result: result
+              });
+            }
+            this.searchedStudents = result;
+            this.isLoading = false;
+          })
+          .catch(e => {
+            this.$feedback.error({
+              message: e
+            });
+            this.isLoading = false;
+          });
+      }
+    },
+    refreshList(args) {
+      var pullRefresh = args.object;
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        // TODO : LOAD FROM LOCAL DB
+        let documentID = appSettings.getString("studentsResponse");
+
+        if (documentID == null) {
+          this.$feedback.warning({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "No data is cached , please connect to the internet."
+          });
+        } else {
+          this.searchedStudents = this.$db.getDocument(documentID).result;
+        }
+
+        pullRefresh.refreshing = false;
+      } else {
+        http
+          .getJSON(this.$store.state.settings.baseLink + "/s/students/all")
+          .then(result => {
+            let documentID = appSettings.getString("studentsResponse");
+
+            if (documentID == null) {
+              var doc = this.$db.createDocument({
+                date: new Date(),
+                result: result
+              });
+
+              appSettings.setString("studentsResponse", doc);
+            } else {
+              this.$db.updateDocument(documentID, {
+                date: new Date(),
+                result: result
+              });
+            }
+            this.searchedStudents = result;
+
+            pullRefresh.refreshing = false;
+          })
+          .catch(e => {
+            this.$feedback.error({
+              message: e
+            });
+            this.isLoading = false;
+          });
+      }
+    },
+    AddStudents() {
+      this.$router.push("/admin/students/add");
+    },
+    onStudentTap(event) {
+      this.$router.push("/admin/fulham/student/profile/" + event.item._id);
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-    $greyColor:#eeeeee;
-    $blueDarkColor:#0093a4;
-    $blueColor:#4ac4d5;
-    $blueLightColor:#84f7ff;
-    $redColor:#ed1c24;
-    $avoColor:#d7df21;
-    $orangeColor:#fcb040;
+$greyColor: #eeeeee;
+$blueDarkColor: #0093a4;
+$blueColor: #4ac4d5;
+$blueLightColor: #84f7ff;
+$redColor: #ed1c24;
+$avoColor: #d7df21;
+$orangeColor: #fcb040;
 </style>
