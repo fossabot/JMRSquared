@@ -22,6 +22,17 @@ var Logs = [
 
 4. Enabled logging in as a tenant
 `
+    },
+    {
+        version:'0.3',
+        text:
+`
+
+1. Fix for NOT PAID bug.
+
+2. Show proof of transactions.
+
+`
     }
 ];
 

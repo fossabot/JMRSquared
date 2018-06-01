@@ -61,7 +61,7 @@ Vue.mixin({
   },
   methods: {
     showChangeLog(){
-      var log = ChangeLog.GetLogs('0.2');
+      var log = ChangeLog.GetLogs('0.3');
       if(log != null && log != undefined){
         this.$feedback.info({
           title:'Change log ( v' + log.version +  ' )',
