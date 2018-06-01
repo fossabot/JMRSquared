@@ -10,7 +10,7 @@
         </StackLayout>
       </ScrollView>
       <PullToRefresh v-show="currentPage == 0" row="2" col="0" @refresh="refreshList($event)">
-        <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
+        <ListView @itemTap="onTransactionTap" borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
@@ -220,227 +220,248 @@
 </template>
 
 <script>
-  const dialogs = require('ui/dialogs')
-  const application = require('application')
-  var AndroidApplication = application.android;
-  var activity = AndroidApplication.foregroundActivity;
-  import * as imageSource from "tns-core-modules/image-source";
-  
-  import * as imagepicker from "nativescript-imagepicker";
-  
-  import * as connectivity from "tns-core-modules/connectivity";
-  const http = require("http")
-  export default {
-    data() {
-      return {
-        txtError: '',
-        Amount: '',
-        users: [],
-        hasImage: false,
-        selectedImage: null,
-        selectedType: "All",
-        transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
-        rentMonthIndex: new Date().getMonth(),
-        rentMonths: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-        rentTenantID: '',
-        rentTenantName: '',
-        isRent: false,
-        description: '',
-        TransactionDate: new Date(),
-        transactions: [],
-        isWithdraw: false,
-        currentPage: false,
-        isMainScreen: false,
-        selectedScreen: '',
-        price: ''
+const dialogs = require("ui/dialogs");
+const application = require("application");
+var AndroidApplication = application.android;
+var activity = AndroidApplication.foregroundActivity;
+import * as imageSource from "tns-core-modules/image-source";
+
+import * as imagepicker from "nativescript-imagepicker";
+
+import * as connectivity from "tns-core-modules/connectivity";
+const http = require("http");
+export default {
+  data() {
+    return {
+      txtError: "",
+      Amount: "",
+      users: [],
+      hasImage: false,
+      selectedImage: null,
+      selectedType: "All",
+      transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
+      rentMonthIndex: new Date().getMonth(),
+      rentMonths: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      rentTenantID: "",
+      rentTenantName: "",
+      isRent: false,
+      description: "",
+      TransactionDate: new Date(),
+      transactions: [],
+      isWithdraw: false,
+      currentPage: false,
+      isMainScreen: false,
+      selectedScreen: "",
+      price: ""
+    };
+  },
+  computed: {
+    amount: {
+      get() {
+        return this.price;
+      },
+      set(value) {
+        if (value.length > 0 && value[0] != "R") {
+          return "R" + this.price;
+        }
+        this.price = value;
       }
     },
-    computed: {
-      amount: {
-        get() {
-          return this.price;
-        },
-        set(value) {
-          if (value.length > 0 && value[0] != 'R') {
-            return 'R' + this.price;
-          }
-          this.price = value;
+    filteredTransactions: {
+      get() {
+        if (this.selectedType == this.transactionTypes[0]) {
+          return this.transactions;
+        } else {
+          return this.transactions.filter(v => v.type == this.selectedType);
         }
       },
-      filteredTransactions: {
-        get() {
-          if (this.selectedType == this.transactionTypes[0]) {
-            return this.transactions;
-          } else {
-            return this.transactions.filter((v) => v.type == this.selectedType);
-          }
-        },
-        set(val) {
-          return this.transactions = val;
-        }
+      set(val) {
+        return (this.transactions = val);
       }
-    },
-    created() {
-      this.pageLoaded();
-    },
-    mounted() {
-      this.pageLoaded();
-    },
-    methods: {
-      pageLoaded(args) {
-        var self = this;
-        this.ApplyNavigation(self);
-        http.getJSON(this.$store.state.settings.baseLink + "/s/students/all/names").then((results) => {
+    }
+  },
+  created() {
+    this.pageLoaded();
+  },
+  mounted() {
+    this.pageLoaded();
+  },
+  methods: {
+    pageLoaded(args) {
+      var self = this;
+      this.ApplyNavigation(self);
+      http
+        .getJSON(this.$store.state.settings.baseLink + "/s/students/all/names")
+        .then(results => {
           this.users = [];
-  
-          results.map((v) => {
+
+          results.map(v => {
             this.users.push({
               id: v._id,
               text: v.username,
               selected: false
             });
           });
-  
         });
-  
-        var connectionType = connectivity.getConnectionType();
-        if (connectionType == connectivity.connectionType.none) {
-          this.$feedback.error({
-            title: "Error (NO INTERNET CONNECTION)",
-            duration: 4000,
-            message: "Please switch on your data/wifi.",
-          });
-  
-        } else {
-          http.getJSON(this.$store.state.settings.baseLink + "/a/transaction/all").then((results) => {
+
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+      } else {
+        http
+          .getJSON(this.$store.state.settings.baseLink + "/a/transaction/all")
+          .then(results => {
             this.filteredTransactions = results;
-          }).catch((err) => {
+          })
+          .catch(err => {
             this.$feedback.error({
               title: "Error",
               duration: 4000,
-              message: err,
+              message: err
             });
           });
+      }
+    },
+    canSubmit() {
+      this.txtError = "";
+      if (!this.hasImage) {
+        this.txtError = "Please an image of your proof (slip)";
+      }
+      if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
+        this.txtError = "Please provide a valid amount.";
+      }
+      if (this.isRent) {
+        if (this.rentTenantName.length < 2) {
+          this.txtError = "Please select a tenant.";
         }
-      },
-      canSubmit() {
-        this.txtError = "";
-        if (!this.hasImage) {
-          this.txtError = "Please an image of your proof (slip)";
+      } else {
+        if (this.description.length < 2) {
+          this.txtError = "A description is required.";
         }
-        if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
-          this.txtError = "Please provide a valid amount.";
-        }
-        if (this.isRent) {
-          if (this.rentTenantName.length < 2) {
-            this.txtError = "Please select a tenant.";
-          }
-        } else {
-          if (this.description.length < 2) {
-            this.txtError = "A description is required.";
-          }
-        }
-        return this.txtError.length < 2;
-      },
-      SubmitTransaction() {
-        this.isLoading = true;
-        if (!this.canSubmit()) {
-          this.ShowNewTransaction(1);
-          this.isLoading = false;
-          return;
-        }
-  
-        let source = new imageSource.ImageSource();
-        source.fromAsset(this.selectedImage).then((img) => {
-          this.selectedImage = img.toBase64String("png");
-  
-          http.request({
-              url: this.$store.state.settings.baseLink + "/a/transaction/add",
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              content: JSON.stringify({
-                adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
-                amount: this.Amount,
-                type: this.isRent ? 'Rent' : (this.isWithdraw ? 'Withdraw' : 'Deposit'),
-                rentTenantID: this.isRent ? this.users.filter(u => u.text == this.rentTenantName)[0].id : false,
-                rentTenantName: this.rentTenantName,
-                rentMonth: this.rentMonths[this.rentMonthIndex],
-                description: this.description,
-                proof: this.selectedImage,
-                date: this.TransactionDate
-              })
+      }
+      return this.txtError.length < 2;
+    },
+    SubmitTransaction() {
+      this.isLoading = true;
+      if (!this.canSubmit()) {
+        this.ShowNewTransaction(1);
+        this.isLoading = false;
+        return;
+      }
+
+      let source = new imageSource.ImageSource();
+      source.fromAsset(this.selectedImage).then(img => {
+        this.selectedImage = 'data:image/png;base64,' + img.toBase64String("png");
+
+        http
+          .request({
+            url: this.$store.state.settings.baseLink + "/a/transaction/add",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            content: JSON.stringify({
+              adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
+              amount: this.Amount,
+              type: this.isRent
+                ? "Rent"
+                : this.isWithdraw ? "Withdraw" : "Deposit",
+              rentTenantID: this.isRent
+                ? this.users.filter(u => u.text == this.rentTenantName)[0].id
+                : false,
+              rentTenantName: this.rentTenantName,
+              rentMonth: this.rentMonths[this.rentMonthIndex],
+              description: this.description,
+              proof: this.selectedImage,
+              date: this.TransactionDate
             })
-            .then(response => {
-              var statusCode = response.statusCode;
-              if (statusCode == 200) {
-  
-                this.$feedback.success({
-                  title: response.content.toString(),
-                  duration: 4000,
-                  onTap: () => {
-                    this.currentPage = 0;
-                  }
-                });
-                this.isLoading = false;
-              } else if (statusCode == 413) {
-                this.$feedback.error({
-                  title: "Unable to add transaction",
-                  message: "The image file is too large",
-                  duration: 4000,
-                });
-                this.isLoading = false;
-              }
-            })
-            .catch(err => {
-              this.$feedback.error({
-                message: err,
+          })
+          .then(response => {
+            var statusCode = response.statusCode;
+            if (statusCode == 200) {
+              this.$feedback.success({
+                title: response.content.toString(),
                 duration: 4000,
+                onTap: () => {
+                  this.currentPage = 0;
+                }
               });
               this.isLoading = false;
-            })
-        });
-  
-      },
-      refreshList(args) {
-        var pullRefresh = args.object;
-  
-        var connectionType = connectivity.getConnectionType();
-        if (connectionType == connectivity.connectionType.none) {
-          this.$feedback.error({
-            title: "Error (NO INTERNET CONNECTION)",
-            duration: 4000,
-            message: "Please switch on your data/wifi.",
+            } else if (statusCode == 413) {
+              this.$feedback.error({
+                title: "Unable to add transaction",
+                message: "The image file is too large",
+                duration: 4000
+              });
+              this.isLoading = false;
+            }
+          })
+          .catch(err => {
+            this.$feedback.error({
+              message: err,
+              duration: 4000
+            });
+            this.isLoading = false;
           });
-  
-          pullRefresh.refreshing = false;
-        } else {
-          http.getJSON(this.$store.state.settings.baseLink + "/a/transaction/all").then((results) => {
+      });
+    },
+    refreshList(args) {
+      var pullRefresh = args.object;
+
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+
+        pullRefresh.refreshing = false;
+      } else {
+        http
+          .getJSON(this.$store.state.settings.baseLink + "/a/transaction/all")
+          .then(results => {
             this.filteredTransactions = results;
             pullRefresh.refreshing = false;
-          }).catch((err) => {
+          })
+          .catch(err => {
             this.$feedback.error({
               title: "Error",
               duration: 4000,
-              message: err,
+              message: err
             });
             pullRefresh.refreshing = false;
-  
           });
-        }
-      },
-      changeRentMonth() {
-        if (this.rentMonthIndex == 11) {
-          this.rentMonthIndex = 0;
-        } else {
-          this.rentMonthIndex++;
-        }
-      },
-      changeTransactionDate() {
-        var self = this;
-        this.$showModal({
-          template: ` 
+      }
+    },
+    changeRentMonth() {
+      if (this.rentMonthIndex == 11) {
+        this.rentMonthIndex = 0;
+      } else {
+        this.rentMonthIndex++;
+      }
+    },
+    changeTransactionDate() {
+      var self = this;
+      this.$showModal({
+        template: ` 
                     <Page>
                         <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
                             <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
@@ -449,75 +470,114 @@
                         </GridLayout>
                     </Page>
                     `,
-          data: function() {
-            return {
-              selectedDueDate: new Date()
-            }
-          },
-          methods: {
-            changeDueRent(modal, value) {
-              self.TransactionDate = value;
-              self.TransactionDate.setDate(value.getDate() + 1);
-              this.$modal.close();
-            }
-          },
-        })
-      },
-      onBackPressed(event) {
-        dialogs.alert("Going Back").then(() => {
-          console.log("card.redirect");
-        });
-  
-      },
-      switchPage(card) {
-        dialogs.alert("Going to " + card.redirect).then(() => {
-          console.log(card.redirect);
-        });
-        this.$router.push({
-          path: card.redirect
-        });
-      },
-      ShowNewTransaction(value) {
-        if (value == 2) {
-          if (!this.canSubmit()) {
-            return;
+        data: function() {
+          return {
+            selectedDueDate: new Date()
+          };
+        },
+        methods: {
+          changeDueRent(modal, value) {
+            self.TransactionDate = value;
+            self.TransactionDate.setDate(value.getDate() + 1);
+            this.$modal.close();
           }
         }
-        this.currentPage = value;
-      },
-      uploadEvidence() {
-        let context = imagepicker.create({
-          mode: "single" // use "multiple" for multiple selection
-        });
-  
-        context
-          .authorize()
-          .then(function() {
-            return context.present();
-          })
-          .then((selection) => {
-            selection.forEach((selected) => {
-              // process the selected image
-              this.selectedImage = selected;
-              this.hasImage = true;
-            });
-          }).catch((err) => {
-            // process error
-            this.$feedback.error({
-              title: "No file selected",
-              message: "Please select a valid image file",
-              duration: 4000,
-              position: 1,
-              onTap: () => {
-  
-              }
-            });
-          });
+      });
+    },
+    onTransactionTap(event) {
+      var self = this;
+      this.$showModal({
+        template: ` 
+                    <Page>
+                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                          <ScrollView row="1" colSpan="2">
+                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                          </ScrollView>
+                        </GridLayout>
+                    </Page>
+                    `,
+        data(){
+          return {
+            imgSrc:null
+          }
+        },
+        mounted(){
+          this.imgSrc = null;
+          this.loadImage();
+        },
+        methods:{
+          loadImage(){
+            http
+              .getJSON(this.$store.state.settings.baseLink + "/a/transaction/get/" + event.item._id)
+              .then(results => {
+                this.imgSrc = results.proof;
+              })
+              .catch(err => {
+                this.$feedback.error({
+                  title: "Error",
+                  duration: 4000,
+                  message: err
+                });
+                this.imgSrc = true;
+              });
+          }
+        }
+      });
+    },
+    onBackPressed(event) {
+      dialogs.alert("Going Back").then(() => {
+        console.log("card.redirect");
+      });
+    },
+    switchPage(card) {
+      dialogs.alert("Going to " + card.redirect).then(() => {
+        console.log(card.redirect);
+      });
+      this.$router.push({
+        path: card.redirect
+      });
+    },
+    ShowNewTransaction(value) {
+      if (value == 2) {
+        if (!this.canSubmit()) {
+          return;
+        }
       }
+      this.currentPage = value;
+    },
+    uploadEvidence() {
+      let context = imagepicker.create({
+        mode: "single" // use "multiple" for multiple selection
+      });
+
+      context
+        .authorize()
+        .then(function() {
+          return context.present();
+        })
+        .then(selection => {
+          selection.forEach(selected => {
+            // process the selected image
+            this.selectedImage = selected;
+            this.hasImage = true;
+          });
+        })
+        .catch(err => {
+          // process error
+          this.$feedback.error({
+            title: "No file selected",
+            message: "Please select a valid image file",
+            duration: 4000,
+            position: 1,
+            onTap: () => {}
+          });
+        });
     }
   }
+};
 </script>
 
 <style lang="scss" scoped>
-  
 </style>
