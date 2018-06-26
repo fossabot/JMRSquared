@@ -30,6 +30,8 @@ import StudentList from '../components/StudentList.vue'
 import Tenant_EditDetails from '../components/Tenant/Tenant_EditDetails.vue'
 
 import TaxifyHome from '../components/Taxify/TaxifyHome.vue'
+import TaxifyTransactions from '../components/Taxify/TaxifyTransactions.vue'
+
 import CosmeticsHome from '../components/Cosmetics/CosmeticsHome.vue'
 
 const http = require("http");
@@ -122,6 +124,15 @@ const router = new VueRouter({
       component: TaxifyHome,
       meta: {
         title: 'TaxifyHome',
+        authLevel: 2
+      },
+    },
+    {
+      name: 'taxifyTransactions',
+      path: '/taxify/transactions',
+      component: TaxifyTransactions,
+      meta: {
+        title: 'TaxifyTransactions',
         authLevel: 2
       },
     },
