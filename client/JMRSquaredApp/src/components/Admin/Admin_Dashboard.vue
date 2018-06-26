@@ -61,9 +61,9 @@ export default {
           col: 0
         },
         {
-          id: "reminders",
-          icon: "notifications",
-          title: "Reminders",
+          id: "cosmetics",
+          icon: "local-florist",
+          title: "Cosmetics",
           row: 0,
           col: 1
         },
@@ -75,9 +75,9 @@ export default {
           col: 2
         },
         {
-          id: "documents",
-          icon: "library-books",
-          title: "Documents",
+          id: "reminders",
+          icon: "notifications",
+          title: "Reminders",
           row: 1,
           col: 0
         },
@@ -175,6 +175,8 @@ export default {
         this.$router.push("/admin/reminders");
       } else if (item.id == "taxify") {
         this.$router.push("/taxify/home");
+      } else if (item.id == "cosmetics") {
+        this.$router.push("/cosmetics/home");
       } else {
         dialogs.alert("Not yet assigned").then(() => {
           console.log("card.redirect");
