@@ -31,41 +31,25 @@
 const dialogs = require("ui/dialogs");
 import * as Toast from "nativescript-toast";
 
-import Students from "../Admin/Fulham/Students.vue";
-import Notifications from "../Admin/Fulham/Notifications.vue";
 import Transactions from "../Admin/Fulham/Transactions.vue";
 import Stats from "../Admin/Fulham/Stats.vue";
 
 import * as connectivity from "tns-core-modules/connectivity";
 export default {
-  name: "TaxifyHomeVue",
+  name: "CosmeticsHomeVue",
   components: {
-    Students,
-    Notifications,
     Transactions,
     Stats
   },
   data() {
     return {
       count: 20,
-      currentTab: 1,
+      currentTab: 0,
       isLoaded: false,
       tabs: [
         {
-          text: "Notifications",
-          icon: "mdi-notifications",
-          view: "Notifications",
-          isLoaded: false
-        },
-        {
-          text: "Students",
-          icon: "mdi-people",
-          view: "Students",
-          isLoaded: false
-        },
-        {
           text: "Transactions",
-          icon: "mdi-receipt",
+          icon: "mdi-attach-money",
           view: "Transactions",
           isLoaded: false
         },

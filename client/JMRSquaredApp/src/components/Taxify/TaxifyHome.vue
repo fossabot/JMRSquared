@@ -44,7 +44,7 @@ export default {
   data() {
     return {
       count: 20,
-      currentTab: 1,
+      currentTab: 0,
       isLoaded: false,
       tabs: [
         {

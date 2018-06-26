@@ -33,6 +33,7 @@ import TaxifyHome from '../components/Taxify/TaxifyHome.vue'
 import TaxifyTransactions from '../components/Taxify/TaxifyTransactions.vue'
 
 import CosmeticsHome from '../components/Cosmetics/CosmeticsHome.vue'
+import CosmeticsTransactions from '../components/Cosmetics/CosmeticsTransactions.vue'
 
 const http = require("http");
 
@@ -150,6 +151,15 @@ const router = new VueRouter({
       component: CosmeticsHome,
       meta: {
         title: 'CosmeticsHome',
+        authLevel: 2
+      },
+    },
+    {
+      name: 'cosmeticsTransactions',
+      path: '/cosmetics/transactions',
+      component: CosmeticsTransactions,
+      meta: {
+        title: 'CosmeticsTransactions',
         authLevel: 2
       },
     },
