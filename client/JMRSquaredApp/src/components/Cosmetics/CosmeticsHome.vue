@@ -31,7 +31,7 @@
 const dialogs = require("ui/dialogs");
 import * as Toast from "nativescript-toast";
 
-import Transactions from "../Admin/Fulham/Transactions.vue";
+import Transactions from "./CosmeticsTransactions.vue";
 import Stats from "../Admin/Fulham/Stats.vue";
 
 import * as connectivity from "tns-core-modules/connectivity";

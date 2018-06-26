@@ -21,7 +21,6 @@
                 <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
   
                 <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
-                <Label row="1" col="1" v-show="transaction.type == 'Rent'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
   
                 <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                 <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
@@ -56,60 +55,26 @@
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout @tap="isRent = !isRent" class="m-10" rows="auto" columns="*,auto">
-              <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="RENT PAYMENT"></label>
-              <switch row="0" col="1" v-model="isRent"></switch>
-            </GridLayout>
-            <StackLayout width="100%" class="hr-light"></StackLayout>
-  
-  
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person-outline' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Tenant's name"></label>
-              <StackLayout v-show="users && users.length > 0" row="1" col="1">
-                <ScrollView orientation="horizontal">
-                  <WrapLayout>
-                    <Label v-for="(user,i) in users" @tap="rentTenantName = user.text" :class="{'chip-selected':rentTenantName == user.text}" :text="user.text" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
-                  </WrapLayout>
-                </ScrollView>
-              </StackLayout>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Description"></label>
               <TextView row="1" col="1" hint="What exactly did you do?" v-model="description" class="h4"></TextView>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" @tap="changeRentMonth()" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-today' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Month for rent (tap to change)"></label>
-              <label :text="rentMonths[rentMonthIndex]" row="1" col="1" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" @tap="isWithdraw = !isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout @tap="isWithdraw = !isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-trending-' + (isWithdraw ? 'down' : 'up') | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type (tap to change)"></label>
               <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" :class="{'text-light-red':isWithdraw,'text-light-blue':!isWithdraw}" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Amount paid"></label>
-              <TextField row="1" col="1" v-model="Amount" :hint="'How much did ' + (rentTenantName.length < 2 ? 'he/she' : rentTenantName)  + ' pay?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Amount ' + (isWithdraw ? 'used' : 'deposited')  "></label>
               <TextField row="1" col="1" v-model="Amount" :hint="'How much did you ' + (isWithdraw ? 'use' : 'deposit')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <GridLayout class="m-10" rows="auto,auto,auto" @tap="uploadEvidence()" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
@@ -155,47 +120,26 @@
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person-outline' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Tenant's name"></label>
-              <label row="1" col="1" hint="Who paid this rent?" :text="rentTenantName" returnKeyType="next" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Description"></label>
               <label row="1" col="1" hint="What exactly did you do?" :text="description" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-today' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Month for rent"></label>
-              <label :text="rentMonths[rentMonthIndex]" row="1" col="1" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-trending-' + (isWithdraw ? 'down' : 'up') | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type"></label>
               <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" :class="{'text-light-red':isWithdraw,'text-light-blue':!isWithdraw}" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Amount paid"></label>
-              <label row="1" col="1" :text="Amount" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Amount ' + (isWithdraw ? 'used' : 'deposited')  "></label>
               <label row="1" col="1" :text="Amount" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
@@ -239,25 +183,7 @@ export default {
       hasImage: false,
       selectedImage: null,
       selectedType: "All",
-      transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
-      rentMonthIndex: new Date().getMonth(),
-      rentMonths: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ],
-      rentTenantID: "",
-      rentTenantName: "",
-      isRent: false,
+      transactionTypes: ["All", "Deposit", "Withdraw"],
       description: "",
       TransactionDate: new Date(),
       transactions: [],
@@ -347,14 +273,8 @@ export default {
       if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
         this.txtError = "Please provide a valid amount.";
       }
-      if (this.isRent) {
-        if (this.rentTenantName.length < 2) {
-          this.txtError = "Please select a tenant.";
-        }
-      } else {
-        if (this.description.length < 2) {
-          this.txtError = "A description is required.";
-        }
+      if (this.description.length < 2) {
+        this.txtError = "A description is required.";
       }
       return this.txtError.length < 2;
     },
@@ -368,7 +288,8 @@ export default {
 
       let source = new imageSource.ImageSource();
       source.fromAsset(this.selectedImage).then(img => {
-        this.selectedImage = 'data:image/png;base64,' + img.toBase64String("png");
+        this.selectedImage =
+          "data:image/png;base64," + img.toBase64String("png");
 
         http
           .request({
@@ -380,14 +301,7 @@ export default {
             content: JSON.stringify({
               adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
               amount: this.Amount,
-              type: this.isRent
-                ? "Rent"
-                : this.isWithdraw ? "Withdraw" : "Deposit",
-              rentTenantID: this.isRent
-                ? this.users.filter(u => u.text == this.rentTenantName)[0].id
-                : false,
-              rentTenantName: this.rentTenantName,
-              rentMonth: this.rentMonths[this.rentMonthIndex],
+              type: this.isWithdraw ? "Withdraw" : "Deposit",
               description: this.description,
               proof: this.selectedImage,
               date: this.TransactionDate
@@ -451,25 +365,18 @@ export default {
           });
       }
     },
-    changeRentMonth() {
-      if (this.rentMonthIndex == 11) {
-        this.rentMonthIndex = 0;
-      } else {
-        this.rentMonthIndex++;
-      }
-    },
     changeTransactionDate() {
       var self = this;
       this.$showModal({
         template: ` 
-                    <Page>
-                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                            <DatePicker row="1" v-model="selectedDueDate" />
-                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                        </GridLayout>
-                    </Page>
-                    `,
+                      <Page>
+                          <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                              <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                              <DatePicker row="1" v-model="selectedDueDate" />
+                              <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                          </GridLayout>
+                      </Page>
+                      `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -488,29 +395,33 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                    <Page>
-                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                          <ScrollView row="1" colSpan="2">
-                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                          </ScrollView>
-                        </GridLayout>
-                    </Page>
-                    `,
-        data(){
+                      <Page>
+                          <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                            <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                            <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                            <ScrollView row="1" colSpan="2">
+                              <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                            </ScrollView>
+                          </GridLayout>
+                      </Page>
+                      `,
+        data() {
           return {
-            imgSrc:null
-          }
+            imgSrc: null
+          };
         },
-        mounted(){
+        mounted() {
           this.imgSrc = null;
           this.loadImage();
         },
-        methods:{
-          loadImage(){
+        methods: {
+          loadImage() {
             http
-              .getJSON(this.$store.state.settings.baseLink + "/a/transaction/get/" + event.item._id)
+              .getJSON(
+                this.$store.state.settings.baseLink +
+                  "/a/transaction/get/" +
+                  event.item._id
+              )
               .then(results => {
                 this.imgSrc = results.proof;
               })
