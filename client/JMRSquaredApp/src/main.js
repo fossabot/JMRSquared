@@ -1,77 +1,90 @@
-import Vue from 'nativescript-vue';
+import Vue from "nativescript-vue";
 
-import router from './router';
+import router from "./router";
 
-import store from './store';
+import store from "./store";
 
 import { Couchbase } from "nativescript-couchbase";
 
-import moment from 'moment';
+import moment from "moment";
 
-import './styles.scss';
+import "./styles.scss";
 
 import * as connectivity from "tns-core-modules/connectivity";
 
 import * as imagepicker from "nativescript-imagepicker";
 import * as imageSource from "tns-core-modules/image-source";
 
-import { TNSFontIcon, fonticon } from 'nativescript-fonticon';// require the couchbase module
+import { TNSFontIcon, fonticon } from "nativescript-fonticon"; // require the couchbase module
 
-import  { Feedback, FeedbackType, FeedbackPosition }  from "nativescript-feedback";
+import {
+  Feedback,
+  FeedbackType,
+  FeedbackPosition
+} from "nativescript-feedback";
 
 TNSFontIcon.debug = true;
 TNSFontIcon.paths = {
-  fa: 'FontAwesome.css',
-  mdi:'MaterialIcons.css'
+  fa: "FontAwesome.css",
+  mdi: "MaterialIcons.css"
 };
 TNSFontIcon.loadCss();
 
-const application = require('application');
+const application = require("application");
 const http = require("http");
 
 // Uncommment the following to see NativeScript-Vue output logs
 //Vue.config.silent = false;
 
-Vue.registerElement('CardView', () => require('nativescript-cardview').CardView)
+Vue.registerElement(
+  "CardView",
+  () => require("nativescript-cardview").CardView
+);
 
-Vue.registerElement('Ripple', () => require('nativescript-ripple').Ripple)
+Vue.registerElement("Ripple", () => require("nativescript-ripple").Ripple);
 
-Vue.registerElement('PullToRefresh', () => require('nativescript-pulltorefresh').PullToRefresh)
+Vue.registerElement(
+  "PullToRefresh",
+  () => require("nativescript-pulltorefresh").PullToRefresh
+);
 
-Vue.registerElement("Fab", () => require("nativescript-floatingactionbutton").Fab);
+Vue.registerElement(
+  "Fab",
+  () => require("nativescript-floatingactionbutton").Fab
+);
 
-Vue.filter('fonticon', fonticon);
+Vue.filter("fonticon", fonticon);
 
 Vue.prototype.$db = new Couchbase("jmrdb");
 Vue.prototype.$feedback = new Feedback();
 
-const dialogs = require('ui/dialogs');
+const dialogs = require("ui/dialogs");
 
 import * as Toast from "nativescript-toast";
 import * as fs from "tns-core-modules/file-system";
-import * as ChangeLog from './changeLog'
+import * as ChangeLog from "./changeLog";
 
 var appSettings = require("application-settings");
 Vue.mixin({
-  data(){
-    return{
-      isLoading:false,
-      toggleSearch:false
-    }
+  data() {
+    return {
+      isLoading: false,
+      toggleSearch: false
+    };
   },
   methods: {
-    showChangeLog(){
-      var log = ChangeLog.GetLogs('0.3');
-      if(log != null && log != undefined){
+    showChangeLog() {
+      var log = ChangeLog.GetLogs("0.3");
+      if (log != null && log != undefined) {
         this.$feedback.info({
-          title:'Change log ( v' + log.version +  ' )',
-          message:log.text.trim(),
-          duration:90000,
-          position:1
+          title: "Change log ( v" + log.version + " )",
+          message: log.text.trim(),
+          duration: 90000,
+          position: 1
         });
       }
     },
-    reportBug(){
+    reportBug() {
       let selectedImage = null;
       let isLoading = false;
       this.$showModal({
@@ -136,149 +149,161 @@ Vue.mixin({
                   `,
         data: function() {
           return {
-            txtBug:'',
-            bugs:[
-            //  {text:'This is the first bug',reporter:'joe',date:new Date(),profilePic:''},{text:'This is the second bug',reporter:'uzzie',date:new Date(),profilePic:''}
-            ],
-          }
+            txtBug: "",
+            bugs: [
+              //  {text:'This is the first bug',reporter:'joe',date:new Date(),profilePic:''},{text:'This is the second bug',reporter:'uzzie',date:new Date(),profilePic:''}
+            ]
+          };
         },
         methods: {
-          getBugScreenshot(id){
+          getBugScreenshot(id) {
             // TODO : Add a page for an individual bug discussion.
             return;
-            http.getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id).then((results) => {
+            http
+              .getJSON(this.$store.state.settings.baseLink + "/a/bug/get/" + id)
+              .then(results => {
                 this.$feedback.success({
-                    title: "Done",
-                    duration: 40000,
-                    message: results.screenshot
+                  title: "Done",
+                  duration: 40000,
+                  message: results.screenshot
                 });
-            }).catch((err) => {
+              })
+              .catch(err => {
                 this.$feedback.error({
-                    title: "Error",
-                    duration: 4000,
-                    message: err,
+                  title: "Error",
+                  duration: 4000,
+                  message: err
                 });
-            });
+              });
           },
           uploadScreenshot() {
             let context = imagepicker.create({
               mode: "single" // use "multiple" for multiple selection
             });
-      
+
             context
               .authorize()
               .then(function() {
                 return context.present();
               })
-              .then((selection) => {
-                selection.forEach((selected) => {
+              .then(selection => {
+                selection.forEach(selected => {
                   // process the selected image
                   selectedImage = selected;
                 });
-              }).catch((err) => {
+              })
+              .catch(err => {
                 // process error
-                
               });
-          },    
+          },
           submitBug() {
             isLoading = true;
-                http.request({
-                  url: this.$store.state.settings.baseLink + "/a/bug/add",
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  content: JSON.stringify({
-                    senderName: this.$route.meta.userAuthLevel == 1 ? this.$store.state.cache.cachedTenant.username : this.$store.state.cache.cachedAdmin.userName,
-                    senderPic: this.$route.meta.userAuthLevel == 1 ? this.$store.state.cache.cachedTenant.profilePic : this.$store.state.cache.cachedAdmin.profilePic,
-                    bugText: this.txtBug
-                  })
-                }).then(response => {
+            http
+              .request({
+                url: this.$store.state.settings.baseLink + "/a/bug/add",
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                content: JSON.stringify({
+                  senderName:
+                    this.$route.meta.userAuthLevel == 1
+                      ? this.$store.state.cache.cachedTenant.username
+                      : this.$store.state.cache.cachedAdmin.userName,
+                  senderPic:
+                    this.$route.meta.userAuthLevel == 1
+                      ? this.$store.state.cache.cachedTenant.profilePic
+                      : this.$store.state.cache.cachedAdmin.profilePic,
+                  bugText: this.txtBug
+                })
+              })
+              .then(response => {
+                var answer = response.content.toString();
+                var statusCode = response.statusCode;
 
-                  var answer = response.content.toString();
-                  var statusCode = response.statusCode;
-
-                  isLoading = false;
-                  if(statusCode == 200){
-                    this.$feedback.success({
-                      title: "Your bug was logged successfully",
-                      message:"The screenshot was not saved."
-                    });
-                  }else{
-                    this.$feedback.error({
-                      title: "The bug was not logged.",
-                      duration: 40000,
-                      message: answer,
-                    });
-                  }
-
-                  this.$modal.close();
-
-                }).catch(err=>{
-                  isLoading = false;
-                  this.$modal.close();
-                  this.$feedback.error({
-                    duration: 4000,
-                    message: err,
+                isLoading = false;
+                if (statusCode == 200) {
+                  this.$feedback.success({
+                    title: "Your bug was logged successfully",
+                    message: "The screenshot was not saved."
                   });
-            });
+                } else {
+                  this.$feedback.error({
+                    title: "The bug was not logged.",
+                    duration: 40000,
+                    message: answer
+                  });
+                }
+
+                this.$modal.close();
+              })
+              .catch(err => {
+                isLoading = false;
+                this.$modal.close();
+                this.$feedback.error({
+                  duration: 4000,
+                  message: err
+                });
+              });
           },
-          refreshList(args){
+          refreshList(args) {
             var pullRefresh = args.object;
-    
+
             var connectionType = connectivity.getConnectionType();
             if (connectionType == connectivity.connectionType.none) {
               this.$modal.close();
               this.$feedback.error({
-                    title: "NO INTERNET CONNECTION",
-                    duration: 4000,
-                    message: "Please switch on your data/wifi.",
-                });
+                title: "NO INTERNET CONNECTION",
+                duration: 4000,
+                message: "Please switch on your data/wifi."
+              });
 
-                pullRefresh.refreshing = false;
+              pullRefresh.refreshing = false;
             } else {
-                http.getJSON(this.$store.state.settings.baseLink + "/a/bug/all").then((results) => {
-                    this.bugs = results;
-                    pullRefresh.refreshing = false;
-                }).catch((err) => {
-                    this.$modal.close();
-                    this.$feedback.error({
-                        title: "Error",
-                        duration: 4000,
-                        message: err,
-                    });
-                    pullRefresh.refreshing = false;
+              http
+                .getJSON(this.$store.state.settings.baseLink + "/a/bug/all")
+                .then(results => {
+                  this.bugs = results;
+                  pullRefresh.refreshing = false;
+                })
+                .catch(err => {
+                  this.$modal.close();
+                  this.$feedback.error({
+                    title: "Error",
+                    duration: 4000,
+                    message: err
+                  });
+                  pullRefresh.refreshing = false;
                 });
             }
           }
-        },
-      })
+        }
+      });
     },
-    ApplyNavigation(self){
+    ApplyNavigation(self) {
       var AndroidApplication = application.android;
       var activity = AndroidApplication.foregroundActivity;
       activity = AndroidApplication.foregroundActivity;
       activity.onBackPressed = function(e) {
-          if (self.currentPage && self.currentPage > 0) {
-              self.currentPage--;
-          } else {
-              activity.onBackPressed = function() {
-                  self.$router.back();
-              }
-              self.$router.back();
-          }
-
+        if (self.currentPage && self.currentPage > 0) {
+          self.currentPage--;
+        } else {
+          activity.onBackPressed = function() {
+            self.$router.back();
+          };
+          self.$router.back();
+        }
       };
     },
-    logBug(){
+    logBug() {
       console.log("Logggging bug");
     },
     getMoment(val) {
-        return moment(val);
+      return moment(val);
     },
-    loginTenant(self, result){
+    loginTenant(self, result) {
       appSettings.setNumber("authLevel", 1);
-    
+
       self.$store.commit("login", {
         id: result._id,
         userName: result.username,
@@ -291,18 +316,16 @@ Vue.mixin({
         isAdmin: false
       });
 
-      self.$store.commit("cacheUser",{
-        db:self.$db,
-        appSettings:appSettings,
-        user:result,
-        isAdmin:false
+      self.$store.commit("cacheUser", {
+        db: self.$db,
+        appSettings: appSettings,
+        user: result,
+        isAdmin: false
       });
-
     },
     loginAdmin(self, result) {
-
       appSettings.setNumber("authLevel", 3);
-      
+
       self.$store.commit("login", {
         id: result._id,
         userName: result.userName,
@@ -314,25 +337,25 @@ Vue.mixin({
         isLoggedIn: true,
         isAdmin: true
       });
-      
-      self.$store.commit("cacheUser",{
-        db:self.$db,
-        appSettings:appSettings,
-        user:result,
-        isAdmin:true
+
+      self.$store.commit("cacheUser", {
+        db: self.$db,
+        appSettings: appSettings,
+        user: result,
+        isAdmin: true
       });
 
       self.$store.dispatch("PopulateNotifications", {
-        notifications: result.notifications.filter((v) => v.dueDate == null)
+        notifications: result.notifications.filter(v => v.dueDate == null)
       });
 
       self.$store.dispatch("PopulateTasks", {
-        tasks: result.notifications.filter((v) => v.dueDate != null)
+        tasks: result.notifications.filter(v => v.dueDate != null)
       });
     },
     loadData(userAuthLevel) {
       if (userAuthLevel == 1) {
-        this.loadTenantData()
+        this.loadTenantData();
       } else if (userAuthLevel == 3) {
         this.loadAdminData();
       }
@@ -348,7 +371,7 @@ Vue.mixin({
         this.$feedback.error({
           title: "Error not expected",
           duration: 4000,
-          message: "Report this as (Error : VVPAOS09)",
+          message: "Report this as (Error : VVPAOS09)"
         });
         this.isLoading = false;
       }
@@ -364,28 +387,30 @@ Vue.mixin({
         this.$feedback.error({
           title: "Error not expected",
           duration: 4000,
-          message: "Report this as (Error : RVPAOS09)",
+          message: "Report this as (Error : RVPAOS09)"
         });
         this.isLoading = false;
       }
     },
     logOut() {
-      dialogs.confirm({
-                title: 'Confirm log out',
-                message: 'You want to log out?',
-                okButtonText: 'Yes',
-                cancelButtonText: 'No'
-      }).then(result => {
+      dialogs
+        .confirm({
+          title: "Confirm log out",
+          message: "You want to log out?",
+          okButtonText: "Yes",
+          cancelButtonText: "No"
+        })
+        .then(result => {
           if (result) {
-            appSettings.setNumber("authLevel",-1);
-            this.$router.replace('/home');
+            appSettings.setNumber("authLevel", -1);
+            this.$router.replace("/home");
           }
-      });
+        });
     }
   }
 });
 
 new Vue({
   router,
-  store,
+  store
 }).$start();

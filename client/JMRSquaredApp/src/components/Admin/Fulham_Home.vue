@@ -73,7 +73,7 @@ export default {
           text: "Stats",
           icon: "mdi-equalizer",
           view: "Stats",
-          isLoaded: false
+          isLoaded: true
         }
       ]
     };
