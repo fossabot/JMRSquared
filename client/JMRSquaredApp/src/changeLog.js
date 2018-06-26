@@ -1,8 +1,6 @@
-var Logs = [
-    {
-        version:'0.1',
-        text:
-`
+var Logs = [{
+        version: '0.1',
+        text: `
 
 1. Added Top Nav on document list.
 
@@ -10,9 +8,8 @@ var Logs = [
 `
     },
     {
-        version:'0.2',
-        text:
-`
+        version: '0.2',
+        text: `
 
 1. Added Tenant Dashboard.
 
@@ -24,19 +21,22 @@ var Logs = [
 `
     },
     {
-        version:'0.3',
-        text:
-`
+        version: '0.3',
+        text: `
 
 1. Fix for NOT PAID bug.
 
 2. Show proof of transactions.
 
+3. Added Taxify FrontEnd
+
+4. Added Cosmetics FrontEnd
+
 `
     }
 ];
 
-function GetLogs(version){
+function GetLogs(version) {
     "use strict";
     return Logs.find(l => l.version == version);
 }
