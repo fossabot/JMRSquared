@@ -56,14 +56,14 @@
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <GridLayout @tap="isWithdraw = !isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-trending-' + (isWithdraw ? 'down' : 'up') | fonticon"></label>
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :class="{'text-dark-blue':!isWithdraw,'text-light-red':isWithdraw}" :text="'mdi-' + (isWithdraw ? 'money-off' : 'attach-money') | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type (tap to change)"></label>
               <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="m-15" fontSize="25%" text="R"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Amount ' + (isWithdraw ? 'used' : 'deposited')  "></label>
               <TextField row="1" col="1" v-model="Amount" :hint="'How much did you ' + (isWithdraw ? 'use' : 'deposit')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
             </GridLayout>
@@ -372,14 +372,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                      <Page>
-                          <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                              <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                              <DatePicker row="1" v-model="selectedDueDate" />
-                              <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                          </GridLayout>
-                      </Page>
-                      `,
+                        <Page>
+                            <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                <DatePicker row="1" v-model="selectedDueDate" />
+                                <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                            </GridLayout>
+                        </Page>
+                        `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -398,16 +398,16 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                      <Page>
-                          <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                            <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                            <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                            <ScrollView row="1" colSpan="2">
-                              <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                            </ScrollView>
-                          </GridLayout>
-                      </Page>
-                      `,
+                        <Page>
+                            <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                              <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                              <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                              <ScrollView row="1" colSpan="2">
+                                <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                              </ScrollView>
+                            </GridLayout>
+                        </Page>
+                        `,
         data() {
           return {
             imgSrc: null
@@ -462,61 +462,22 @@ export default {
       this.currentPage = value;
     },
     uploadEvidence() {
-      let context = imagepicker.create({
-        mode: "single" // use "multiple" for multiple selection
-      });
-      alert("Before permission");
-
-      var t = camera
+      camera
         .requestPermissions()
         .then(answer => {
-          alert("After permission");
           camera
             .takePicture()
             .then(imageAsset => {
-              alert("Captured the pic");
-              console.log("Result is an image asset instance");
               this.selectedImage = imageAsset;
               this.hasImage = true;
             })
             .catch(err => {
-              alert("I caught it " + err.message);
-              alert(JSON.stringify(err));
               console.log("Error -> " + err.message);
             });
         })
         .catch(err => {
-          alert("I caught it " + err.message);
-          alert(JSON.stringify(err));
           console.log("Error -> " + err.message);
         });
-      alert(t);
-
-      /*
-      context
-        .authorize()
-        .then(function() {
-          return context.present();
-        })
-        .then(selection => {
-          selection.forEach(selected => {
-            // process the selected image
-            this.selectedImage = selected;
-            this.hasImage = true;
-          });
-        })
-        .catch(err => {
-          // process error
-          this.$feedback.error({
-            title: "No file selected",
-            message: "Please select a valid image file",
-            duration: 4000,
-            position: 1,
-            onTap: () => {}
-          });
-        });
-
-        */
     }
   }
 };
