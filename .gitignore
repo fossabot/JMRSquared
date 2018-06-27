@@ -74,3 +74,4 @@ typings/
 .env
 
 server/dist/
+client/JMRSquaredApp/\.vscode/
