@@ -11,7 +11,7 @@ const AdminSchema = new mongoose.Schema({
     email: String,
     role: {
         type: String,
-        enum: ['All', 'PROPERTY', 'TAXIFY', 'COSMETICS'],
+        enum: ['ALL', 'PROPERTY', 'TAXIFY', 'COSMETICS'],
         default: 'PROPERTY'
     },
     numbers: Number,
