@@ -125,7 +125,8 @@ const router = new VueRouter({
       component: TaxifyHome,
       meta: {
         title: 'TaxifyHome',
-        authLevel: 2
+        authLevel: 3,
+        source: 'TAXIFY'
       },
     },
     {
@@ -134,7 +135,8 @@ const router = new VueRouter({
       component: TaxifyTransactions,
       meta: {
         title: 'TaxifyTransactions',
-        authLevel: 2
+        authLevel: 3,
+        source: 'TAXIFY'
       },
     },
 
@@ -151,7 +153,8 @@ const router = new VueRouter({
       component: CosmeticsHome,
       meta: {
         title: 'CosmeticsHome',
-        authLevel: 2
+        authLevel: 3,
+        source: 'COSMETICS'
       },
     },
     {
@@ -160,7 +163,8 @@ const router = new VueRouter({
       component: CosmeticsTransactions,
       meta: {
         title: 'CosmeticsTransactions',
-        authLevel: 2
+        authLevel: 3,
+        source: 'COSMETICS'
       },
     },
     /**
@@ -176,7 +180,8 @@ const router = new VueRouter({
       component: EditDetails,
       meta: {
         title: 'ProfileEdit',
-        authLevel: 3
+        authLevel: 3,
+        source: 'PROPERTY'
       },
     },
     {
@@ -185,7 +190,8 @@ const router = new VueRouter({
       component: DocumentList,
       meta: {
         title: 'Documents',
-        authLevel: 3
+        authLevel: 3,
+        source: 'PROPERTY'
       },
     },
     {
@@ -194,7 +200,8 @@ const router = new VueRouter({
       component: RemindersList,
       meta: {
         title: 'Reminders',
-        authLevel: 3
+        authLevel: 3,
+        source: 'PROPERTY'
       },
     },
     {
@@ -203,7 +210,8 @@ const router = new VueRouter({
       component: Admin_DashboardVue,
       meta: {
         title: 'Admin Dashboard',
-        authLevel: 3
+        authLevel: 3,
+        source: null
       },
     },
     {
@@ -212,7 +220,8 @@ const router = new VueRouter({
       component: Fulham_HomeVue,
       meta: {
         title: 'Fulham Home',
-        authLevel: 3
+        authLevel: 3,
+        source: 'PROPERTY'
       },
     },
     {
@@ -221,7 +230,8 @@ const router = new VueRouter({
       component: BottomNav,
       meta: {
         title: 'Fulham Home',
-        authLevel: 3
+        authLevel: 3,
+        source: 'PROPERTY'
       },
     },
     {
@@ -230,7 +240,8 @@ const router = new VueRouter({
       component: AddStudent,
       meta: {
         title: 'Add Students',
-        authLevel: 3
+        authLevel: 3,
+        source: 'PROPERTY'
       },
     },
     {
@@ -285,6 +296,14 @@ router.beforeEach((to, from, next) => {
           title: "You are not Authorized to access this page!"
         });
         return;
+      } else {
+        if (to.meta.source != null && to.meta.source != store.state.user.role && store.state.user.role != "ALL") {
+          feedback.error({
+            title: "You are not Authorized to access this page!",
+            message: "You have permissions to access " + store.state.user.role + " only "
+          });
+          return;
+        }
       }
       break;
   }
