@@ -210,6 +210,9 @@ router.get("/transaction/all", function (req, res) {
       }
       transactions.reverse();
       res.json(transactions);
+    }).catch(err => {
+      res.status(500);
+      res.send("Error : " + err.message);
     });
 });
 
@@ -240,14 +243,14 @@ router.post("/transaction/add", function (req, res) {
     itemCount: req.body.itemCount,
     carName: req.body.carName,
     propertyName: req.body.propertyName,
-    type: req.body.type.toUpperCase(),
+    type: req.body.type,
     rentTenantID: req.body.rentTenantID,
     rentTenantName: req.body.rentTenantName,
     rentMonth: req.body.rentMonth,
     description: req.body.description,
     proof: req.body.proof,
     date: req.body.date,
-    source: req.body.source.toUpperCase()
+    source: req.body.source
   });
 
   transaction.save(function (err) {
