@@ -14,16 +14,16 @@
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-                <Label row="0" col="0" textAlignment="center" class="m-5" :text="transaction.type"></Label>
-                <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
-                <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
+     
+                <Label row="0" col="1" class="m-5" textAlignment="center" :text="getMoment(transaction.date).format('dddd')"></Label>
+                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="getMoment(transaction.date).format('Do MMMM')"></Label>
   
-                <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
+                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'Withdraw','text-light-blue':transaction.type == 'Deposit'}"  textWrap="true" textAlignment="center" :text="'R' + transaction.amount"></Label>
   
-                <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
+                <Label row="2" col="1" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" :text="transaction.description"></Label>
   
                 <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
-                <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
+                <Label row="2" col="2" v-show="transaction.type == 'Withdraw'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
   
               </GridLayout>
             </CardView>
