@@ -247,14 +247,14 @@ router.post("/transaction/add", function (req, res) {
     itemCount: req.body.itemCount,
     carName: req.body.carName,
     propertyName: req.body.propertyName,
-    type: req.body.type,
+    type: req.body.type.toUpperCase(),
     rentTenantID: req.body.rentTenantID,
     rentTenantName: req.body.rentTenantName,
     rentMonth: req.body.rentMonth,
     description: req.body.description,
     proof: req.body.proof,
     date: req.body.date,
-    source: req.body.source
+    source: req.body.source.toUpperCase()
   });
 
   transaction.save(function (err) {
@@ -271,7 +271,7 @@ router.post("/transaction/add", function (req, res) {
           console.log(err);
           return;
         }
-        if (req.body.type == "Rent") {
+        if (req.body.type.toUpperCase() == "RENT") {
           var rent = new Rent({
             _id: mongoose.Types.ObjectId(),
             studentID: req.body.rentTenantID,
