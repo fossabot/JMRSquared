@@ -198,7 +198,11 @@ router.get("/transaction/get/:transactionId", function (req, res) {
 // This function will soon be abolute (it returns for properties only)
 router.get("/transaction/all", function (req, res) {
   Transaction.find({
-        source: "PROPERTY"
+        $or: [{
+          source: "PROPERTY"
+        }, {
+          source: null
+        }]
       },
       "_id adminID amount type rentTenantName rentMonth description date"
     )
