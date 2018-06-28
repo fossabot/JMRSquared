@@ -297,10 +297,10 @@ router.beforeEach((to, from, next) => {
         });
         return;
       } else {
-        if (to.meta.source != null && to.meta.source != store.state.user.role && store.state.user.role != "ALL") {
+        if (to.meta.source != null && to.meta.source != store.state.cache.cachedAdmin.role && store.state.cache.cachedAdmin.role != "ALL") {
           feedback.error({
             title: "You are not Authorized to access this page!",
-            message: "You have permissions to access " + store.state.user.role + " only "
+            message: "You have permissions to access " + store.state.cache.cachedAdmin.role + " only "
           });
           return;
         }
