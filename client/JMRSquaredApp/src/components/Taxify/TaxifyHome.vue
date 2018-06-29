@@ -15,14 +15,11 @@
       </GridLayout>
     </ActionBar>
   
-    <GridLayout rows="*,auto" columns="*">
+    <GridLayout rows="*" columns="*">
       <StackLayout row="0">
         <component :is="tabs[currentTab].view"></component>
         <ActivityIndicator verticalAlignment="center" :busy="!tabs[currentTab].isLoaded"></ActivityIndicator>
       </StackLayout>
-      <SegmentedBar row="1" #tabs borderColor="$blueDarkColor" class="mdi" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
-        <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" @tap="currentTab = i" style="font-size:25%" :title="tab.icon | fonticon"></SegmentedBarItem>
-      </SegmentedBar>
   </GridLayout>
 </page>
 </template>
