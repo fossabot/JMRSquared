@@ -1,6 +1,6 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
-    <GridLayout rows="auto,auto,*">
+    <GridLayout rows="auto,auto,*,auto">
       <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
       <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
@@ -32,7 +32,26 @@
         </ListView>
       </PullToRefresh>
       <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
-  
+      <StackLayout row="3">
+        <Ripple>
+          <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+            <GridLayout class="m-10" rows="auto" columns="*,*">
+              <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+                <GridLayout class="m-10" rows="auto,auto" columns="*">
+                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total REVENUE"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="R80 000"></label>
+                </GridLayout>
+              </CardView>
+              <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+                <GridLayout class="m-10" rows="auto,auto" columns="*">
+                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total PROFIT"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="R62 000"></label>
+                </GridLayout>
+              </CardView>
+            </GridLayout>
+          </CardView>
+        </Ripple>
+      </StackLayout>
       <!-- This is the first step -->
       <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
         <ScrollView>
@@ -368,7 +387,8 @@ export default {
 
       let source = new imageSource.ImageSource();
       source.fromAsset(this.selectedImage).then(img => {
-        this.selectedImage = 'data:image/png;base64,' + img.toBase64String("png");
+        this.selectedImage =
+          "data:image/png;base64," + img.toBase64String("png");
 
         http
           .request({
@@ -462,14 +482,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                    <Page>
-                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                            <DatePicker row="1" v-model="selectedDueDate" />
-                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                        </GridLayout>
-                    </Page>
-                    `,
+                                    <Page>
+                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                            <DatePicker row="1" v-model="selectedDueDate" />
+                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                        </GridLayout>
+                                    </Page>
+                                    `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -488,29 +508,33 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                    <Page>
-                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                          <ScrollView row="1" colSpan="2">
-                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                          </ScrollView>
-                        </GridLayout>
-                    </Page>
-                    `,
-        data(){
+                                    <Page>
+                                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                          <ScrollView row="1" colSpan="2">
+                                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                          </ScrollView>
+                                        </GridLayout>
+                                    </Page>
+                                    `,
+        data() {
           return {
-            imgSrc:null
-          }
+            imgSrc: null
+          };
         },
-        mounted(){
+        mounted() {
           this.imgSrc = null;
           this.loadImage();
         },
-        methods:{
-          loadImage(){
+        methods: {
+          loadImage() {
             http
-              .getJSON(this.$store.state.settings.baseLink + "/a/transaction/get/" + event.item._id)
+              .getJSON(
+                this.$store.state.settings.baseLink +
+                  "/a/transaction/get/" +
+                  event.item._id
+              )
               .then(results => {
                 this.imgSrc = results.proof;
               })
