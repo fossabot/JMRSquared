@@ -1,6 +1,6 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
-    <GridLayout rows="auto,auto,*">
+    <GridLayout rows="auto,auto,*,auto">
       <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
       <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
@@ -31,7 +31,27 @@
         </ListView>
       </PullToRefresh>
       <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
-  
+        <StackLayout row="3">
+        <Ripple>
+          <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+            <GridLayout class="m-10" rows="auto" columns="*,*">
+              <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+                <GridLayout class="m-10" rows="auto,auto" columns="*">
+                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total Sales"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="23 products"></label>
+                </GridLayout>
+              </CardView>
+              <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+                <GridLayout class="m-10" rows="auto,auto" columns="*">
+                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total PROFIT"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="R6 000"></label>
+                </GridLayout>
+              </CardView>
+            </GridLayout>
+          </CardView>
+        </Ripple>
+      </StackLayout>
+
       <!-- This is the first step -->
       <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
         <ScrollView>
