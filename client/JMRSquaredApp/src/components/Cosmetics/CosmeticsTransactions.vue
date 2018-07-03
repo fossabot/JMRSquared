@@ -38,13 +38,13 @@
               <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout class="m-10" rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total Sales"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="23 products"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" :text="total.sales + 'products'"></label>
                 </GridLayout>
               </CardView>
               <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout class="m-10" rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total PROFIT"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="R6 000"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" :text="'R' + total.profit"></label>
                 </GridLayout>
               </CardView>
             </GridLayout>
@@ -178,6 +178,11 @@ const http = require("http");
 export default {
   data() {
     return {
+      total: {
+        revenue: 0,
+        profit: 0,
+        sales: 0
+      },
       txtError: "",
       Amount: "",
       ItemCount: "",
@@ -217,7 +222,8 @@ export default {
         }
       },
       set(val) {
-        return (this.transactions = val);
+        this.transactions = val;
+        this.updateTotals();
       }
     }
   },
@@ -228,6 +234,23 @@ export default {
     this.pageLoaded();
   },
   methods: {
+    updateTotals() {
+      var revenue = 0;
+      var profit = 0;
+      var sales = 0;
+      this.transactions.map(value => {
+        if (value.type == "DEPOSIT") {
+          sales += Number(value.numOfItems);
+          profit += Number(value.amount);
+          revenue += Number(value.amount);
+        } else if (value.type == "WITHDRAW") {
+          profit -= Number(value.amount);
+        }
+      });
+      this.total.revenue = revenue.toFixed(2);
+      this.total.profit = profit.toFixed(2);
+      this.total.sales = sales;
+    },
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);

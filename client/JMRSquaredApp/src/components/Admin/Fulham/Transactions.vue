@@ -35,17 +35,17 @@
       <StackLayout row="3">
         <Ripple>
           <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout class="m-10" rows="auto" columns="*,*">
-              <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout class="m-10" rows="auto,auto" columns="*">
+            <GridLayout rows="auto" columns="*,*">
+              <CardView class="m-t-10" row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+                <GridLayout  rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total REVENUE"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="R80 000"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.revenue"></label>
                 </GridLayout>
               </CardView>
-              <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout class="m-10" rows="auto,auto" columns="*">
+              <CardView class="m-t-10" row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+                <GridLayout rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total PROFIT"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" text="R62 000"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.profit"></label>
                 </GridLayout>
               </CardView>
             </GridLayout>
@@ -284,7 +284,11 @@ export default {
       currentPage: false,
       isMainScreen: false,
       selectedScreen: "",
-      price: ""
+      price: "",
+      total: {
+        revenue: 0,
+        profit: 0
+      }
     };
   },
   computed: {
@@ -308,7 +312,8 @@ export default {
         }
       },
       set(val) {
-        return (this.transactions = val);
+        this.transactions = val;
+        this.updateTotals();
       }
     }
   },
@@ -319,6 +324,20 @@ export default {
     this.pageLoaded();
   },
   methods: {
+    updateTotals() {
+      var revenue = 0;
+      var profit = 0;
+      this.transactions.map(value => {
+        if (value.type == "Rent" || value.type == "Deposit") {
+          profit += Number(value.amount);
+          revenue += Number(value.amount);
+        } else if (value.type == "Withdraw") {
+          profit -= Number(value.amount);
+        }
+      });
+      this.total.revenue = revenue.toFixed(2);
+      this.total.profit = profit.toFixed(2);
+    },
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
