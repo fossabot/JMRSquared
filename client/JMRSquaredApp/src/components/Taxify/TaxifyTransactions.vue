@@ -317,7 +317,8 @@ export default {
               type: this.isWithdraw ? "Withdraw" : "Deposit",
               description: this.description,
               proof: this.selectedImage,
-              date: this.TransactionDate
+              date: this.TransactionDate,
+              source: "TAXIFY"
             })
           })
           .then(response => {

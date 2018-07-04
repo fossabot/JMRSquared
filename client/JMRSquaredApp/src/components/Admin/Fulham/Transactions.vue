@@ -431,7 +431,8 @@ export default {
               rentMonth: this.rentMonths[this.rentMonthIndex],
               description: this.description,
               proof: this.selectedImage,
-              date: this.TransactionDate
+              date: this.TransactionDate,
+              source: "PROPERTY"
             })
           })
           .then(response => {
