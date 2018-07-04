@@ -364,7 +364,9 @@ export default {
         });
       } else {
         http
-          .getJSON(this.$store.state.settings.baseLink + "/a/transaction/all")
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+          )
           .then(results => {
             this.filteredTransactions = results;
           })
@@ -475,7 +477,9 @@ export default {
         pullRefresh.refreshing = false;
       } else {
         http
-          .getJSON(this.$store.state.settings.baseLink + "/a/transaction/all")
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+          )
           .then(results => {
             this.filteredTransactions = results;
             pullRefresh.refreshing = false;

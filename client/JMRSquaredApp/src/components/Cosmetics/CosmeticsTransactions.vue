@@ -38,7 +38,7 @@
               <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout class="m-10" rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total Sales"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" :text="total.sales + 'products'"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="center" textAlignment="center" :text="total.sales + ' products'"></label>
                 </GridLayout>
               </CardView>
               <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
@@ -277,7 +277,9 @@ export default {
         });
       } else {
         http
-          .getJSON(this.$store.state.settings.baseLink + "/a/transaction/all")
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/COSMETICS/all"
+          )
           .then(results => {
             this.filteredTransactions = results;
           })
@@ -375,7 +377,9 @@ export default {
         pullRefresh.refreshing = false;
       } else {
         http
-          .getJSON(this.$store.state.settings.baseLink + "/a/transaction/all")
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/COSMETICS/all"
+          )
           .then(results => {
             this.filteredTransactions = results;
             pullRefresh.refreshing = false;
