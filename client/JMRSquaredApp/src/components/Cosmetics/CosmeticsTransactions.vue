@@ -10,7 +10,7 @@
         </StackLayout>
       </ScrollView>
       <PullToRefresh v-show="currentPage == 0" row="2" col="0" @refresh="refreshList($event)">
-        <ListView @itemTap="onTransactionTap" borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
+        <ListView borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
@@ -411,52 +411,6 @@ export default {
             self.TransactionDate = value;
             self.TransactionDate.setDate(value.getDate() + 1);
             this.$modal.close();
-          }
-        }
-      });
-    },
-    onTransactionTap(event) {
-      var self = this;
-      this.$showModal({
-        template: ` 
-                        <Page>
-                            <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                              <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                              <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                              <ScrollView row="1" colSpan="2">
-                                <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                              </ScrollView>
-                            </GridLayout>
-                        </Page>
-                        `,
-        data() {
-          return {
-            imgSrc: null
-          };
-        },
-        mounted() {
-          this.imgSrc = null;
-          this.loadImage();
-        },
-        methods: {
-          loadImage() {
-            http
-              .getJSON(
-                this.$store.state.settings.baseLink +
-                  "/a/transaction/get/" +
-                  event.item._id
-              )
-              .then(results => {
-                this.imgSrc = results.proof;
-              })
-              .catch(err => {
-                this.$feedback.error({
-                  title: "Error",
-                  duration: 4000,
-                  message: err
-                });
-                this.imgSrc = true;
-              });
           }
         }
       });
