@@ -35,14 +35,14 @@
       <StackLayout row="3">
         <Ripple>
           <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout rows="auto" columns="*,*">
-              <CardView class="m-t-10" row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+            <GridLayout class="m-t-10" rows="auto" columns="*,*">
+              <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout  rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total REVENUE"></label>
                   <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.revenue"></label>
                 </GridLayout>
               </CardView>
-              <CardView class="m-t-10" row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+              <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total PROFIT"></label>
                   <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.profit"></label>

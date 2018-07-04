@@ -158,11 +158,15 @@
   
             <ActivityIndicator :busy="isLoading"></ActivityIndicator>
   
-            <GridLayout v-show="!isLoading" columns="*,*" rows="*" verticalAlignment="bottom">
+            <GridLayout v-show="!isLoading && !donePayment" columns="*,*" rows="*" verticalAlignment="bottom">
               <button row="0" col="0" @tap="ShowNewTransaction(1)" verticalAlignment="bottom" width="100%" textAlignment="center" class="btn-primary bg-light-red" text="Back"></button>
               <button row="0" col="1" @tap="SubmitTransaction()" verticalAlignment="bottom" width="100%" textAlignment="center" class="btn-primary bg-light-blue" text="Submit"></button>
             </GridLayout>
   
+            <GridLayout v-show="!isLoading && donePayment" columns="*" rows="*" verticalAlignment="bottom">
+              <button row="0" col="0" @tap="ShowNewTransaction(0)" verticalAlignment="bottom" width="100%" textAlignment="center" class="btn-primary bg-light-blue" text="Back to transactions"></button>
+            </GridLayout>
+
           </StackLayout>
         </ScrollView>
       </CardView>
@@ -202,7 +206,8 @@ export default {
       currentPage: false,
       isMainScreen: false,
       selectedScreen: "",
-      price: ""
+      price: "",
+      donePayment: false
     };
   },
   computed: {
@@ -286,7 +291,7 @@ export default {
       if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
         this.txtError = "Please provide a valid amount.";
       }
-      if (this.description.length < 2) {
+      if (this.description.length < 2 && this.isWithdraw) {
         this.txtError = "A description is required.";
       }
       return this.txtError.length < 2;
@@ -331,6 +336,7 @@ export default {
                   this.currentPage = 0;
                 }
               });
+              this.donePayment = true;
               this.isLoading = false;
             } else if (statusCode == 413) {
               this.$feedback.error({
@@ -470,7 +476,26 @@ export default {
       if (value == 2) {
         if (!this.canSubmit()) {
           return;
+        } else {
+          this.donePayment = false;
         }
+      } else if (value == 0) {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
+          )
+          .then(results => {
+            this.filteredTransactions = results;
+            pullRefresh.refreshing = false;
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err
+            });
+            pullRefresh.refreshing = false;
+          });
       }
       this.currentPage = value;
     },
