@@ -30,11 +30,11 @@
       </PullToRefresh>
       <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
       <StackLayout row="3">
-        <Ripple>
+        <Ripple @tap="changeTotalFilter()">
           <CardView margin="2" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout class="m-10" rows="auto" columns="*,auto">
-              <label row="0" col="0" class="font-weight-bold" verticalAlignment="center" :text="'Balance due on ' + getMoment().endOf('week').add(1, 'day').format('dddd [(]DD MMM[)]')"></label>
-              <label row="0" col="1" class="h4 text-mute text-light-red" fontSize="20%" verticalAlignment="center" text="R800"></label>
+            <GridLayout class="m-10" rows="auto" columns="*,*">
+              <label row="0" col="0" class="font-weight-bold" verticalAlignment="center" :text="total.values[total.filter].key"></label>
+              <label row="0" col="1" class="h4 text-mute text-light-red" fontSize="20%" textAlignment="right" verticalAlignment="center" :text="'R' + total.values[total.filter].value"></label>
             </GridLayout>
           </CardView>
         </Ripple>
@@ -166,7 +166,7 @@
             <GridLayout v-show="!isLoading && donePayment" columns="*" rows="*" verticalAlignment="bottom">
               <button row="0" col="0" @tap="ShowNewTransaction(0)" verticalAlignment="bottom" width="100%" textAlignment="center" class="btn-primary bg-light-blue" text="Back to transactions"></button>
             </GridLayout>
-
+  
           </StackLayout>
         </ScrollView>
       </CardView>
@@ -192,6 +192,20 @@ const http = require("http");
 export default {
   data() {
     return {
+      total: {
+        filter: 0,
+        values: [
+          {
+            key:
+              "Balance due on " +
+              this.getMoment()
+                .endOf("week")
+                .add(1, "day")
+                .format("dddd [(]DD MMM[)]"),
+            value: 900
+          }
+        ]
+      },
       txtError: "",
       Amount: "",
       users: [],
@@ -231,7 +245,8 @@ export default {
         }
       },
       set(val) {
-        return (this.transactions = val);
+        this.transactions = val;
+        this.updateTotals();
       }
     }
   },
@@ -242,6 +257,34 @@ export default {
     this.pageLoaded();
   },
   methods: {
+    updateTotals() {
+      var revenue = 0;
+      var profit = 0;
+      this.transactions.map(value => {
+        if (value.type == "DEPOSIT") {
+          profit += Number(value.amount);
+          revenue += Number(value.amount);
+        } else if (value.type == "WITHDRAW") {
+          profit -= Number(value.amount);
+        }
+      });
+
+      profit = profit.toFixed(2);
+
+      if (this.total.values.length == 1) {
+        this.total.values.push({ key: "Total Revenue", value: profit });
+      } else {
+        this.total.values[1].key = "Total Revenue";
+        this.total.values[1].value = profit;
+      }
+    },
+    changeTotalFilter() {
+      if (this.total.filter == this.total.values.length - 1) {
+        this.total.filter = 0;
+      } else {
+        this.total.filter++;
+      }
+    },
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
@@ -391,14 +434,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                  <Page>
-                                      <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                          <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                          <DatePicker row="1" v-model="selectedDueDate" />
-                                          <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                      </GridLayout>
-                                  </Page>
-                                  `,
+                                    <Page>
+                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                            <DatePicker row="1" v-model="selectedDueDate" />
+                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                        </GridLayout>
+                                    </Page>
+                                    `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -417,16 +460,16 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                  <Page>
-                                      <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                                        <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                                        <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                                        <ScrollView row="1" colSpan="2">
-                                          <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                                        </ScrollView>
-                                      </GridLayout>
-                                  </Page>
-                                  `,
+                                    <Page>
+                                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                          <ScrollView row="1" colSpan="2">
+                                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                          </ScrollView>
+                                        </GridLayout>
+                                    </Page>
+                                    `,
         data() {
           return {
             imgSrc: null
