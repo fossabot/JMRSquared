@@ -32,7 +32,7 @@
       <StackLayout row="3">
         <Ripple @tap="changeTotalFilter()">
           <CardView margin="2" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout class="m-10" rows="auto" columns="*,*">
+            <GridLayout v-if="total.values.length > 0" class="m-10" rows="auto" columns="*,*">
               <label row="0" col="0" class="font-weight-bold" verticalAlignment="center" :text="total.values[total.filter].key"></label>
               <label row="0" col="1" class="h4 text-mute text-light-red" fontSize="20%" textAlignment="right" verticalAlignment="center" :text="'R' + total.values[total.filter].value"></label>
             </GridLayout>
@@ -195,15 +195,7 @@ export default {
       total: {
         filter: 0,
         values: [
-          {
-            key:
-              "Balance due on " +
-              this.getMoment()
-                .endOf("week")
-                .add(1, "day")
-                .format("dddd [(]DD MMMM[)]"),
-            value: 900
-          }
+         
         ]
       },
       txtError: "",
@@ -263,7 +255,7 @@ export default {
       var revenue = 0;
       var profit = 0;
       var thisMonthsRevenue = 0;
-      var thisWeekBalance = 0;
+      var thisWeekBalance = this.duePerWeek;
       var overDraft = 0;
 
       // We count the weeks from the first transaction
@@ -277,6 +269,11 @@ export default {
           if(this.getMoment().isSame(value.date, 'month')){
             thisMonthsRevenue += Number(value.amount);
           }
+
+          if(this.getMoment().isSame(value.date, 'week')){
+            thisWeekBalance -= Number(value.amount);
+          }
+
           profit += Number(value.amount);
           revenue += Number(value.amount);
         } else if (value.type == "WITHDRAW") {
@@ -288,12 +285,20 @@ export default {
       });
 
       profit = profit.toFixed(2);
-      revenue =revenue.toFixed(2);
+      revenue = revenue.toFixed(2);
+      thisWeekBalance = thisWeekBalance.toFixed(2);
       thisMonthsRevenue = thisMonthsRevenue.toFixed(2);
 
       overDraft = this.expectedProfit - revenue; 
       if(overDraft < 0) overDraft = 0;
+      if(thisWeekBalance < 0) thisWeekBalance = 0;
 
+      if(this.total.values.length == 0){
+          this.total.values.push({key:"Balance due on " + this.getMoment().endOf("week").add(1, "day").format("dddd [(]DD MMMM[)]") , value: thisWeekBalance });
+      }else{
+        this.total.values[0].key = "Balance due on " + this.getMoment().endOf("week").add(1, "day").format("dddd [(]DD MMMM[)]");
+        this.total.values[0].value = thisWeekBalance;
+      }
 
       if (this.total.values.length == 1) {
         this.total.values.push({ key: "Total Revenue", value: profit });
