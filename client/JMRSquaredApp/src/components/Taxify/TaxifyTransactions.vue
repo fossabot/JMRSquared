@@ -201,7 +201,7 @@ export default {
               this.getMoment()
                 .endOf("week")
                 .add(1, "day")
-                .format("dddd [(]DD MMM[)]"),
+                .format("dddd [(]DD MMMM[)]"),
             value: 900
           }
         ]
@@ -260,16 +260,25 @@ export default {
     updateTotals() {
       var revenue = 0;
       var profit = 0;
+      var thisMonthsRevenue = 0;
       this.transactions.map(value => {
+
         if (value.type == "DEPOSIT") {
+          if(this.getMoment().isSame(value.date, 'month')){
+            thisMonthsRevenue += Number(value.amount);
+          }
           profit += Number(value.amount);
           revenue += Number(value.amount);
         } else if (value.type == "WITHDRAW") {
+          if(this.getMoment().isSame(value.date, 'month')){
+            thisMonthsRevenue -= Number(value.amount);
+          }
           profit -= Number(value.amount);
         }
       });
 
       profit = profit.toFixed(2);
+      thisMonthsRevenue = thisMonthsRevenue.toFixed(2);
 
       if (this.total.values.length == 1) {
         this.total.values.push({ key: "Total Revenue", value: profit });
@@ -277,6 +286,14 @@ export default {
         this.total.values[1].key = "Total Revenue";
         this.total.values[1].value = profit;
       }
+
+      if (this.total.values.length == 2) {
+        this.total.values.push({ key: this.getMoment().format("MMMM") + "'s Revenue", value: thisMonthsRevenue });
+      } else {
+        this.total.values[2].key =  this.getMoment().format("MMMM") + "'s Revenue";
+        this.total.values[2].value = thisMonthsRevenue;
+      }
+
     },
     changeTotalFilter() {
       if (this.total.filter == this.total.values.length - 1) {
