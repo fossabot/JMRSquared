@@ -17,9 +17,9 @@
                 <Label row="0" col="1" class="m-5" textAlignment="center" :text="getMoment(transaction.date).format('dddd')"></Label>
                 <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="getMoment(transaction.date).format('Do MMMM')"></Label>
   
-                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'Withdraw','text-light-blue':transaction.type == 'Deposit'}" textWrap="true" textAlignment="center" :text="'R' + transaction.amount"></Label>
+                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT'}" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
   
-                <Label row="2" col="1" v-show="transaction.type == 'Withdraw'" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" :text="transaction.description"></Label>
+                <Label row="2" col="1" v-show="transaction.type == 'WITHDRAW'" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" :text="transaction.description"></Label>
   
                 <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                 <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
@@ -221,7 +221,9 @@ export default {
       isMainScreen: false,
       selectedScreen: "",
       price: "",
-      donePayment: false
+      donePayment: false,
+      duePerWeek:2800,
+      expectedProfit:0
     };
   },
   computed: {
@@ -241,7 +243,7 @@ export default {
         if (this.selectedType == this.transactionTypes[0]) {
           return this.transactions;
         } else {
-          return this.transactions.filter(v => v.type == this.selectedType);
+          return this.transactions.filter(v => v.type == this.selectedType.toUpperCase());
         }
       },
       set(val) {
@@ -261,8 +263,16 @@ export default {
       var revenue = 0;
       var profit = 0;
       var thisMonthsRevenue = 0;
-      this.transactions.map(value => {
+      var thisWeekBalance = 0;
+      var overDraft = 0;
 
+      // We count the weeks from the first transaction
+      var weeks = this.getMoment().diff(this.transactions[0].date,'weeks');
+
+      // We calculate the expectedProfit from those weeks
+      this.expectedProfit = weeks*this.duePerWeek;
+
+      this.transactions.map(value => {
         if (value.type == "DEPOSIT") {
           if(this.getMoment().isSame(value.date, 'month')){
             thisMonthsRevenue += Number(value.amount);
@@ -278,7 +288,12 @@ export default {
       });
 
       profit = profit.toFixed(2);
+      revenue =revenue.toFixed(2);
       thisMonthsRevenue = thisMonthsRevenue.toFixed(2);
+
+      overDraft = this.expectedProfit - revenue; 
+      if(overDraft < 0) overDraft = 0;
+
 
       if (this.total.values.length == 1) {
         this.total.values.push({ key: "Total Revenue", value: profit });
@@ -294,6 +309,12 @@ export default {
         this.total.values[2].value = thisMonthsRevenue;
       }
 
+      if (this.total.values.length == 3 && overDraft > 0) {
+        this.total.values.push({ key: "Over draft (You owe this amount)", value: overDraft });
+      } else if(overDraft > 0) {
+        this.total.values[3].key =  "Over draft (You owe this amount)";
+        this.total.values[3].value = overDraft;
+      }
     },
     changeTotalFilter() {
       if (this.total.filter == this.total.values.length - 1) {
