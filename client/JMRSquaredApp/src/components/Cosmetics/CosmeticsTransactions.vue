@@ -14,24 +14,23 @@
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-                <Label row="0" col="0" textAlignment="center" class="m-5" :text="transaction.type"></Label>
-                <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
-                <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
+                <Label row="0" col="1" class="m-5" textAlignment="center" :text="getMoment(transaction.date).format('dddd')"></Label>
+                <!--Remember to pluralize the products -->
+                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="transaction.itemCount + ' products'"></Label>
   
-                <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
+                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT'}" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
   
-                <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
+                <Label row="2" col="0" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" :text="(transaction.type == 'DEPOSIT') ? 'Sale' : 'Stock'"></Label>
   
                 <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                 <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
-  
               </GridLayout>
             </CardView>
           </v-template>
         </ListView>
       </PullToRefresh>
       <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
-        <StackLayout row="3">
+      <StackLayout row="3">
         <Ripple>
           <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
             <GridLayout class="m-10" rows="auto" columns="*,*">
@@ -51,7 +50,7 @@
           </CardView>
         </Ripple>
       </StackLayout>
-
+  
       <!-- This is the first step -->
       <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
         <ScrollView>
@@ -81,14 +80,14 @@
               <label row="1" col="1" :text="isWithdraw ? 'Stock' : 'Deposit'" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of items ' + (isWithdraw ? 'bought' : 'sold')"></label>
-              <TextField row="1" col="1" v-model="ItemCount" :hint="'How many items did you ' + (isWithdraw ? 'buy' : 'sell')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
+              <TextField row="1" col="1" v-model="itemCount" :hint="'How many items did you ' + (isWithdraw ? 'buy' : 'sell')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="m-15" fontSize="25%" text="R"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Money spent"></label>
@@ -146,6 +145,14 @@
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
+
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
+              <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of items ' + (isWithdraw ? 'bought' : 'sold')"></label>
+              <label row="1" col="1" :text="'You ' + (isWithdraw ? 'bought ' : 'sold ')  + itemCount +  ' products'"  class="h4"></label>
+            </GridLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
+
             <ActivityIndicator :busy="isLoading"></ActivityIndicator>
   
             <GridLayout v-show="!isLoading && !donePayment" columns="*,*" rows="*" verticalAlignment="bottom">
@@ -203,7 +210,8 @@ export default {
       isMainScreen: false,
       selectedScreen: "",
       price: "",
-      donePayment: false
+      donePayment: false,
+      itemCount:0
     };
   },
   computed: {
@@ -245,7 +253,7 @@ export default {
       var sales = 0;
       this.transactions.map(value => {
         if (value.type == "DEPOSIT") {
-          sales += Number(value.numOfItems);
+          sales += Number(value.itemCount);
           profit += Number(value.amount);
           revenue += Number(value.amount);
         } else if (value.type == "WITHDRAW") {
@@ -326,6 +334,7 @@ export default {
             description: this.description,
             proof: this.selectedImage,
             date: this.TransactionDate,
+            itemCount:this.itemCount,
             source: "COSMETICS"
           })
         })
@@ -393,14 +402,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                        <Page>
-                            <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                <DatePicker row="1" v-model="selectedDueDate" />
-                                <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                            </GridLayout>
-                        </Page>
-                        `,
+                            <Page>
+                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                    <DatePicker row="1" v-model="selectedDueDate" />
+                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                </GridLayout>
+                            </Page>
+                            `,
         data: function() {
           return {
             selectedDueDate: new Date()
