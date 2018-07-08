@@ -14,9 +14,10 @@
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-                <Label row="0" col="0" textAlignment="center" class="m-5" :text="transaction.type"></Label>
-                <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
-                <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
+               
+                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT' || transaction.type == 'RENT' }" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' || transaction.type == 'RENT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
+  
+                <Label row="2" col="0" v-show="transaction.type == 'RENT'" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" text="Rent"></Label>
   
                 <Label row="0" col="1" v-show="transaction.type == 'RENT'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
   
@@ -33,19 +34,19 @@
       </PullToRefresh>
       <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
       <StackLayout row="3">
-        <Ripple>
+        <Ripple @tap="changeTotalFilter()">
           <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout class="m-t-10" rows="auto" columns="*,*">
+            <GridLayout  v-if="total.values.length > 0" class="m-t-10" rows="auto" columns="*,*">
               <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout  rows="auto,auto" columns="*">
-                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total REVENUE"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.revenue"></label>
+                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" :text="total.values[total.filter].revenue.key"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.values[total.filter].revenue.value"></label>
                 </GridLayout>
               </CardView>
               <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
                 <GridLayout rows="auto,auto" columns="*">
-                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" text="Total PROFIT"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.profit"></label>
+                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" :text="total.values[total.filter].profit.key"></label>
+                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.values[total.filter].profit.value"></label>
                 </GridLayout>
               </CardView>
             </GridLayout>
@@ -257,8 +258,10 @@ export default {
   data() {
     return {
       total: {
-        revenue: 0,
-        profit: 0
+        filter: 0,
+        values: [
+         
+        ]
       },
       txtError: "",
       Amount: "",
@@ -332,16 +335,99 @@ export default {
     updateTotals() {
       var revenue = 0;
       var profit = 0;
+
+      var threeMonthsBalance = [{revenue:0,profit:0},{revenue:0,profit:0},{revenue:0,profit:0}];
       this.transactions.map(value => {
-        if (value.type == "Rent" || value.type == "Deposit") {
+      var diff = this.getMoment().endOf('month').diff(value.date,'months');
+        try{
+        if(value.type == "RENT"){
+          var theMonth = this.getMoment(value.date).month(value.rentMonth);
+          diff = this.getMoment().endOf('month').diff(theMonth,'months');
+
+          if(diff >= 0 && diff < 3){
+            threeMonthsBalance[diff].revenue += Number(value.amount);
+            threeMonthsBalance[diff].profit += Number(value.amount);
+          }
+
           profit += Number(value.amount);
           revenue += Number(value.amount);
-        } else if (value.type == "Withdraw") {
+        } else if (value.type == "DEPOSIT") {
+          if(diff >= 0 && diff < 3){
+            threeMonthsBalance[diff].revenue += Number(value.amount);
+            threeMonthsBalance[diff].profit += Number(value.amount);
+          }
+
+          profit += Number(value.amount);
+          revenue += Number(value.amount);
+        } else if (value.type == "WITHDRAW") {
           profit -= Number(value.amount);
+          if(diff >= 0 && diff < 3){
+            threeMonthsBalance[diff].profit -= Number(value.amount);
+          }
         }
+      }catch(e){
+        alert("The nigga who is fucking up is " + diff + " <- diff " + value.type + " " + value.description + " " + value.amount + " " + this.getMoment(value.date).format("YYYY-MMMM-DD"));
+      }
       });
-      this.total.revenue = revenue.toFixed(2);
-      this.total.profit = profit.toFixed(2);
+    
+      profit = profit.toFixed(2);
+      revenue = revenue.toFixed(2);
+      for(let i=0;i<threeMonthsBalance.length;i++){
+        threeMonthsBalance[i].revenue =threeMonthsBalance[i].revenue.toFixed(2);
+        threeMonthsBalance[i].profit =threeMonthsBalance[i].profit.toFixed(2); 
+      }
+
+      if (this.total.values.length == 0) {
+        this.total.values.push(
+           {revenue : { 
+             key: "Total Revenue", value: revenue 
+            },
+            profit:{
+             key: "Total Profit", value: profit 
+            }}
+          );
+      } else {
+        this.total.values[0] = {revenue : { 
+             key: "Total Revenue", value: revenue 
+            },
+            profit:{
+             key: "Total Profit", value: profit 
+            }}
+      }
+
+       if (this.total.values.length == 1) {
+        for(let i=0;i<threeMonthsBalance.length;i++){
+         var monthName = this.getMoment().endOf('month').subtract(i,'months').format("MMMM");
+        this.total.values.push(
+           {revenue : { 
+             key: monthName + "'s Revenue", value: threeMonthsBalance[i].revenue 
+            },
+            profit:{
+             key: monthName + "'s Profit", value: threeMonthsBalance[i].profit 
+            }}
+          );
+
+        }
+      } else {
+         for(let i=0;i<threeMonthsBalance.length;i++){
+        var monthName =  this.getMoment().endOf('month').subtract(i,'months').format("MMMM");
+       
+        this.total.values[i+1] = {revenue : { 
+             key: monthName + "'s Revenue", value: threeMonthsBalance[i].revenue 
+            },
+            profit:{
+             key: monthName + "'s Profit", value: threeMonthsBalance[i].profit 
+            }}
+         }
+      }
+
+    }, 
+    changeTotalFilter() {
+      if (this.total.filter == this.total.values.length - 1) {
+        this.total.filter = 0;
+      } else {
+        this.total.filter++;
+      }
     },
     pageLoaded(args) {
       var self = this;
