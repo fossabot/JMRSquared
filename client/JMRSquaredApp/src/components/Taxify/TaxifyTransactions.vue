@@ -55,19 +55,23 @@
               <label row="1" col="1" :text="$store.state.cache.cachedAdmin.userName" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout @tap="changeTransactionDate()" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Date (tap to change)"></label>
-              <label row="1" col="1" :text="TransactionDate.toISOString().slice(0,10)" class="h4"></label>
-            </GridLayout>
+
+            <Ripple @tap="changeTransactionDate()">
+              <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
+                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Date (tap to change)"></label>
+                <label row="1" col="1" :text="TransactionDate.toISOString().slice(0,10)" class="h4"></label>
+              </GridLayout>
+            </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout @tap="isWithdraw = !isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :class="{'text-dark-blue':!isWithdraw,'text-light-red':isWithdraw}" :text="'mdi-' + (isWithdraw ? 'money-off' : 'attach-money') | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type (tap to change)"></label>
-              <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
-            </GridLayout>
+            <Ripple @tap="isWithdraw = !isWithdraw">
+              <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :class="{'text-dark-blue':!isWithdraw,'text-light-red':isWithdraw}" :text="'mdi-' + (isWithdraw ? 'money-off' : 'attach-money') | fonticon"></label>
+                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type (tap to change)"></label>
+                <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
+              </GridLayout>
+            </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
@@ -84,12 +88,14 @@
             </GridLayout>
             <StackLayout v-show="isWithdraw" width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout class="m-10" rows="auto,auto,auto" @tap="uploadEvidence()" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Evidence"></label>
-              <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
-              <Image row="2" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
-            </GridLayout>
+            <Ripple @tap="uploadEvidence()">
+              <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*">
+                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
+                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Evidence"></label>
+                <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
+                <Image row="2" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
+              </GridLayout>
+            </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <DockLayout v-show="txtError.length > 2" alignSelf="center" justifyContent="flex-end" orientation="horizontal" textAlignment="center">
