@@ -316,7 +316,7 @@ export default {
         if (this.selectedType == this.transactionTypes[0]) {
           return this.transactions;
         } else {
-          return this.transactions.filter(v => v.type == this.selectedType);
+          return this.transactions.filter(v => v.type == this.selectedType.toUpperCase());
         }
       },
       set(val) {
@@ -339,7 +339,6 @@ export default {
       var threeMonthsBalance = [{revenue:0,profit:0},{revenue:0,profit:0},{revenue:0,profit:0}];
       this.transactions.map(value => {
       var diff = this.getMoment().endOf('month').diff(value.date,'months');
-        try{
         if(value.type == "RENT"){
           var theMonth = this.getMoment(value.date).month(value.rentMonth);
           diff = this.getMoment().endOf('month').diff(theMonth,'months');
@@ -365,9 +364,6 @@ export default {
             threeMonthsBalance[diff].profit -= Number(value.amount);
           }
         }
-      }catch(e){
-        alert("The nigga who is fucking up is " + diff + " <- diff " + value.type + " " + value.description + " " + value.amount + " " + this.getMoment(value.date).format("YYYY-MMMM-DD"));
-      }
       });
     
       profit = profit.toFixed(2);
