@@ -509,8 +509,8 @@ export default {
               adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
               amount: this.Amount,
               type: this.isRent
-                ? "Rent"
-                : this.isWithdraw ? "Withdraw" : "Deposit",
+                ? "RENT"
+                : this.isWithdraw ? "WITHDRAW" : "DEPOSIT",
               rentTenantID: this.isRent
                 ? this.users.filter(u => u.text == this.rentTenantName)[0].id
                 : false,
