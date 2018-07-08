@@ -345,7 +345,7 @@ export default {
               title: response.content.toString(),
               duration: 4000,
               onTap: () => {
-                this.currentPage = 0;
+                this.ShowNewTransaction(0);
               }
             });
             this.donePayment = true;
@@ -451,7 +451,6 @@ export default {
           )
           .then(results => {
             this.filteredTransactions = results;
-            pullRefresh.refreshing = false;
           })
           .catch(err => {
             this.$feedback.error({
@@ -459,7 +458,6 @@ export default {
               duration: 4000,
               message: err
             });
-            pullRefresh.refreshing = false;
           });
       }
       this.currentPage = value;

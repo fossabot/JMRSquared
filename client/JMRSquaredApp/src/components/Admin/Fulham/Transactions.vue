@@ -18,10 +18,10 @@
                 <Label row="1" col="0" textAlignment="center" :class="{'text-dark-blue':transaction.type == 'Deposit' || transaction.type == 'Rent','text-light-red':transaction.type == 'Withdraw'}" class="mdi m-5" fontSize="50%" :text="(transaction.type == 'Rent' ? 'mdi-attach-money' : (transaction.type == 'Deposit' ? 'mdi-trending-up' :'mdi-trending-down')) | fonticon"></Label>
                 <Label row="2" col="0" textAlignment="center" class="font-weight-bold m-5" :text="'R' + transaction.amount"></Label>
   
-                <Label row="0" col="1" v-show="transaction.type == 'Rent'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
+                <Label row="0" col="1" v-show="transaction.type == 'RENT'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
   
-                <Label row="1" col="1" v-show="transaction.type != 'Rent'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
-                <Label row="1" col="1" v-show="transaction.type == 'Rent'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
+                <Label row="1" col="1" v-show="transaction.type != 'RENT'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
+                <Label row="1" col="1" v-show="transaction.type == 'RENT'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
   
                 <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                 <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
@@ -447,7 +447,7 @@ export default {
                 title: response.content.toString(),
                 duration: 4000,
                 onTap: () => {
-                  this.currentPage = 0;
+                  this.ShowNewTransaction(0);
                 }
               });
               this.donePayment = true;
@@ -607,7 +607,6 @@ export default {
           )
           .then(results => {
             this.filteredTransactions = results;
-            pullRefresh.refreshing = false;
           })
           .catch(err => {
             this.$feedback.error({
@@ -615,7 +614,6 @@ export default {
               duration: 4000,
               message: err
             });
-            pullRefresh.refreshing = false;
           });
       }
       this.currentPage = value;
