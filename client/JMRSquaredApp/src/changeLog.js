@@ -28,9 +28,15 @@ var Logs = [{
 
 2. Show proof of transactions.
 
-3. Added Taxify FrontEnd
+3. Added Taxify
 
-4. Added Cosmetics FrontEnd
+4. Added Cosmetics
+
+5. Shows totals of all platforms
+
+6. Made the UI Better
+
+7. More bug fixes
 
 `
     }
