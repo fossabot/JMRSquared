@@ -15,9 +15,18 @@ const TransactionSchema = new mongoose.Schema({
         type: Number,
         default: null
     },
-    carName: String,
-    propertyName: String,
-    productName: String,
+    carName: {
+        type: String,
+        default: null
+    },
+    propertyName: {
+        type: String,
+        default: null
+    },
+    productName: {
+        type: String,
+        default: null
+    },
     //Withdraw , Deposit , Rent
     type: {
         type: String,
