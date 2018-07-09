@@ -400,7 +400,6 @@ export default {
           })
         })
         .then(response => {
-          alert(this.ProductNames[this.ProductNameIndex]);
           var statusCode = response.statusCode;
           if (statusCode == 200) {
             this.$feedback.success({
@@ -411,13 +410,6 @@ export default {
               }
             });
             this.donePayment = true;
-            this.isLoading = false;
-          } else if (statusCode == 413) {
-            this.$feedback.error({
-              title: "Unable to add transaction",
-              message: "The image file is too large",
-              duration: 4000
-            });
             this.isLoading = false;
           }
         })
