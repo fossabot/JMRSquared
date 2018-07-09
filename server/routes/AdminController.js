@@ -245,9 +245,9 @@ router.post("/transaction/add", function (req, res) {
     adminID: req.body.adminID, //ForeignKey
     amount: req.body.amount,
     itemCount: req.body.itemCount,
+    productName: req.body.productName,
     carName: req.body.carName,
     propertyName: req.body.propertyName,
-    productName: req.body.productName,
     type: req.body.type.toUpperCase(),
     rentTenantID: req.body.rentTenantID,
     rentTenantName: req.body.rentTenantName,
