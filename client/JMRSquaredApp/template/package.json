@@ -4,7 +4,7 @@
   "license": "MIT",
   "readme": "JMRSquared",
   "nativescript": {
-    "id": "com.jmrsquared.dev"
+    "id": "com.jmrsquared.app"
   },
   "dependencies": {
     "nativescript-theme-core": "^1.0.4",
