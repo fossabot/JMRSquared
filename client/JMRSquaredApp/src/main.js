@@ -4,7 +4,9 @@ import router from "./router";
 
 import store from "./store";
 
-import { Couchbase } from "nativescript-couchbase";
+import {
+  Couchbase
+} from "nativescript-couchbase";
 
 import moment from "moment";
 
@@ -15,7 +17,10 @@ import * as connectivity from "tns-core-modules/connectivity";
 import * as imagepicker from "nativescript-imagepicker";
 import * as imageSource from "tns-core-modules/image-source";
 
-import { TNSFontIcon, fonticon } from "nativescript-fonticon"; // require the couchbase module
+import {
+  TNSFontIcon,
+  fonticon
+} from "nativescript-fonticon"; // require the couchbase module
 
 import {
   Feedback,
@@ -147,7 +152,7 @@ Vue.mixin({
                       </TabView>
                   </Page>
                   `,
-        data: function() {
+        data: function () {
           return {
             txtBug: "",
             bugs: [
@@ -183,7 +188,7 @@ Vue.mixin({
 
             context
               .authorize()
-              .then(function() {
+              .then(function () {
                 return context.present();
               })
               .then(selection => {
@@ -206,14 +211,10 @@ Vue.mixin({
                   "Content-Type": "application/json"
                 },
                 content: JSON.stringify({
-                  senderName:
-                    this.$route.meta.userAuthLevel == 1
-                      ? this.$store.state.cache.cachedTenant.username
-                      : this.$store.state.cache.cachedAdmin.userName,
-                  senderPic:
-                    this.$route.meta.userAuthLevel == 1
-                      ? this.$store.state.cache.cachedTenant.profilePic
-                      : this.$store.state.cache.cachedAdmin.profilePic,
+                  senderName: this.$route.meta.userAuthLevel == 1 ?
+                    this.$store.state.cache.cachedTenant.username : this.$store.state.cache.cachedAdmin.userName,
+                  senderPic: this.$route.meta.userAuthLevel == 1 ?
+                    this.$store.state.cache.cachedTenant.profilePic : this.$store.state.cache.cachedAdmin.profilePic,
                   bugText: this.txtBug
                 })
               })
@@ -284,11 +285,11 @@ Vue.mixin({
       var AndroidApplication = application.android;
       var activity = AndroidApplication.foregroundActivity;
       activity = AndroidApplication.foregroundActivity;
-      activity.onBackPressed = function(e) {
+      activity.onBackPressed = function (e) {
         if (self.currentPage && self.currentPage > 0) {
           self.currentPage--;
         } else {
-          activity.onBackPressed = function() {
+          activity.onBackPressed = function () {
             self.$router.back();
           };
           self.$router.back();
