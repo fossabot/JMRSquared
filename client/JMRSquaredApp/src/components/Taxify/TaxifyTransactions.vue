@@ -1,15 +1,25 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
-    <GridLayout rows="auto,auto,*,auto">
-      <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
-      <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
+    <GridLayout rows="auto,auto,auto,*,auto">
+  
+      <CardView row="0">
+        <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto">
+          <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-taxi' | fonticon"></label>
+          <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Car registration number"></label>
+          <TextField row="1" col="1" v-model="carRegistration" hint="Car registration number" returnKeyType="next" class="h4"></TextField>
+          <button row="1" col="2" text="Refresh" @tap="RefreshTransactions()" class="h4"></button>
+        </GridLayout>
+      </CardView>
+  
+      <Label v-show="currentPage == 0" row="1" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <ScrollView row="2" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
             <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
           </Ripple>
         </StackLayout>
       </ScrollView>
-      <PullToRefresh v-show="currentPage == 0" row="2" col="0" @refresh="refreshList($event)">
+      <PullToRefresh v-show="currentPage == 0" row="3" col="0" @refresh="refreshList($event)">
         <ListView @itemTap="onTransactionTap" borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
@@ -28,8 +38,8 @@
           </v-template>
         </ListView>
       </PullToRefresh>
-      <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
-      <StackLayout row="3">
+      <Fab v-show="currentPage == 0" row="3" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
+      <StackLayout row="4">
         <Ripple @tap="changeTotalFilter()">
           <CardView margin="2" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
             <GridLayout v-if="total.values.length > 0" class="m-10" rows="auto" columns="*,*">
@@ -55,7 +65,7 @@
               <label row="1" col="1" :text="$store.state.cache.cachedAdmin.userName" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <Ripple @tap="changeTransactionDate()">
               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
@@ -63,6 +73,13 @@
                 <label row="1" col="1" :text="TransactionDate.toISOString().slice(0,10)" class="h4"></label>
               </GridLayout>
             </Ripple>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-taxi' | fonticon"></label>
+              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Car registration"></label>
+              <TextField row="1" col="1" v-model="carName" hint="Registration of the vehicle" returnKeyType="next" class="h4"></TextField>
+            </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <Ripple @tap="isWithdraw = !isWithdraw">
@@ -134,12 +151,12 @@
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout v-show="isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Description"></label>
               <label row="1" col="1" hint="What exactly did you do?" :text="description" class="h4"></label>
             </GridLayout>
-            <StackLayout width="100%" class="hr-light"></StackLayout>
+            <StackLayout v-show="isWithdraw" width="100%" class="hr-light"></StackLayout>
   
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-trending-' + (isWithdraw ? 'down' : 'up') | fonticon"></label>
@@ -200,9 +217,7 @@ export default {
     return {
       total: {
         filter: 0,
-        values: [
-         
-        ]
+        values: []
       },
       txtError: "",
       Amount: "",
@@ -220,8 +235,10 @@ export default {
       selectedScreen: "",
       price: "",
       donePayment: false,
-      duePerWeek:2800,
-      expectedProfit:0
+      duePerWeek: 2800,
+      expectedProfit: 0,
+      carName: "FT49BJGP",
+      carRegistration: "FT49BJGP"
     };
   },
   computed: {
@@ -241,7 +258,9 @@ export default {
         if (this.selectedType == this.transactionTypes[0]) {
           return this.transactions;
         } else {
-          return this.transactions.filter(v => v.type == this.selectedType.toUpperCase());
+          return this.transactions.filter(
+            v => v.type == this.selectedType.toUpperCase()
+          );
         }
       },
       set(val) {
@@ -257,6 +276,33 @@ export default {
     this.pageLoaded();
   },
   methods: {
+    RefreshTransactions() {
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+      } else {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
+          )
+          .then(results => {
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err
+            });
+          });
+      }
+    },
     updateTotals() {
       var revenue = 0;
       var profit = 0;
@@ -265,25 +311,25 @@ export default {
       var overDraft = 0;
 
       // We count the weeks from the first transaction
-      var weeks = this.getMoment().diff(this.transactions[0].date,'weeks');
+      var weeks = this.getMoment().diff(this.transactions[0].date, "weeks");
 
       // We calculate the expectedProfit from those weeks
-      this.expectedProfit = weeks*this.duePerWeek;
+      this.expectedProfit = weeks * this.duePerWeek;
 
       this.transactions.map(value => {
         if (value.type == "DEPOSIT") {
-          if(this.getMoment().isSame(value.date, 'month')){
+          if (this.getMoment().isSame(value.date, "month")) {
             thisMonthsRevenue += Number(value.amount);
           }
 
-          if(this.getMoment().isSame(value.date, 'week')){
+          if (this.getMoment().isSame(value.date, "week")) {
             thisWeekBalance -= Number(value.amount);
           }
 
           profit += Number(value.amount);
           revenue += Number(value.amount);
         } else if (value.type == "WITHDRAW") {
-          if(this.getMoment().isSame(value.date, 'month')){
+          if (this.getMoment().isSame(value.date, "month")) {
             thisMonthsRevenue -= Number(value.amount);
           }
           profit -= Number(value.amount);
@@ -295,35 +341,58 @@ export default {
       thisWeekBalance = thisWeekBalance.toFixed(2);
       thisMonthsRevenue = thisMonthsRevenue.toFixed(2);
 
-      overDraft = this.expectedProfit - revenue; 
-      if(overDraft < 0) overDraft = 0;
-      if(thisWeekBalance < 0) thisWeekBalance = 0;
+      overDraft = this.expectedProfit - revenue;
+      if (overDraft < 0) overDraft = 0;
+      if (thisWeekBalance < 0) thisWeekBalance = 0;
 
-      if(this.total.values.length == 0){
-          this.total.values.push({key:"Balance due on " + this.getMoment().endOf("week").add(1, "day").format("dddd [(]DD MMMM[)]") , value: thisWeekBalance });
-      }else{
-        this.total.values[0].key = "Balance due on " + this.getMoment().endOf("week").add(1, "day").format("dddd [(]DD MMMM[)]");
+      if (this.total.values.length == 0) {
+        this.total.values.push({
+          key:
+            "Balance due on " +
+            this.getMoment()
+              .endOf("week")
+              .add(1, "day")
+              .format("dddd [(]DD MMMM[)]"),
+          value: thisWeekBalance
+        });
+      } else {
+        this.total.values[0].key =
+          "Balance due on " +
+          this.getMoment()
+            .endOf("week")
+            .add(1, "day")
+            .format("dddd [(]DD MMMM[)]");
         this.total.values[0].value = thisWeekBalance;
       }
 
       if (this.total.values.length == 1) {
-        this.total.values.push({ key: "Total Revenue", value: profit });
+        this.total.values.push({
+          key: "Total Revenue",
+          value: profit
+        });
       } else {
         this.total.values[1].key = "Total Revenue";
         this.total.values[1].value = profit;
       }
 
       if (this.total.values.length == 2) {
-        this.total.values.push({ key: this.getMoment().format("MMMM") + "'s Revenue", value: thisMonthsRevenue });
+        this.total.values.push({
+          key: this.getMoment().format("MMMM") + "'s Revenue",
+          value: thisMonthsRevenue
+        });
       } else {
-        this.total.values[2].key =  this.getMoment().format("MMMM") + "'s Revenue";
+        this.total.values[2].key =
+          this.getMoment().format("MMMM") + "'s Revenue";
         this.total.values[2].value = thisMonthsRevenue;
       }
 
       if (this.total.values.length == 3 && overDraft > 0) {
-        this.total.values.push({ key: "Over draft (You owe this amount)", value: overDraft });
-      } else if(overDraft > 0) {
-        this.total.values[3].key =  "Over draft (You owe this amount)";
+        this.total.values.push({
+          key: "Over draft (You owe this amount)",
+          value: overDraft
+        });
+      } else if (overDraft > 0) {
+        this.total.values[3].key = "Over draft (You owe this amount)";
         this.total.values[3].value = overDraft;
       }
     },
@@ -364,7 +433,9 @@ export default {
             this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
           )
           .then(results => {
-            this.filteredTransactions = results;
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
           })
           .catch(err => {
             this.$feedback.error({
@@ -415,7 +486,7 @@ export default {
               description: this.description,
               proof: this.selectedImage,
               date: this.TransactionDate,
-              carName:"FT49BJGP",
+              carName: this.carName,
               source: "TAXIFY"
             })
           })
@@ -467,7 +538,9 @@ export default {
             this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
           )
           .then(results => {
-            this.filteredTransactions = results;
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
             pullRefresh.refreshing = false;
           })
           .catch(err => {
@@ -484,14 +557,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                    <Page>
-                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                            <DatePicker row="1" v-model="selectedDueDate" />
-                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                        </GridLayout>
-                                    </Page>
-                                    `,
+                                            <Page>
+                                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                                    <DatePicker row="1" v-model="selectedDueDate" />
+                                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                </GridLayout>
+                                            </Page>
+                                            `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -510,16 +583,16 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                    <Page>
-                                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                                          <ScrollView row="1" colSpan="2">
-                                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                                          </ScrollView>
-                                        </GridLayout>
-                                    </Page>
-                                    `,
+                                            <Page>
+                                                <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                                  <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                                  <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                                  <ScrollView row="1" colSpan="2">
+                                                    <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                                  </ScrollView>
+                                                </GridLayout>
+                                            </Page>
+                                            `,
         data() {
           return {
             imgSrc: null
@@ -578,7 +651,9 @@ export default {
             this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
           )
           .then(results => {
-            this.filteredTransactions = results;
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
           })
           .catch(err => {
             this.$feedback.error({
