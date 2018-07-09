@@ -339,7 +339,7 @@ export default {
     },
     canSubmit() {
       this.txtError = "";
-      if (this.Amount.toString().length < 1 || !isNaN(this.Amount)) {
+      if (this.Amount.toString().length < 1 || isNaN(this.Amount)) {
         this.txtError = "Please provide a valid amount.";
         return false;
       }
@@ -348,7 +348,7 @@ export default {
           "Please write the name of the product and click 'Save Product'";
         return false;
       }
-      if (this.itemCount.toString().length < 1 || !isNaN(this.itemCount)) {
+      if (this.itemCount.toString().length < 1 || isNaN(this.itemCount)) {
         this.txtError =
           "Please provide the number of " +
           this.ProductNames[this.ProductNameIndex] +
@@ -356,15 +356,15 @@ export default {
         return false;
       }
       if (
-        this.ProductNames[ProductNameIndex].indexOf("s") !=
-        this.ProductNames[ProductNameIndex].length - 1
+        this.ProductNames[this.ProductNameIndex].indexOf("s") !=
+        this.ProductNames[this.ProductNameIndex].length - 1
       ) {
         if (this.itemCount > 1) {
-          this.ProductNames[ProductNameIndex] += "s";
+          this.ProductNames[this.ProductNameIndex] += "s";
         }
       } else {
         if (this.itemCount == 1) {
-          this.ProductNames[ProductNameIndex] -= "s";
+          this.ProductNames[this.ProductNameIndex] -= "s";
         }
       }
       return true;
