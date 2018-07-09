@@ -226,7 +226,7 @@ router.get("/transaction/:source/all", function (req, res) {
   Transaction.find({
         source: source
       },
-      "_id adminID amount type itemCount carName propertyName source rentTenantName rentMonth description date"
+      "_id adminID amount type itemCount carName propertyName productName source rentTenantName rentMonth description date"
     )
     .populate("adminID", "userName")
     .then(transactions => {
