@@ -16,7 +16,7 @@
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
                 <Label row="0" col="1" class="m-5" textAlignment="center" :text="getMoment(transaction.date).format('dddd')"></Label>
                 <!--Remember to pluralize the products -->
-                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="transaction.itemCount + ' products'"></Label>
+                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="transaction.itemCount + ' ' + transaction.productName"></Label>
   
                 <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT'}" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
   
@@ -81,24 +81,33 @@
               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :class="{'text-dark-blue':!isWithdraw,'text-light-red':isWithdraw}" :text="'mdi-' + (isWithdraw ? 'money-off' : 'attach-money') | fonticon"></label>
                 <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type (tap to change)"></label>
-                <label row="1" col="1" :text="isWithdraw ? 'Stock' : 'Deposit'" class="h4"></label>
+                <label row="1" col="1" :text="isWithdraw ? 'Stock' : 'Sale'" class="h4"></label>
               </GridLayout>
             </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <Ripple>
+            <Ripple v-show="ProductNames[ProductNameIndex] != 'Other'" @tap="ProductNameIndex >= (ProductNames.length-1) ? ProductNameIndex = 0:ProductNameIndex++">
               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
                 <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Product name (tap to change)"></label>
-                <label row="1" col="1" text="Perfume" class="h4"></label>
+                <label row="1" col="1" :text="ProductNames[ProductNameIndex]" class="h4"></label>
               </GridLayout>
             </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
 
+            <GridLayout v-show="ProductNames[ProductNameIndex] == 'Other'" class="m-10" rows="auto,auto" columns="auto,*,auto">
+                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
+                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Add new product"></label>
+                <button @tap="ProductNameIndex >= (ProductNames.length-1) ? ProductNameIndex = 0:ProductNameIndex++" row="0" col="2" text="Cancel" class="h4"></button>
+                <TextField row="1" col="1" v-model="productName" hint="Name of the product" returnKeyType="next" class="h4"></TextField>
+                <button row="1" col="2" text="Save Product" @tap="AddNewProduct()" class="h4"></button>
+            </GridLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
+
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-whatshot' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of items ' + (isWithdraw ? 'bought' : 'sold')"></label>
-              <TextField row="1" col="1" v-model="itemCount" :hint="'How many items did you ' + (isWithdraw ? 'buy' : 'sell')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
+              <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of ' + ProductNames[ProductNameIndex] + 's '  + (isWithdraw ? ' bought' : ' sold')"></label>
+              <TextField row="1" col="1" v-model="itemCount" :hint="'How many ' + ProductNames[ProductNameIndex] + 's did you ' + (isWithdraw ? 'buy' : 'sell')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
@@ -158,12 +167,11 @@
               <label row="1" col="1" :text="Amount" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-  
 
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of items ' + (isWithdraw ? 'bought' : 'sold')"></label>
-              <label row="1" col="1" :text="'You ' + (isWithdraw ? 'bought ' : 'sold ')  + itemCount +  ' products'"  class="h4"></label>
+              <label row="1" col="1" :text="'You ' + (isWithdraw ? 'bought ' : 'sold ')  + itemCount +  ' ' + ProductNames[ProductNameIndex]"  class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
 
@@ -210,7 +218,9 @@ export default {
       },
       txtError: "",
       Amount: "",
-      ItemCount: "",
+      ProductName: "",
+      ProductNames: ["Perfume", "Oil", "Lipstick", "Other"],
+      ProductNameIndex: 0,
       users: [],
       hasImage: false,
       selectedImage: null,
@@ -225,7 +235,7 @@ export default {
       selectedScreen: "",
       price: "",
       donePayment: false,
-      itemCount:0
+      itemCount: 0
     };
   },
   computed: {
@@ -278,6 +288,14 @@ export default {
       this.total.profit = profit.toFixed(2);
       this.total.sales = sales;
     },
+    AddNewProduct() {
+      this.ProductNames.pop();
+
+      this.ProductNames.push(this.productName);
+      this.ProductNames.push("Other");
+      this.ProductNameIndex = this.ProductNames.indexOf(this.productName);
+      this.productName = "";
+    },
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
@@ -321,10 +339,35 @@ export default {
     },
     canSubmit() {
       this.txtError = "";
-      if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
+      if (this.Amount.toString().length < 1 || !isNaN(this.Amount)) {
         this.txtError = "Please provide a valid amount.";
+        return false;
       }
-      return this.txtError.length < 2;
+      if (this.ProductNames[this.ProductNameIndex] == "Other") {
+        this.txtError =
+          "Please write the name of the product and click 'Save Product'";
+        return false;
+      }
+      if (this.itemCount.toString().length < 1 || !isNaN(this.itemCount)) {
+        this.txtError =
+          "Please provide the number of " +
+          this.ProductNames[this.ProductNameIndex] +
+          "s";
+        return false;
+      }
+      if (
+        this.ProductNames[ProductNameIndex].indexOf("s") !=
+        this.ProductNames[ProductNameIndex].length - 1
+      ) {
+        if (this.itemCount > 1) {
+          this.ProductNames[ProductNameIndex] += "s";
+        }
+      } else {
+        if (this.itemCount == 1) {
+          this.ProductNames[ProductNameIndex] -= "s";
+        }
+      }
+      return true;
     },
     SubmitTransaction() {
       this.isLoading = true;
@@ -348,7 +391,8 @@ export default {
             description: this.description,
             proof: this.selectedImage,
             date: this.TransactionDate,
-            itemCount:this.itemCount,
+            itemCount: this.itemCount,
+            productName: this.ProductNames[this.ProductNameIndex],
             source: "COSMETICS"
           })
         })
