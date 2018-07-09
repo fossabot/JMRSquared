@@ -255,7 +255,11 @@ export default {
         if (this.selectedType == this.transactionTypes[0]) {
           return this.transactions;
         } else {
-          return this.transactions.filter(v => v.type == this.selectedType);
+          if (this.selectedType == "Sale") {
+            return this.transactions.filter(v => v.type == "DEPOSIT");
+          } else if (this.selectedType == "Stock") {
+            return this.transactions.filter(v => v.type == "WITHDRAW");
+          }
         }
       },
       set(val) {
@@ -388,7 +392,6 @@ export default {
             adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
             amount: this.Amount,
             type: this.isWithdraw ? "Withdraw" : "Deposit",
-            description: this.description,
             proof: this.selectedImage,
             date: this.TransactionDate,
             itemCount: this.itemCount,
@@ -397,6 +400,7 @@ export default {
           })
         })
         .then(response => {
+          alert(this.ProductNames[this.ProductNameIndex]);
           var statusCode = response.statusCode;
           if (statusCode == 200) {
             this.$feedback.success({
