@@ -451,11 +451,14 @@ export default {
       if (!this.hasImage) {
         this.txtError = "Please an image of your proof (slip)";
       }
-      if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
+      if (this.Amount.toString().length < 1 || isNaN(this.Amount)) {
         this.txtError = "Please provide a valid amount.";
       }
       if (this.description.length < 2 && this.isWithdraw) {
         this.txtError = "A description is required.";
+      }
+      if (this.carName.length < 2) {
+        this.txtError = "Please provide a valid car registration number.";
       }
       return this.txtError.length < 2;
     },

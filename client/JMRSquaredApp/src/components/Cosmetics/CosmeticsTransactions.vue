@@ -16,7 +16,7 @@
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
                 <Label row="0" col="1" class="m-5" textAlignment="center" :text="getMoment(transaction.date).format('dddd')"></Label>
                 <!--Remember to pluralize the products -->
-                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="transaction.itemCount + ' ' + transaction.productName"></Label>
+                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="transaction.itemCount + ' ' + (transaction.productName != null ? transaction.productName : 'products' )"></Label>
   
                 <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT'}" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
   
