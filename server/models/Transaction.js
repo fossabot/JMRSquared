@@ -29,6 +29,7 @@ const TransactionSchema = new mongoose.Schema({
         enum: ['WITHDRAW', 'DEPOSIT', 'RENT'],
         default: "DEPOSIT"
     },
+    productName: String,
     rentTenantID: String,
     rentTenantName: String,
     rentMonth: String,

@@ -254,6 +254,7 @@ router.post("/transaction/add", function (req, res) {
     description: req.body.description,
     proof: req.body.proof,
     date: req.body.date,
+    productName: req.body.productName,
     source: req.body.source.toUpperCase()
   });
 
