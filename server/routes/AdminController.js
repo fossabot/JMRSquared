@@ -247,6 +247,7 @@ router.post("/transaction/add", function (req, res) {
     itemCount: req.body.itemCount,
     carName: req.body.carName,
     propertyName: req.body.propertyName,
+    productName: req.body.productName,
     type: req.body.type.toUpperCase(),
     rentTenantID: req.body.rentTenantID,
     rentTenantName: req.body.rentTenantName,
@@ -254,7 +255,6 @@ router.post("/transaction/add", function (req, res) {
     description: req.body.description,
     proof: req.body.proof,
     date: req.body.date,
-    productName: req.body.productName,
     source: req.body.source.toUpperCase()
   });
 

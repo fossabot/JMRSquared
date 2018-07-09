@@ -15,21 +15,15 @@ const TransactionSchema = new mongoose.Schema({
         type: Number,
         default: null
     },
-    carName: {
-        type: String,
-        default: null
-    },
-    propertyName: {
-        type: String,
-        default: null
-    },
+    carName: String,
+    propertyName: String,
+    productName: String,
     //Withdraw , Deposit , Rent
     type: {
         type: String,
         enum: ['WITHDRAW', 'DEPOSIT', 'RENT'],
         default: "DEPOSIT"
     },
-    productName: String,
     rentTenantID: String,
     rentTenantName: String,
     rentMonth: String,
