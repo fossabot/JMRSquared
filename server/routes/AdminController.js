@@ -19,7 +19,7 @@ import Student from "../models/Student";
                 - 
 */
 
-router.get("/all", function(req, res) {
+router.get("/all", function (req, res) {
   Admin.find()
     .populate(["documents"])
     .populate(["notifications"])
@@ -29,7 +29,7 @@ router.get("/all", function(req, res) {
     });
 });
 
-router.get("/GetById/:adminID", function(req, res) {
+router.get("/GetById/:adminID", function (req, res) {
   var adminID = req.params.adminID;
   Admin.findById(adminID)
     .populate(["documents"])
@@ -48,12 +48,12 @@ router.get("/GetById/:adminID", function(req, res) {
     });
 });
 
-router.post("/login", function(req, res) {
+router.post("/login", function (req, res) {
   if (req.body.useEmail) {
     Admin.findOne({
-      email: req.body.email,
-      pass: req.body.pass
-    })
+        email: req.body.email,
+        pass: req.body.pass
+      })
       .populate(["documents"])
       .populate(["notifications"])
       .then(admin => {
@@ -66,9 +66,9 @@ router.post("/login", function(req, res) {
       });
   } else {
     Admin.findOne({
-      numbers: req.body.numbers,
-      pass: req.body.pass
-    })
+        numbers: req.body.numbers,
+        pass: req.body.pass
+      })
       .populate(["documents"])
       .populate(["notifications"])
       .then(admin => {
@@ -82,22 +82,23 @@ router.post("/login", function(req, res) {
   }
 });
 
-router.post("/add", function(req, res) {
+router.post("/add", function (req, res) {
   var admin = new Admin({
     _id: mongoose.Types.ObjectId(),
     email: req.body.email,
     pass: req.body.pass,
     numbers: req.body.numbers,
+    role: req.body.role.toUpperCase(),
     userName: req.body.username
   });
 
-  admin.save(function(err) {
+  admin.save(function (err) {
     if (err) res.send(err);
     res.send("User successfully saved");
   });
 });
 
-router.get("/bug/get/:bugId", function(req, res) {
+router.get("/bug/get/:bugId", function (req, res) {
   var bugID = req.params.bugId;
   Bug.findById(bugID).then(bug => {
     if (bug == null) {
@@ -109,7 +110,7 @@ router.get("/bug/get/:bugId", function(req, res) {
   });
 });
 
-router.get("/bug/all", function(req, res) {
+router.get("/bug/all", function (req, res) {
   Bug.find({}, "_id senderName senderPic bugText date").then(bugs => {
     if (bugs == null) {
       res.status(500);
@@ -120,7 +121,7 @@ router.get("/bug/all", function(req, res) {
   });
 });
 
-router.post("/bug/add", function(req, res) {
+router.post("/bug/add", function (req, res) {
   var bug = new Bug({
     _id: mongoose.Types.ObjectId(),
     senderName: req.body.senderName,
@@ -128,7 +129,7 @@ router.post("/bug/add", function(req, res) {
     bugText: req.body.bugText
   });
 
-  bug.save(function(err) {
+  bug.save(function (err) {
     if (err) {
       res.status(500);
       res.send(err);
@@ -137,7 +138,7 @@ router.post("/bug/add", function(req, res) {
   });
 });
 
-router.get("/document/get/:documentId", function(req, res) {
+router.get("/document/get/:documentId", function (req, res) {
   var documentID = req.params.documentId;
   Document.findById(documentID).then(document => {
     if (document == null) {
@@ -149,7 +150,7 @@ router.get("/document/get/:documentId", function(req, res) {
   });
 });
 
-router.get("/document/all", function(req, res) {
+router.get("/document/all", function (req, res) {
   Document.find({}, "_id title description type date").then(documents => {
     if (documents == null) {
       res.status(500);
@@ -160,7 +161,7 @@ router.get("/document/all", function(req, res) {
   });
 });
 
-router.post("/document/add", function(req, res) {
+router.post("/document/add", function (req, res) {
   var document = new Document({
     _id: mongoose.Types.ObjectId(),
     title: req.body.title,
@@ -171,7 +172,7 @@ router.post("/document/add", function(req, res) {
     type: req.body.type
   });
 
-  document.save(function(err) {
+  document.save(function (err) {
     if (err) {
       res.status(500);
       res.send(err);
@@ -180,7 +181,7 @@ router.post("/document/add", function(req, res) {
   });
 });
 
-router.get("/transaction/get/:transactionId", function(req, res) {
+router.get("/transaction/get/:transactionId", function (req, res) {
   var transactionID = req.params.transactionId;
   Transaction.findById(transactionID)
     .populate("adminID", "userName")
@@ -194,11 +195,39 @@ router.get("/transaction/get/:transactionId", function(req, res) {
     });
 });
 
-router.get("/transaction/all", function(req, res) {
-  Transaction.find(
-    {},
-    "_id adminID amount type rentTenantName rentMonth description date"
-  )
+// This function will soon be abolute (it returns for properties only)
+router.get("/transaction/all", function (req, res) {
+  Transaction.find({
+        $or: [{
+          source: "PROPERTY"
+        }, {
+          source: null
+        }]
+      },
+      "_id adminID amount type rentTenantName rentMonth description date"
+    )
+    .populate("adminID", "userName")
+    .then(transactions => {
+      if (transactions == null) {
+        res.status(500);
+        res.send("Error : 9032rtu834g9erbo");
+      }
+      transactions.reverse();
+      res.json(transactions);
+    }).catch(err => {
+      res.status(500);
+      res.send("Error : " + err.message);
+    });
+});
+
+// This is the new function to be used
+router.get("/transaction/:source/all", function (req, res) {
+  var source = req.params.source.toUpperCase();
+  Transaction.find({
+        source: source
+      },
+      "_id adminID amount type itemCount carName propertyName productName source rentTenantName rentMonth description date"
+    )
     .populate("adminID", "userName")
     .then(transactions => {
       if (transactions == null) {
@@ -210,35 +239,40 @@ router.get("/transaction/all", function(req, res) {
     });
 });
 
-router.post("/transaction/add", function(req, res) {
+router.post("/transaction/add", function (req, res) {
   var transaction = new Transaction({
     _id: mongoose.Types.ObjectId(),
     adminID: req.body.adminID, //ForeignKey
     amount: req.body.amount,
-    type: req.body.type,
+    itemCount: req.body.itemCount,
+    productName: req.body.productName,
+    carName: req.body.carName,
+    propertyName: req.body.propertyName,
+    type: req.body.type.toUpperCase(),
     rentTenantID: req.body.rentTenantID,
     rentTenantName: req.body.rentTenantName,
     rentMonth: req.body.rentMonth,
     description: req.body.description,
     proof: req.body.proof,
-    date: req.body.date
+    date: req.body.date,
+    source: req.body.source.toUpperCase()
   });
 
-  transaction.save(function(err) {
+  transaction.save(function (err) {
     if (err) res.send(err);
-    Admin.findById(req.body.adminID, function(err, admin) {
+    Admin.findById(req.body.adminID, function (err, admin) {
       if (err || admin == null) {
         console.log(err);
         return;
       }
 
       admin.transactions.push(transaction._id);
-      admin.save(function(err) {
+      admin.save(function (err) {
         if (err) {
           console.log(err);
           return;
         }
-        if (req.body.type == "Rent") {
+        if (req.body.type.toUpperCase() == "RENT") {
           var rent = new Rent({
             _id: mongoose.Types.ObjectId(),
             studentID: req.body.rentTenantID,
@@ -247,18 +281,18 @@ router.post("/transaction/add", function(req, res) {
             amount: req.body.amount
           });
 
-          rent.save(function(err) {
+          rent.save(function (err) {
             if (err) {
               console.log(err);
               return;
             }
-            Student.findById(req.body.rentTenantID, function(err, student) {
+            Student.findById(req.body.rentTenantID, function (err, student) {
               if (err || student == null) {
                 console.log(err);
                 return;
               }
               student.rents.push(rent._id);
-              student.save(function(err) {
+              student.save(function (err) {
                 if (err) {
                   console.log(err);
                   return;
@@ -276,8 +310,10 @@ router.post("/transaction/add", function(req, res) {
   });
 });
 
-router.get("/notifications/all", function(req, res) {
-  Notification.find({ dueDate: null }).then(result => {
+router.get("/notifications/all", function (req, res) {
+  Notification.find({
+    dueDate: null
+  }).then(result => {
     if (result == null) {
       res.status(400);
       res.send("Error : 9032egrrtu834g9erbo");

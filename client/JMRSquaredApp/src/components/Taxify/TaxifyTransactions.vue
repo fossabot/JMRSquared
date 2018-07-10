@@ -1,58 +1,55 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
-    <GridLayout rows="auto,auto,*,auto">
-      <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
-      <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
+    <GridLayout rows="auto,auto,auto,*,auto">
+  
+      <CardView row="0">
+        <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto">
+          <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-taxi' | fonticon"></label>
+          <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Car registration number"></label>
+          <TextField row="1" col="1" v-model="carRegistration" hint="Car registration number" returnKeyType="next" class="h4"></TextField>
+          <button row="1" col="2" text="Refresh" @tap="RefreshTransactions()" class="h4"></button>
+        </GridLayout>
+      </CardView>
+  
+      <Label v-show="currentPage == 0" row="1" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <ScrollView row="2" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
             <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
           </Ripple>
         </StackLayout>
       </ScrollView>
-      <PullToRefresh v-show="currentPage == 0" row="2" col="0" @refresh="refreshList($event)">
+      <PullToRefresh v-show="currentPage == 0" row="3" col="0" @refresh="refreshList($event)">
         <ListView @itemTap="onTransactionTap" borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-               
-                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT' || transaction.type == 'RENT' }" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' || transaction.type == 'RENT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
+                <Label row="0" col="1" class="m-5" textAlignment="center" :text="getMoment(transaction.date).format('dddd')"></Label>
+                <Label row="1" col="1" class="m-5 font-weight-bold" textAlignment="center" :text="getMoment(transaction.date).format('Do MMMM')"></Label>
   
-                <Label row="2" col="0" v-show="transaction.type == 'RENT'" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" text="Rent"></Label>
+                <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT'}" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
   
-                <Label row="0" col="1" v-show="transaction.type == 'RENT'" class="m-5" textWrap="true" textAlignment="center" :text="transaction.rentMonth"></Label>
-  
-                <Label row="1" col="1" v-show="transaction.type != 'RENT'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
-                <Label row="1" col="1" v-show="transaction.type == 'RENT'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
+                <Label row="2" col="1" v-show="transaction.type == 'WITHDRAW'" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" :text="transaction.description"></Label>
   
                 <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                 <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
-  
               </GridLayout>
             </CardView>
           </v-template>
         </ListView>
       </PullToRefresh>
-      <Fab v-show="currentPage == 0" row="2" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
-      <StackLayout row="3">
+      <Fab v-show="currentPage == 0" row="3" @tap="ShowNewTransaction(1)" icon="res://ic_add_white_24dp" class="fab-button"></Fab>
+      <StackLayout row="4">
         <Ripple @tap="changeTotalFilter()">
-          <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout  v-if="total.values.length > 0" class="m-t-10" rows="auto" columns="*,*">
-              <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout  rows="auto,auto" columns="*">
-                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" :text="total.values[total.filter].revenue.key"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.values[total.filter].revenue.value"></label>
-                </GridLayout>
-              </CardView>
-              <CardView row="0" col="1" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout rows="auto,auto" columns="*">
-                  <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" :text="total.values[total.filter].profit.key"></label>
-                  <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.values[total.filter].profit.value"></label>
-                </GridLayout>
-              </CardView>
+          <CardView margin="2" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
+            <GridLayout v-if="total.values.length > 0" class="m-10" rows="auto" columns="*,*">
+              <label row="0" col="0" class="font-weight-bold" verticalAlignment="center" :text="total.values[total.filter].key"></label>
+              <label row="0" col="1" class="h4 text-mute text-light-red" fontSize="20%" textAlignment="right" verticalAlignment="center" :text="'R' + total.values[total.filter].value"></label>
             </GridLayout>
           </CardView>
         </Ripple>
       </StackLayout>
+  
       <!-- This is the first step -->
       <CardView row="0" margin="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" elevation="10" height="100%" v-show="currentPage == 1">
         <ScrollView>
@@ -78,66 +75,35 @@
             </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <Ripple @tap="isRent = !isRent">
-              <GridLayout @tap="isRent = !isRent" class="m-10" rows="auto" columns="*,auto">
-                <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="RENT PAYMENT"></label>
-                <switch row="0" col="1" v-model="isRent"></switch>
-              </GridLayout>
-            </Ripple>
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-taxi' | fonticon"></label>
+              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Car registration"></label>
+              <TextField row="1" col="1" v-model="carName" hint="Registration of the vehicle" returnKeyType="next" class="h4"></TextField>
+            </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-  
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person-outline' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Tenant's name"></label>
-              <StackLayout v-show="users && users.length > 0" row="1" col="1">
-                <ScrollView orientation="horizontal">
-                  <WrapLayout>
-                    <Label v-for="(user,i) in users" @tap="rentTenantName = user.text" :class="{'chip-selected':rentTenantName == user.text}" :text="user.text" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
-                  </WrapLayout>
-                </ScrollView>
-              </StackLayout>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Description"></label>
-              <TextView row="1" col="1" hint="What exactly did you do?" v-model="description" class="h4"></TextView>
-            </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
-
-            <Ripple v-show="isRent" @tap="changeRentMonth()">
+            <Ripple @tap="isWithdraw = !isWithdraw">
               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-today' | fonticon"></label>
-                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Month for rent (tap to change)"></label>
-                <label :text="rentMonths[rentMonthIndex]" row="1" col="1" class="h4"></label>
-              </GridLayout>
-            </Ripple>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <Ripple v-show="!isRent" @tap="isWithdraw = !isWithdraw">
-              <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-trending-' + (isWithdraw ? 'down' : 'up') | fonticon"></label>
+                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :class="{'text-dark-blue':!isWithdraw,'text-light-red':isWithdraw}" :text="'mdi-' + (isWithdraw ? 'money-off' : 'attach-money') | fonticon"></label>
                 <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type (tap to change)"></label>
                 <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
               </GridLayout>
             </Ripple>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" :class="{'text-light-red':isWithdraw,'text-light-blue':!isWithdraw}" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Amount paid"></label>
-              <TextField row="1" col="1" v-model="Amount" :hint="'How much did ' + (rentTenantName.length < 2 ? 'he/she' : rentTenantName)  + ' pay?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="m-15" fontSize="25%" text="R"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Amount ' + (isWithdraw ? 'used' : 'deposited')  "></label>
               <TextField row="1" col="1" v-model="Amount" :hint="'How much did you ' + (isWithdraw ? 'use' : 'deposit')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+            <GridLayout v-show="isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message' | fonticon"></label>
+              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Reason for withdrawal"></label>
+              <TextView row="1" col="1" :hint="'Why did you withdraw the ' + (Amount.length == 0 ? 'money' : 'R' + Amount ) + '?'" v-model="description" class="h4"></TextView>
+            </GridLayout>
+            <StackLayout v-show="isWithdraw" width="100%" class="hr-light"></StackLayout>
   
             <Ripple @tap="uploadEvidence()">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*">
@@ -185,47 +151,26 @@
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person-outline' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Tenant's name"></label>
-              <label row="1" col="1" hint="Who paid this rent?" :text="rentTenantName" returnKeyType="next" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout v-show="isWithdraw" class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Description"></label>
               <label row="1" col="1" hint="What exactly did you do?" :text="description" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout v-show="isWithdraw" width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-today' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Month for rent"></label>
-              <label :text="rentMonths[rentMonthIndex]" row="1" col="1" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-trending-' + (isWithdraw ? 'down' : 'up') | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transaction type"></label>
               <label row="1" col="1" :text="isWithdraw ? 'Withdraw' : 'Deposit'" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
-            <GridLayout v-show="isRent" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" :class="{'text-light-red':isWithdraw,'text-light-blue':!isWithdraw}" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Amount paid"></label>
-              <label row="1" col="1" :text="Amount" class="h4"></label>
-            </GridLayout>
-            <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
-  
-            <GridLayout v-show="!isRent" class="m-10" rows="auto,auto" columns="auto,*">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Amount ' + (isWithdraw ? 'used' : 'deposited')  "></label>
               <label row="1" col="1" :text="Amount" class="h4"></label>
             </GridLayout>
-            <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
+            <StackLayout width="100%" class="hr-light"></StackLayout>
   
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-file' | fonticon"></label>
@@ -263,15 +208,16 @@ import * as imageSource from "tns-core-modules/image-source";
 import * as imagepicker from "nativescript-imagepicker";
 
 import * as connectivity from "tns-core-modules/connectivity";
+
+import * as camera from "nativescript-camera";
+
 const http = require("http");
 export default {
   data() {
     return {
       total: {
         filter: 0,
-        values: [
-         
-        ]
+        values: []
       },
       txtError: "",
       Amount: "",
@@ -279,25 +225,7 @@ export default {
       hasImage: false,
       selectedImage: null,
       selectedType: "All",
-      transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
-      rentMonthIndex: new Date().getMonth(),
-      rentMonths: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ],
-      rentTenantID: "",
-      rentTenantName: "",
-      isRent: false,
+      transactionTypes: ["All", "Deposit", "Withdraw"],
       description: "",
       TransactionDate: new Date(),
       transactions: [],
@@ -306,7 +234,11 @@ export default {
       isMainScreen: false,
       selectedScreen: "",
       price: "",
-      donePayment: false
+      donePayment: false,
+      duePerWeek: 2800,
+      expectedProfit: 0,
+      carName: "FT49BJGP",
+      carRegistration: "FT49BJGP"
     };
   },
   computed: {
@@ -326,7 +258,9 @@ export default {
         if (this.selectedType == this.transactionTypes[0]) {
           return this.transactions;
         } else {
-          return this.transactions.filter(v => v.type == this.selectedType.toUpperCase());
+          return this.transactions.filter(
+            v => v.type == this.selectedType.toUpperCase()
+          );
         }
       },
       set(val) {
@@ -342,92 +276,126 @@ export default {
     this.pageLoaded();
   },
   methods: {
+    RefreshTransactions() {
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+      } else {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
+          )
+          .then(results => {
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err
+            });
+          });
+      }
+    },
     updateTotals() {
       var revenue = 0;
       var profit = 0;
+      var thisMonthsRevenue = 0;
+      var thisWeekBalance = this.duePerWeek;
+      var overDraft = 0;
 
-      var threeMonthsBalance = [{revenue:0,profit:0},{revenue:0,profit:0},{revenue:0,profit:0}];
+      // We count the weeks from the first transaction
+      var weeks = this.getMoment().diff(this.transactions[0].date, "weeks");
+
+      // We calculate the expectedProfit from those weeks
+      this.expectedProfit = weeks * this.duePerWeek;
+
       this.transactions.map(value => {
-      var diff = this.getMoment().endOf('month').diff(value.date,'months');
-        if(value.type == "RENT"){
-          var theMonth = this.getMoment(value.date).month(value.rentMonth);
-          diff = this.getMoment().endOf('month').diff(theMonth,'months');
-
-          if(diff >= 0 && diff < 3){
-            threeMonthsBalance[diff].revenue += Number(value.amount);
-            threeMonthsBalance[diff].profit += Number(value.amount);
+        if (value.type == "DEPOSIT") {
+          if (this.getMoment().isSame(value.date, "month")) {
+            thisMonthsRevenue += Number(value.amount);
           }
 
-          profit += Number(value.amount);
-          revenue += Number(value.amount);
-        } else if (value.type == "DEPOSIT") {
-          if(diff >= 0 && diff < 3){
-            threeMonthsBalance[diff].revenue += Number(value.amount);
-            threeMonthsBalance[diff].profit += Number(value.amount);
+          if (this.getMoment().isSame(value.date, "week")) {
+            thisWeekBalance -= Number(value.amount);
           }
 
           profit += Number(value.amount);
           revenue += Number(value.amount);
         } else if (value.type == "WITHDRAW") {
-          profit -= Number(value.amount);
-          if(diff >= 0 && diff < 3){
-            threeMonthsBalance[diff].profit -= Number(value.amount);
+          if (this.getMoment().isSame(value.date, "month")) {
+            thisMonthsRevenue -= Number(value.amount);
           }
+          profit -= Number(value.amount);
         }
       });
-    
+
       profit = profit.toFixed(2);
       revenue = revenue.toFixed(2);
-      for(let i=0;i<threeMonthsBalance.length;i++){
-        threeMonthsBalance[i].revenue =threeMonthsBalance[i].revenue.toFixed(2);
-        threeMonthsBalance[i].profit =threeMonthsBalance[i].profit.toFixed(2); 
-      }
+      thisWeekBalance = thisWeekBalance.toFixed(2);
+      thisMonthsRevenue = thisMonthsRevenue.toFixed(2);
+
+      overDraft = this.expectedProfit - revenue;
+      if (overDraft < 0) overDraft = 0;
+      if (thisWeekBalance < 0) thisWeekBalance = 0;
 
       if (this.total.values.length == 0) {
-        this.total.values.push(
-           {revenue : { 
-             key: "Total Revenue", value: revenue 
-            },
-            profit:{
-             key: "Total Profit", value: profit 
-            }}
-          );
+        this.total.values.push({
+          key:
+            "Balance due on " +
+            this.getMoment()
+              .endOf("week")
+              .add(1, "day")
+              .format("dddd [(]DD MMMM[)]"),
+          value: thisWeekBalance
+        });
       } else {
-        this.total.values[0] = {revenue : { 
-             key: "Total Revenue", value: revenue 
-            },
-            profit:{
-             key: "Total Profit", value: profit 
-            }}
+        this.total.values[0].key =
+          "Balance due on " +
+          this.getMoment()
+            .endOf("week")
+            .add(1, "day")
+            .format("dddd [(]DD MMMM[)]");
+        this.total.values[0].value = thisWeekBalance;
       }
 
-       if (this.total.values.length == 1) {
-        for(let i=0;i<threeMonthsBalance.length;i++){
-         var monthName = this.getMoment().endOf('month').subtract(i,'months').format("MMMM");
-        this.total.values.push(
-           {revenue : { 
-             key: monthName + "'s Revenue", value: threeMonthsBalance[i].revenue 
-            },
-            profit:{
-             key: monthName + "'s Profit", value: threeMonthsBalance[i].profit 
-            }}
-          );
-
-        }
+      if (this.total.values.length == 1) {
+        this.total.values.push({
+          key: "Total Revenue",
+          value: profit
+        });
       } else {
-         for(let i=0;i<threeMonthsBalance.length;i++){
-        var monthName =  this.getMoment().endOf('month').subtract(i,'months').format("MMMM");
-       
-        this.total.values[i+1] = {revenue : { 
-             key: monthName + "'s Revenue", value: threeMonthsBalance[i].revenue 
-            },
-            profit:{
-             key: monthName + "'s Profit", value: threeMonthsBalance[i].profit 
-            }}
-         }
+        this.total.values[1].key = "Total Revenue";
+        this.total.values[1].value = profit;
       }
 
-    }, 
+      if (this.total.values.length == 2) {
+        this.total.values.push({
+          key: this.getMoment().format("MMMM") + "'s Revenue",
+          value: thisMonthsRevenue
+        });
+      } else {
+        this.total.values[2].key =
+          this.getMoment().format("MMMM") + "'s Revenue";
+        this.total.values[2].value = thisMonthsRevenue;
+      }
+
+      if (this.total.values.length == 3 && overDraft > 0) {
+        this.total.values.push({
+          key: "Over draft (You owe this amount)",
+          value: overDraft
+        });
+      } else if (overDraft > 0) {
+        this.total.values[3].key = "Over draft (You owe this amount)";
+        this.total.values[3].value = overDraft;
+      }
+    },
     changeTotalFilter() {
       if (this.total.filter == this.total.values.length - 1) {
         this.total.filter = 0;
@@ -462,10 +430,12 @@ export default {
       } else {
         http
           .getJSON(
-            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+            this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
           )
           .then(results => {
-            this.filteredTransactions = results;
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
           })
           .catch(err => {
             this.$feedback.error({
@@ -481,17 +451,14 @@ export default {
       if (!this.hasImage) {
         this.txtError = "Please an image of your proof (slip)";
       }
-      if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
+      if (this.Amount.toString().length < 1 || isNaN(this.Amount)) {
         this.txtError = "Please provide a valid amount.";
       }
-      if (this.isRent) {
-        if (this.rentTenantName.length < 2) {
-          this.txtError = "Please select a tenant.";
-        }
-      } else {
-        if (this.description.length < 2) {
-          this.txtError = "A description is required.";
-        }
+      if (this.description.length < 2 && this.isWithdraw) {
+        this.txtError = "A description is required.";
+      }
+      if (this.carName.length < 2) {
+        this.txtError = "Please provide a valid car registration number.";
       }
       return this.txtError.length < 2;
     },
@@ -518,18 +485,12 @@ export default {
             content: JSON.stringify({
               adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
               amount: this.Amount,
-              type: this.isRent
-                ? "RENT"
-                : this.isWithdraw ? "WITHDRAW" : "DEPOSIT",
-              rentTenantID: this.isRent
-                ? this.users.filter(u => u.text == this.rentTenantName)[0].id
-                : false,
-              rentTenantName: this.rentTenantName,
-              rentMonth: this.rentMonths[this.rentMonthIndex],
+              type: this.isWithdraw ? "Withdraw" : "Deposit",
               description: this.description,
               proof: this.selectedImage,
               date: this.TransactionDate,
-              source: "PROPERTY"
+              carName: this.carName,
+              source: "TAXIFY"
             })
           })
           .then(response => {
@@ -577,10 +538,12 @@ export default {
       } else {
         http
           .getJSON(
-            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+            this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
           )
           .then(results => {
-            this.filteredTransactions = results;
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
             pullRefresh.refreshing = false;
           })
           .catch(err => {
@@ -593,25 +556,18 @@ export default {
           });
       }
     },
-    changeRentMonth() {
-      if (this.rentMonthIndex == 11) {
-        this.rentMonthIndex = 0;
-      } else {
-        this.rentMonthIndex++;
-      }
-    },
     changeTransactionDate() {
       var self = this;
       this.$showModal({
         template: ` 
-                                    <Page>
-                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                            <DatePicker row="1" v-model="selectedDueDate" />
-                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                        </GridLayout>
-                                    </Page>
-                                    `,
+                                            <Page>
+                                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                                    <DatePicker row="1" v-model="selectedDueDate" />
+                                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                </GridLayout>
+                                            </Page>
+                                            `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -630,16 +586,16 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                    <Page>
-                                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                                          <ScrollView row="1" colSpan="2">
-                                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                                          </ScrollView>
-                                        </GridLayout>
-                                    </Page>
-                                    `,
+                                            <Page>
+                                                <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                                  <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                                  <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                                  <ScrollView row="1" colSpan="2">
+                                                    <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                                  </ScrollView>
+                                                </GridLayout>
+                                            </Page>
+                                            `,
         data() {
           return {
             imgSrc: null
@@ -695,10 +651,12 @@ export default {
       } else if (value == 0) {
         http
           .getJSON(
-            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+            this.$store.state.settings.baseLink + "/a/transaction/TAXIFY/all"
           )
           .then(results => {
-            this.filteredTransactions = results;
+            this.filteredTransactions = results.filter(
+              t => t.carName == this.carRegistration
+            );
           })
           .catch(err => {
             this.$feedback.error({
@@ -711,31 +669,21 @@ export default {
       this.currentPage = value;
     },
     uploadEvidence() {
-      let context = imagepicker.create({
-        mode: "single" // use "multiple" for multiple selection
-      });
-
-      context
-        .authorize()
-        .then(function() {
-          return context.present();
-        })
-        .then(selection => {
-          selection.forEach(selected => {
-            // process the selected image
-            this.selectedImage = selected;
-            this.hasImage = true;
-          });
+      camera
+        .requestPermissions()
+        .then(answer => {
+          camera
+            .takePicture()
+            .then(imageAsset => {
+              this.selectedImage = imageAsset;
+              this.hasImage = true;
+            })
+            .catch(err => {
+              console.log("Error -> " + err.message);
+            });
         })
         .catch(err => {
-          // process error
-          this.$feedback.error({
-            title: "No file selected",
-            message: "Please select a valid image file",
-            duration: 4000,
-            position: 1,
-            onTap: () => {}
-          });
+          console.log("Error -> " + err.message);
         });
     }
   }

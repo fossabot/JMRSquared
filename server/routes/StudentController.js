@@ -16,15 +16,17 @@ import Rent from "../models/Rent";
         Login student
 */
 
-router.get("/rents/all", function(req, res) {
+router.get("/rents/all", function (req, res) {
   Rent.find().then(rents => {
     if (rents == null) res.send("Error : 90ty32rtu834g9erbo");
     res.json(rents);
   });
 });
 
-router.get("/students/all", function(req, res) {
-  Student.find()
+router.get("/students/all", function (req, res) {
+  Student.find({
+      "active": true
+    })
     .populate(["rents"])
     .then(students => {
       if (students == null) res.send("Error : 9032rtu834g9erbo");
@@ -32,14 +34,16 @@ router.get("/students/all", function(req, res) {
     });
 });
 
-router.get("/students/all/names", function(req, res) {
-  Student.find({}, "_id username").then(students => {
+router.get("/students/all/names", function (req, res) {
+  Student.find({
+    "active": true
+  }, "_id username").then(students => {
     if (students == null) res.send("Error : 9032rtu834g9erbo");
     res.json(students);
   });
 });
 
-router.get("/:id/get", function(req, res) {
+router.get("/:id/get", function (req, res) {
   let id = req.params.id;
   if (id == null) {
     res.status(404);
@@ -60,7 +64,7 @@ router.get("/:id/get", function(req, res) {
  * POST methods
  */
 
-router.post("/:text/search", function(req, res) {
+router.post("/:text/search", function (req, res) {
   let text = req.params.text;
   if (text == null || text.length < 3) {
     res.status(404);
@@ -68,8 +72,7 @@ router.post("/:text/search", function(req, res) {
   } else {
     Student.find({
       where: {
-        [Op.or]: [
-          {
+        [Op.or]: [{
             lastName: {
               [Op.like]: "%" + text + "%"
             }
@@ -91,7 +94,7 @@ router.post("/:text/search", function(req, res) {
   }
 });
 
-router.post("/login", function(req, res) {
+router.post("/login", function (req, res) {
   //Dont forget this is just to disable the nigga
   if (req.body.useEmail) {
     Student.findOne({
@@ -120,14 +123,20 @@ router.post("/login", function(req, res) {
   }
 });
 
-router.post("/add", function(req, res) {
+router.post("/add", function (req, res) {
   console.log(req.body);
   req.body._id = mongoose.Types.ObjectId();
   Student.find()
-    .or([
-      { username: req.body.username },
-      { contactNumbers: req.body.contactNumbers },
-      { firstName: req.body.firstName, surname: req.body.surname }
+    .or([{
+        username: req.body.username
+      },
+      {
+        contactNumbers: req.body.contactNumbers
+      },
+      {
+        firstName: req.body.firstName,
+        surname: req.body.surname
+      }
     ])
     .then(s => {
       console.log(s);
@@ -146,7 +155,7 @@ router.post("/add", function(req, res) {
           res.send("Contact numbers must be 10 digits long");
         } else {
           var student = new Student(req.body);
-          student.save(function(err) {
+          student.save(function (err) {
             if (err) {
               console.log("Error .....");
               console.log(err);
@@ -163,11 +172,34 @@ router.post("/add", function(req, res) {
     });
 });
 
-router.post("/:id/remove", function(req, res) {
+router.post("/:id/remove", function (req, res) {
   //Dont forget this is just to disable the nigga
+  let id = req.params.id;
+  if (id == null) {
+    res.status(404);
+    res.send("Invalid ID > " + id);
+  } else {
+    Student.findById(id).then(student => {
+      if (student == null) {
+        res.status(404);
+        res.send("No student with id : " + id);
+      } else {
+        student.active = false;
+        student.save(function (err) {
+          if (err) {
+            console.log("Error .....");
+            console.log(err);
+            res.status(402);
+            res.send(err);
+          }
+          res.json(student);
+        });
+      }
+    });
+  }
 });
 
-router.post("/:id/update", function(req, res) {
+router.post("/:id/update", function (req, res) {
   //Dont forget this is just to disable the nigga
 });
 
