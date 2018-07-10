@@ -70,3 +70,11 @@ and
 > ```
 >  android:icon="@drawable/icon_dev"
 > ```
+
+### client/JMRSquaredApp/src/store/modules/settings.js
+
+> #### Dev
+>
+> ```
+>  baseLink: "http://68.66.193.181:3000",
+> ```
