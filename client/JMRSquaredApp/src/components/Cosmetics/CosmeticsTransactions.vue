@@ -1,7 +1,8 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
     <GridLayout rows="auto,auto,*,auto">
-      <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <Label @tap="toggleSearch = !toggleSearch" v-show="currentPage == 0 && !toggleSearch" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <SearchBar v-show="currentPage == 0 && toggleSearch" row="0" @clear="toggleSearch = !toggleSearch" hint="Search ..." v-model="txtSearch"></SearchBar>
       <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
@@ -217,6 +218,7 @@ export default {
         sales: 0
       },
       txtError: "",
+      txtSearch: "",
       Amount: "",
       ProductName: "",
       ProductNames: ["Perfume", "Oil", "Lipstick", "Other"],
@@ -235,7 +237,8 @@ export default {
       selectedScreen: "",
       price: "",
       donePayment: false,
-      itemCount: 0
+      itemCount: 0,
+      toggleSearch: false
     };
   },
   computed: {
@@ -253,12 +256,31 @@ export default {
     filteredTransactions: {
       get() {
         if (this.selectedType == this.transactionTypes[0]) {
-          return this.transactions;
+          if (this.txtSearch.length < 2) {
+            return this.transactions;
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
         } else {
-          if (this.selectedType == "Sale") {
-            return this.transactions.filter(v => v.type == "DEPOSIT");
-          } else if (this.selectedType == "Stock") {
-            return this.transactions.filter(v => v.type == "WITHDRAW");
+          if (this.txtSearch.length < 2) {
+            return this.transactions.filter(
+              v => v.type == this.selectedType.toUpperCase()
+            );
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                t.type == this.selectedType.toUpperCase() &&
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
           }
         }
       },

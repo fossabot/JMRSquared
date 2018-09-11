@@ -1,7 +1,8 @@
 <template>
   <FlexboxLayout v-if="!isMainScreen" class="page">
     <GridLayout rows="auto,auto,*,auto">
-      <Label v-show="currentPage == 0" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <Label @tap="toggleSearch = !toggleSearch" v-show="currentPage == 0 && !toggleSearch" row="0" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <SearchBar v-show="currentPage == 0 && toggleSearch" row="0" @clear="toggleSearch = !toggleSearch" hint="Search ..." v-model="txtSearch"></SearchBar>
       <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
@@ -14,7 +15,7 @@
           <v-template>
             <CardView margin="10" elevation="25" radius="10" shadowOffsetHeight="10" shadowOpacity="0.5" shadowRadius="50">
               <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*,auto">
-               
+  
                 <Label row="1" col="0" fontSize="20%" class="body m-10" :class="{'text-light-red':transaction.type == 'WITHDRAW','text-light-blue':transaction.type == 'DEPOSIT' || transaction.type == 'RENT' }" textWrap="true" textAlignment="center" :text="(transaction.type == 'DEPOSIT' || transaction.type == 'RENT' ? '+' : '-' ) + ' R' + transaction.amount"></Label>
   
                 <Label row="2" col="0" v-show="transaction.type == 'RENT'" textWrap="true" verticalAlignment="bottom" fontSize="10%" class="m-5" textAlignment="center" text="Rent"></Label>
@@ -36,9 +37,9 @@
       <StackLayout row="3">
         <Ripple @tap="changeTotalFilter()">
           <CardView elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout  v-if="total.values.length > 0" class="m-t-10" rows="auto" columns="*,*">
+            <GridLayout v-if="total.values.length > 0" class="m-t-10" rows="auto" columns="*,*">
               <CardView row="0" col="0" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-                <GridLayout  rows="auto,auto" columns="*">
+                <GridLayout rows="auto,auto" columns="*">
                   <label row="0" col="0" class="font-weight-bold" textAlignment="center" verticalAlignment="center" :text="total.values[total.filter].revenue.key"></label>
                   <label row="1" col="0" class="text-mute text-light-blue" fontSize="15%" verticalAlignment="bottom" textAlignment="center" :text="'R' + total.values[total.filter].revenue.value"></label>
                 </GridLayout>
@@ -106,7 +107,7 @@
               <TextView row="1" col="1" hint="What exactly did you do?" v-model="description" class="h4"></TextView>
             </GridLayout>
             <StackLayout v-show="!isRent" width="100%" class="hr-light"></StackLayout>
-
+  
             <Ripple v-show="isRent" @tap="changeRentMonth()">
               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-today' | fonticon"></label>
@@ -269,11 +270,10 @@ export default {
     return {
       total: {
         filter: 0,
-        values: [
-         
-        ]
+        values: []
       },
       txtError: "",
+      txtSearch: "",
       Amount: "",
       users: [],
       hasImage: false,
@@ -306,7 +306,8 @@ export default {
       isMainScreen: false,
       selectedScreen: "",
       price: "",
-      donePayment: false
+      donePayment: false,
+      toggleSearch: false
     };
   },
   computed: {
@@ -324,9 +325,32 @@ export default {
     filteredTransactions: {
       get() {
         if (this.selectedType == this.transactionTypes[0]) {
-          return this.transactions;
+          if (this.txtSearch.length < 2) {
+            return this.transactions;
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
         } else {
-          return this.transactions.filter(v => v.type == this.selectedType.toUpperCase());
+          if (this.txtSearch.length < 2) {
+            return this.transactions.filter(
+              v => v.type == this.selectedType.toUpperCase()
+            );
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                t.type == this.selectedType.toUpperCase() &&
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
         }
       },
       set(val) {
@@ -346,14 +370,31 @@ export default {
       var revenue = 0;
       var profit = 0;
 
-      var threeMonthsBalance = [{revenue:0,profit:0},{revenue:0,profit:0},{revenue:0,profit:0}];
+      var threeMonthsBalance = [
+        {
+          revenue: 0,
+          profit: 0
+        },
+        {
+          revenue: 0,
+          profit: 0
+        },
+        {
+          revenue: 0,
+          profit: 0
+        }
+      ];
       this.transactions.map(value => {
-      var diff = this.getMoment().endOf('month').diff(value.date,'months');
-        if(value.type == "RENT"){
+        var diff = this.getMoment()
+          .endOf("month")
+          .diff(value.date, "months");
+        if (value.type == "RENT") {
           var theMonth = this.getMoment(value.date).month(value.rentMonth);
-          diff = this.getMoment().endOf('month').diff(theMonth,'months');
+          diff = this.getMoment()
+            .endOf("month")
+            .diff(theMonth, "months");
 
-          if(diff >= 0 && diff < 3){
+          if (diff >= 0 && diff < 3) {
             threeMonthsBalance[diff].revenue += Number(value.amount);
             threeMonthsBalance[diff].profit += Number(value.amount);
           }
@@ -361,7 +402,7 @@ export default {
           profit += Number(value.amount);
           revenue += Number(value.amount);
         } else if (value.type == "DEPOSIT") {
-          if(diff >= 0 && diff < 3){
+          if (diff >= 0 && diff < 3) {
             threeMonthsBalance[diff].revenue += Number(value.amount);
             threeMonthsBalance[diff].profit += Number(value.amount);
           }
@@ -370,64 +411,82 @@ export default {
           revenue += Number(value.amount);
         } else if (value.type == "WITHDRAW") {
           profit -= Number(value.amount);
-          if(diff >= 0 && diff < 3){
+          if (diff >= 0 && diff < 3) {
             threeMonthsBalance[diff].profit -= Number(value.amount);
           }
         }
       });
-    
+
       profit = profit.toFixed(2);
       revenue = revenue.toFixed(2);
-      for(let i=0;i<threeMonthsBalance.length;i++){
-        threeMonthsBalance[i].revenue =threeMonthsBalance[i].revenue.toFixed(2);
-        threeMonthsBalance[i].profit =threeMonthsBalance[i].profit.toFixed(2); 
+      for (let i = 0; i < threeMonthsBalance.length; i++) {
+        threeMonthsBalance[i].revenue = threeMonthsBalance[i].revenue.toFixed(
+          2
+        );
+        threeMonthsBalance[i].profit = threeMonthsBalance[i].profit.toFixed(2);
       }
 
       if (this.total.values.length == 0) {
-        this.total.values.push(
-           {revenue : { 
-             key: "Total Revenue", value: revenue 
-            },
-            profit:{
-             key: "Total Profit", value: profit 
-            }}
-          );
+        this.total.values.push({
+          revenue: {
+            key: "Total Revenue",
+            value: revenue
+          },
+          profit: {
+            key: "Total Profit",
+            value: profit
+          }
+        });
       } else {
-        this.total.values[0] = {revenue : { 
-             key: "Total Revenue", value: revenue 
-            },
-            profit:{
-             key: "Total Profit", value: profit 
-            }}
+        this.total.values[0] = {
+          revenue: {
+            key: "Total Revenue",
+            value: revenue
+          },
+          profit: {
+            key: "Total Profit",
+            value: profit
+          }
+        };
       }
 
-       if (this.total.values.length == 1) {
-        for(let i=0;i<threeMonthsBalance.length;i++){
-         var monthName = this.getMoment().endOf('month').subtract(i,'months').format("MMMM");
-        this.total.values.push(
-           {revenue : { 
-             key: monthName + "'s Revenue", value: threeMonthsBalance[i].revenue 
+      if (this.total.values.length == 1) {
+        for (let i = 0; i < threeMonthsBalance.length; i++) {
+          var monthName = this.getMoment()
+            .endOf("month")
+            .subtract(i, "months")
+            .format("MMMM");
+          this.total.values.push({
+            revenue: {
+              key: monthName + "'s Revenue",
+              value: threeMonthsBalance[i].revenue
             },
-            profit:{
-             key: monthName + "'s Profit", value: threeMonthsBalance[i].profit 
-            }}
-          );
-
+            profit: {
+              key: monthName + "'s Profit",
+              value: threeMonthsBalance[i].profit
+            }
+          });
         }
       } else {
-         for(let i=0;i<threeMonthsBalance.length;i++){
-        var monthName =  this.getMoment().endOf('month').subtract(i,'months').format("MMMM");
-       
-        this.total.values[i+1] = {revenue : { 
-             key: monthName + "'s Revenue", value: threeMonthsBalance[i].revenue 
-            },
-            profit:{
-             key: monthName + "'s Profit", value: threeMonthsBalance[i].profit 
-            }}
-         }
-      }
+        for (let i = 0; i < threeMonthsBalance.length; i++) {
+          var monthName = this.getMoment()
+            .endOf("month")
+            .subtract(i, "months")
+            .format("MMMM");
 
-    }, 
+          this.total.values[i + 1] = {
+            revenue: {
+              key: monthName + "'s Revenue",
+              value: threeMonthsBalance[i].revenue
+            },
+            profit: {
+              key: monthName + "'s Profit",
+              value: threeMonthsBalance[i].profit
+            }
+          };
+        }
+      }
+    },
     changeTotalFilter() {
       if (this.total.filter == this.total.values.length - 1) {
         this.total.filter = 0;
@@ -604,14 +663,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                    <Page>
-                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                            <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                            <DatePicker row="1" v-model="selectedDueDate" />
-                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                        </GridLayout>
-                                    </Page>
-                                    `,
+                                      <Page>
+                                          <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                              <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                              <DatePicker row="1" v-model="selectedDueDate" />
+                                              <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                          </GridLayout>
+                                      </Page>
+                                      `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -630,16 +689,16 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                    <Page>
-                                        <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                                          <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                                          <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                                          <ScrollView row="1" colSpan="2">
-                                            <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                                          </ScrollView>
-                                        </GridLayout>
-                                    </Page>
-                                    `,
+                                      <Page>
+                                          <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                            <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                            <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                            <ScrollView row="1" colSpan="2">
+                                              <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                            </ScrollView>
+                                          </GridLayout>
+                                      </Page>
+                                      `,
         data() {
           return {
             imgSrc: null

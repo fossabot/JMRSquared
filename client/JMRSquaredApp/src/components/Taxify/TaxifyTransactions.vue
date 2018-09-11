@@ -11,15 +11,16 @@
         </GridLayout>
       </CardView>
   
-     <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
+      <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
             <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
           </Ripple>
         </StackLayout>
       </ScrollView>
-      <Label v-show="currentPage == 0" row="2" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
-     
+      <Label @tap="toggleSearch = !toggleSearch" v-show="currentPage == 0 && !toggleSearch" row="2" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+      <SearchBar v-show="currentPage == 0 && toggleSearch" row="2" @clear="toggleSearch = !toggleSearch" hint="Search ..." v-model="txtSearch"></SearchBar>
+  
       <PullToRefresh v-show="currentPage == 0" row="3" col="0" @refresh="refreshList($event)">
         <ListView @itemTap="onTransactionTap" borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
@@ -221,6 +222,7 @@ export default {
         values: []
       },
       txtError: "",
+      txtSearch: "",
       Amount: "",
       users: [],
       hasImage: false,
@@ -238,8 +240,9 @@ export default {
       donePayment: false,
       duePerWeek: 2400,
       expectedProfit: 0,
-      carName: "FT49BJGP",
-      carRegistration: "FT49BJGP"
+      carName: "Number plate...",
+      carRegistration: "Number plate...",
+      toggleSearch: false
     };
   },
   computed: {
@@ -257,11 +260,32 @@ export default {
     filteredTransactions: {
       get() {
         if (this.selectedType == this.transactionTypes[0]) {
-          return this.transactions;
+          if (this.txtSearch.length < 2) {
+            return this.transactions;
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
         } else {
-          return this.transactions.filter(
-            v => v.type == this.selectedType.toUpperCase()
-          );
+          if (this.txtSearch.length < 2) {
+            return this.transactions.filter(
+              v => v.type == this.selectedType.toUpperCase()
+            );
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                t.type == this.selectedType.toUpperCase() &&
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
         }
       },
       set(val) {
@@ -443,6 +467,10 @@ export default {
       }
     },
     pageLoaded(args) {
+      if (this.$store.state.cache.cachedAdmin.carRegistration != null) {
+        this.carName = this.$store.state.cache.cachedAdmin.carRegistration;
+        this.carRegistration = this.$store.state.cache.cachedAdmin.carRegistration;
+      }
       var self = this;
       this.ApplyNavigation(self);
       http
@@ -599,14 +627,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                            <Page>
-                                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                                    <DatePicker row="1" v-model="selectedDueDate" />
-                                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                </GridLayout>
-                                            </Page>
-                                            `,
+                                                <Page>
+                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                                        <DatePicker row="1" v-model="selectedDueDate" />
+                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                    </GridLayout>
+                                                </Page>
+                                                `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -625,16 +653,16 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                            <Page>
-                                                <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
-                                                  <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
-                                                  <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
-                                                  <ScrollView row="1" colSpan="2">
-                                                    <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
-                                                  </ScrollView>
-                                                </GridLayout>
-                                            </Page>
-                                            `,
+                                                <Page>
+                                                    <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                                      <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                                      <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                                      <ScrollView row="1" colSpan="2">
+                                                        <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                                      </ScrollView>
+                                                    </GridLayout>
+                                                </Page>
+                                                `,
         data() {
           return {
             imgSrc: null
