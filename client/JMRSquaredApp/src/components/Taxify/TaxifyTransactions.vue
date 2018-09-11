@@ -11,14 +11,15 @@
         </GridLayout>
       </CardView>
   
-      <Label v-show="currentPage == 0" row="1" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
-      <ScrollView row="2" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
+     <ScrollView row="1" v-show="currentPage == 0" textAlignment="center" orientation="horizontal">
         <StackLayout textAlignment="center" orientation="horizontal">
           <Ripple @tap="selectedType = transactionType" v-for="(transactionType,i) in transactionTypes" :key="i" borderRadius="50%">
             <label :text="transactionType" :class="{'bottom-line-blue':selectedType == transactionType}" class="m-10"></label>
           </Ripple>
         </StackLayout>
       </ScrollView>
+      <Label v-show="currentPage == 0" row="2" textAlignment="center" class="text-muted p-20" text="Pull to refresh the list."></Label>
+     
       <PullToRefresh v-show="currentPage == 0" row="3" col="0" @refresh="refreshList($event)">
         <ListView @itemTap="onTransactionTap" borderRightWidth="2px" borderRightColor="transparent" for="transaction in filteredTransactions">
           <v-template>
@@ -42,7 +43,7 @@
       <StackLayout row="4">
         <Ripple @tap="changeTotalFilter()">
           <CardView margin="2" elevation="25" radius="10" shadowOpacity="0.5" shadowRadius="50">
-            <GridLayout v-if="total.values.length > 0" class="m-10" rows="auto" columns="*,*">
+            <GridLayout v-if="total.values.length > 0" class="m-10" rows="auto" columns="*,auto">
               <label row="0" col="0" class="font-weight-bold" verticalAlignment="center" :text="total.values[total.filter].key"></label>
               <label row="0" col="1" class="h4 text-mute text-light-red" fontSize="20%" textAlignment="right" verticalAlignment="center" :text="'R' + total.values[total.filter].value"></label>
             </GridLayout>
@@ -235,7 +236,7 @@ export default {
       selectedScreen: "",
       price: "",
       donePayment: false,
-      duePerWeek: 2800,
+      duePerWeek: 2400,
       expectedProfit: 0,
       carName: "FT49BJGP",
       carRegistration: "FT49BJGP"
@@ -307,6 +308,8 @@ export default {
       var revenue = 0;
       var profit = 0;
       var thisMonthsRevenue = 0;
+      var lastMonthsRevenue = 0;
+      var lastWeeksRevenue = 0;
       var thisWeekBalance = this.duePerWeek;
       var overDraft = 0;
 
@@ -322,8 +325,16 @@ export default {
             thisMonthsRevenue += Number(value.amount);
           }
 
-          if (this.getMoment().isSame(value.date, "week")) {
+          if (this.getMoment().isSame(value.date, "isoWeek")) {
             thisWeekBalance -= Number(value.amount);
+          }
+
+          if (this.getMoment().diff(value.date, "weeks") == 1) {
+            lastWeeksRevenue += Number(value.amount);
+          }
+
+          if (this.getMoment().diff(value.date, "months") == 1) {
+            lastMonthsRevenue += Number(value.amount);
           }
 
           profit += Number(value.amount);
@@ -340,6 +351,8 @@ export default {
       revenue = revenue.toFixed(2);
       thisWeekBalance = thisWeekBalance.toFixed(2);
       thisMonthsRevenue = thisMonthsRevenue.toFixed(2);
+      lastWeeksRevenue = lastWeeksRevenue.toFixed(2);
+      lastMonthsRevenue = lastMonthsRevenue.toFixed(2);
 
       overDraft = this.expectedProfit - revenue;
       if (overDraft < 0) overDraft = 0;
@@ -350,7 +363,7 @@ export default {
           key:
             "Balance due on " +
             this.getMoment()
-              .endOf("week")
+              .endOf("isoWeek")
               .add(1, "day")
               .format("dddd [(]DD MMMM[)]"),
           value: thisWeekBalance
@@ -359,7 +372,7 @@ export default {
         this.total.values[0].key =
           "Balance due on " +
           this.getMoment()
-            .endOf("week")
+            .endOf("isoWeek")
             .add(1, "day")
             .format("dddd [(]DD MMMM[)]");
         this.total.values[0].value = thisWeekBalance;
@@ -386,14 +399,40 @@ export default {
         this.total.values[2].value = thisMonthsRevenue;
       }
 
-      if (this.total.values.length == 3 && overDraft > 0) {
+      if (this.total.values.length == 3) {
+        this.total.values.push({
+          key:
+            this.getMoment()
+              .subtract(1, "month")
+              .format("MMMM") + "'s Revenue",
+          value: lastMonthsRevenue
+        });
+      } else {
+        this.total.values[3].key =
+          this.getMoment()
+            .subtract(1, "month")
+            .format("MMMM") + "'s Revenue";
+        this.total.values[3].value = lastMonthsRevenue;
+      }
+
+      if (this.total.values.length == 4) {
+        this.total.values.push({
+          key: "Last Week's Revenue",
+          value: lastWeeksRevenue
+        });
+      } else {
+        this.total.values[4].key = "Last Week's Revenue";
+        this.total.values[4].value = lastWeeksRevenue;
+      }
+
+      if (this.total.values.length == 5 && overDraft > 0) {
         this.total.values.push({
           key: "Over draft (You owe this amount)",
           value: overDraft
         });
       } else if (overDraft > 0) {
-        this.total.values[3].key = "Over draft (You owe this amount)";
-        this.total.values[3].value = overDraft;
+        this.total.values[5].key = "Over draft (You owe this amount)";
+        this.total.values[5].value = overDraft;
       }
     },
     changeTotalFilter() {
