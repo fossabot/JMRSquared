@@ -70,28 +70,28 @@ export default {
         {
           id: "fulham86",
           icon: "home",
-          title: "Fulham 86",
+          title: "Property",
           row: 0,
           col: 2
         },
         {
           id: "reminders",
-          icon: "notifications",
-          title: "Reminders",
+          icon: "add",
+          title: "Add Business",
           row: 1,
           col: 0
+        },
+        {
+          id: "bugReport",
+          icon: "add",
+          title: "Add Business",
+          row: 1,
+          col: 1
         },
         {
           id: "info",
           icon: "info",
           title: "Info and help",
-          row: 1,
-          col: 1
-        },
-        {
-          id: "bugReport",
-          icon: "bug-report",
-          title: "Bug report",
           row: 1,
           col: 2
         }

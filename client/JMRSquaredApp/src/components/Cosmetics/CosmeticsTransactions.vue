@@ -77,7 +77,7 @@
             </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
   
-
+  
             <Ripple @tap="isWithdraw = !isWithdraw">
               <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                 <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :class="{'text-dark-blue':!isWithdraw,'text-light-red':isWithdraw}" :text="'mdi-' + (isWithdraw ? 'money-off' : 'attach-money') | fonticon"></label>
@@ -95,16 +95,16 @@
               </GridLayout>
             </Ripple>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <GridLayout v-show="ProductNames[ProductNameIndex] == 'Other'" class="m-10" rows="auto,auto" columns="auto,*,auto">
-                <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
-                <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Add new product"></label>
-                <button @tap="ProductNameIndex >= (ProductNames.length-1) ? ProductNameIndex = 0:ProductNameIndex++" row="0" col="2" text="Cancel" class="h4"></button>
-                <TextField row="1" col="1" v-model="productName" hint="Name of the product" returnKeyType="next" class="h4"></TextField>
-                <button row="1" col="2" text="Save Product" @tap="AddNewProduct()" class="h4"></button>
+              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
+              <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Add new product"></label>
+              <button @tap="ProductNameIndex >= (ProductNames.length-1) ? ProductNameIndex = 0:ProductNameIndex++" row="0" col="2" text="Cancel" class="h4"></button>
+              <TextField row="1" col="1" v-model="productName" hint="Name of the product" returnKeyType="next" class="h4"></TextField>
+              <button row="1" col="2" text="Save Product" @tap="AddNewProduct()" class="h4"></button>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-whatshot' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of ' + ProductNames[ProductNameIndex] + 's '  + (isWithdraw ? ' bought' : ' sold')"></label>
@@ -168,14 +168,14 @@
               <label row="1" col="1" :text="Amount" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
               <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-local-florist' | fonticon"></label>
               <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Number of items ' + (isWithdraw ? 'bought' : 'sold')"></label>
-              <label row="1" col="1" :text="'You ' + (isWithdraw ? 'bought ' : 'sold ')  + itemCount +  ' ' + ProductNames[ProductNameIndex]"  class="h4"></label>
+              <label row="1" col="1" :text="'You ' + (isWithdraw ? 'bought ' : 'sold ')  + itemCount +  ' ' + ProductNames[ProductNameIndex]" class="h4"></label>
             </GridLayout>
             <StackLayout width="100%" class="hr-light"></StackLayout>
-
+  
             <ActivityIndicator :busy="isLoading"></ActivityIndicator>
   
             <GridLayout v-show="!isLoading && !donePayment" columns="*,*" rows="*" verticalAlignment="bottom">
@@ -268,19 +268,32 @@ export default {
             });
           }
         } else {
-          if (this.txtSearch.length < 2) {
-            return this.transactions.filter(
-              v => v.type == this.selectedType.toUpperCase()
-            );
-          } else {
-            return this.transactions.filter(t => {
-              return (
-                t.type == this.selectedType.toUpperCase() &&
-                JSON.stringify(t)
-                  .toLowerCase()
-                  .indexOf(this.txtSearch.toLowerCase()) >= 0
-              );
-            });
+          if (this.selectedType == "Sale") {
+            if (this.txtSearch.length < 2) {
+              return this.transactions.filter(v => v.type == "DEPOSIT");
+            } else {
+              return this.transactions.filter(t => {
+                return (
+                  t.type == "DEPOSIT" &&
+                  JSON.stringify(t)
+                    .toLowerCase()
+                    .indexOf(this.txtSearch.toLowerCase()) >= 0
+                );
+              });
+            }
+          } else if (this.selectedType == "Stock") {
+            if (this.txtSearch.length < 2) {
+              return this.transactions.filter(v => v.type == "WITHDRAW");
+            } else {
+              return this.transactions.filter(t => {
+                return (
+                  t.type == "WITHDRAW" &&
+                  JSON.stringify(t)
+                    .toLowerCase()
+                    .indexOf(this.txtSearch.toLowerCase()) >= 0
+                );
+              });
+            }
           }
         }
       },
@@ -478,14 +491,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                            <Page>
-                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                    <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
-                                    <DatePicker row="1" v-model="selectedDueDate" />
-                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                </GridLayout>
-                            </Page>
-                            `,
+                              <Page>
+                                  <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                      <Label row="0" class="h2 m-5" textAlignment="center" text="When was the transaction?"></Label>
+                                      <DatePicker row="1" v-model="selectedDueDate" />
+                                      <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                  </GridLayout>
+                              </Page>
+                              `,
         data: function() {
           return {
             selectedDueDate: new Date()

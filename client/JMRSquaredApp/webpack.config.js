@@ -9,25 +9,26 @@ const NativeScriptVueExternals = require('nativescript-vue-externals');
 const NativeScriptVueTarget = require('nativescript-vue-target');
 
 // Prepare NativeScript application from template (if necessary)
-require('./prepare')();
+const prepare = (env) => {
+  require('./prepare')(env);
+}
 
 // Generate platform-specific webpack configuration
-const config = (platform, launchArgs) => {
+const config = (env, platform, launchArgs) => {
 
   winston.info(`Bundling application for ${platform}...`);
 
   // CSS / SCSS style extraction loaders
   const cssLoader = ExtractTextPlugin.extract({
-    use: [
-      {
-        loader: 'css-loader',
-        options: {url: false},
+    use: [{
+      loader: 'css-loader',
+      options: {
+        url: false
       },
-    ],
+    }, ],
   });
   const scssLoader = ExtractTextPlugin.extract({
-    use: [
-      {
+    use: [{
         loader: 'css-loader',
         options: {
           url: false,
@@ -50,8 +51,7 @@ const config = (platform, launchArgs) => {
     },
 
     module: {
-      rules: [
-        {
+      rules: [{
           test: /\.js$/,
           exclude: /(node_modules)/,
           loader: 'babel-loader',
@@ -99,33 +99,47 @@ const config = (platform, launchArgs) => {
     externals: NativeScriptVueExternals,
 
     plugins: [
+      new webpack.DefinePlugin({
+        NODE_ENV: env
+      }),
 
       // Extract CSS to separate file
-      new ExtractTextPlugin({filename: `app.${platform}.css`}),
+      new ExtractTextPlugin({
+        filename: `app.${platform}.css`
+      }),
 
       // Optimize CSS output
       new OptimizeCssAssetsPlugin({
         cssProcessor: require('cssnano'),
-        cssProcessorOptions: {discardComments: {removeAll: true}},
+        cssProcessorOptions: {
+          discardComments: {
+            removeAll: true
+          }
+        },
         canPrint: false,
       }),
 
       // Minify JavaScript code
       new webpack.optimize.UglifyJsPlugin({
-        compress: {warnings: false},
-        output: {comments: false},
+        compress: {
+          warnings: false
+        },
+        output: {
+          comments: false
+        },
       }),
 
       // Copy src/assets/**/* to dist/
-      new CopyWebpackPlugin([
-        {from: 'assets', context: 'src'},
-      ]),
+      new CopyWebpackPlugin([{
+        from: 'assets',
+        context: 'src'
+      }, ]),
 
       // Execute post-build scripts with specific arguments
       new WebpackSynchronizableShellPlugin({
         onBuildEnd: {
           scripts: [
-            ... launchArgs ? [`node launch.js ${launchArgs}`] : [],
+            ...launchArgs ? [`node launch.js ${launchArgs}`] : [],
           ],
           blocking: false,
         },
@@ -147,13 +161,15 @@ const config = (platform, launchArgs) => {
 
 // Determine platform(s) and action from webpack env arguments
 module.exports = env => {
+  env.isDev = env.isDev != 'false';
+  prepare(env);
+
   const action = (!env || !env.tnsAction) ? 'build' : env.tnsAction;
 
   if (!env || (!env.android && !env.ios)) {
-    return [config('android'), config('ios', action)];
+    return [config(env, 'android'), config(env, 'ios', action)];
   }
 
-  return env.android && config('android', `${action} android`)
-    || env.ios && config('ios', `${action} ios`)
-    || {};
+  return env.android && config(env, 'android', `${action} android`) ||
+    env.ios && config(env, 'ios', `${action} ios`) || {};
 };

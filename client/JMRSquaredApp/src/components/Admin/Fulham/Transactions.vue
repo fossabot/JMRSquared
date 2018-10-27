@@ -25,7 +25,7 @@
                 <Label row="1" col="1" v-show="transaction.type != 'RENT'" class="body m-10" textWrap="true" textAlignment="center" :text="transaction.description"></Label>
                 <Label row="1" col="1" v-show="transaction.type == 'RENT'" class="h2 m-10" textWrap="true" textAlignment="center" :text="transaction.rentTenantName"></Label>
   
-                <Label row="0" col="2" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
+                <Label row="0" col="2" id="date" class="font-italic m-5 tinyText" textWrap="true" textAlignment="center" :text="getMoment(transaction.date).fromNow()"></Label>
                 <Label row="2" col="2" class="m-5" textWrap="true" textAlignment="center" :text="transaction.adminID.userName"></Label>
   
               </GridLayout>

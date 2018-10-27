@@ -14,7 +14,7 @@
       </FlexboxLayout>
       <FlexboxLayout flexDirection="column">
         <GridLayout columns="auto" rows="auto" justifyContent="center">
-          <Image src="~/images/logo/JMRSQUARED-blue.png" row="0" col="0" width="100%" alignSelf="center" stretch="aspectFit" />
+          <Image src="res://jmrlogo" row="0" col="0" width="100%" alignSelf="center" stretch="aspectFit" />
         </GridLayout>
       </FlexboxLayout>
       <FlexboxLayout justifyContent="flex-end" flexDirection="column">
@@ -34,35 +34,36 @@
 </template>
 
 <script>
-  const dialogs = require('ui/dialogs')
-  const http = require("http")
-  
-  var appSettings = require("application-settings");
-  
-  import * as connectivity from "tns-core-modules/connectivity";
-  export default {
-    data() {
-      return {
-        introTxt: 'JMRSqaured is a company that deals with blah blah blah blah ......'
-      }
-    },
-    created() {
-      this.pageLoaded();
-    },
-    mounted() {
-      this.pageLoaded();
-    },
-    methods: {
-      pageLoaded() {
-        this.$store.commit("refreshCache", {
-          db: this.$db,
-          appSettings: appSettings
-        });
-      }
+const dialogs = require("ui/dialogs");
+const http = require("http");
+
+var appSettings = require("application-settings");
+
+import * as connectivity from "tns-core-modules/connectivity";
+export default {
+  data() {
+    return {
+      introTxt:
+        "JMRSqaured is a company that deals with blah blah blah blah ......"
+    };
+  },
+  created() {
+    this.pageLoaded();
+  },
+  mounted() {
+    this.pageLoaded();
+  },
+  methods: {
+    pageLoaded() {
+      this.$store.commit("refreshCache", {
+        db: this.$db,
+        appSettings: appSettings
+      });
     }
   }
+};
 </script>
 
 <style lang="scss" scoped>
-  @import '../assets/variables';
+@import "../assets/variables";
 </style>

@@ -1,0 +1,33 @@
+{
+  "name": "jmrsquared",
+  "description": "An app for JMRSquared to use for all the logistics",
+  "license": "MIT",
+  "readme": "JMRSquared",
+  "nativescript": {
+    "id": "com.jmrsquared.dev"
+  },
+  "dependencies": {
+    "nativescript-theme-core": "^1.0.4",
+    "nativescript-vue": "^1.3.1",
+    "tns-core-modules": "~3.4.1",
+    "nativescript-cardview": "^2.0.5",
+    "nativescript-fonticon": "^1.1.1",
+    "nativescript-local-notifications": "^2.0.4",
+    "nativescript-toast": "^1.4.6",
+    "nativescript-pulltorefresh": "^2.1.1",
+    "nativescript-couchbase": "^1.0.18",
+    "nativescript-feedback": "^1.2.0",
+    "nativescript-imagepicker": "^5.0.2",
+    "nativescript-permissions": "^1.2.3",
+    "nativescript-ripple": "^2.0.0",
+    "nativescript-floatingactionbutton": "^4.1.3",
+    "nativescript-camera": "^4.0.2",
+    "nativescript-fontawesome": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-traverse": "6.26.0",
+    "babel-types": "6.26.0",
+    "babylon": "6.18.0",
+    "lazy": "1.0.11"
+  }
+}
