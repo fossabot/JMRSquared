@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Business from "../models/Business";
 
-router.get("/all/for/:userID", async (req, res, next) => {
+router.get("/all/for/:userID", async (req, res) => {
   var adminID = req.params.userID;
   try {
     var admin = await Admin.findById(adminID).exec();
@@ -21,7 +21,7 @@ router.get("/all/for/:userID", async (req, res, next) => {
   }
 });
 
-router.post("/add/business", async (req, res, next) => {
+router.post("/add/business", async (req, res) => {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
@@ -40,6 +40,7 @@ router.post("/add/business", async (req, res, next) => {
       icon: _business.icon,
       logo: _business.logo,
       type: _business.type && _business.type.toUpperCase(),
+      category: _business.category && _business.category.toUpperCase(),
       description: _business.description
     });
 
@@ -52,7 +53,7 @@ router.post("/add/business", async (req, res, next) => {
   }
 });
 
-router.post("/assign/to/business", async (req, res, next) => {
+router.post("/assign/to/business", async (req, res) => {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;

@@ -22,9 +22,11 @@ const BusinessSchema = new mongoose.Schema({
     logo: String,
     type: {
         type: String,
-        enum: ['SERVICE', 'SERVICE-CLIENTS', 'MERCHANDISING'],
+        enum: ['SERVICE', 'MANUFACTORING', 'MERCHANDISING'],
         default: "SERVICE"
     },
+    // e.g Taxify , Cosmetics , Property
+    category: String,
     description: String,
 });
 
