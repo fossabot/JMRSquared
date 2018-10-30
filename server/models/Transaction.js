@@ -10,6 +10,10 @@ const TransactionSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Admin'
     }, //ForeignKey
+    businessID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Business'
+    },
     amount: String,
     itemCount: {
         type: Number,

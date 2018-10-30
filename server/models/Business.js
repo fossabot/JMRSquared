@@ -28,6 +28,10 @@ const BusinessSchema = new mongoose.Schema({
     // e.g Taxify , Cosmetics , Property
     category: String,
     description: String,
+    transactions: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Transaction'
+    }],
 });
 
 BusinessSchema.methods.findSimilarTypes = function (cb) {
