@@ -6,7 +6,7 @@ import Admin from "../models/Admin";
 import Business from "../models/Business";
 
 router.get("/all/for/:userID", async function (req, res) {
-  var adminID = req.params.adminID;
+  var adminID = req.params.userID;
 
   var admin = await Admin.findById(adminID).exec();
   if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
