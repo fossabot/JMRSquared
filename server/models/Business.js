@@ -14,17 +14,17 @@ const BusinessSchema = new mongoose.Schema({
         authority: {
             type: String,
             enum: ['ADMIN', 'CLIENT', 'WORKER'],
-            default: "CLIENT"
+            default: "WORKER"
         }
     }],
     name: String,
     icon: String,
+    logo: String,
     type: {
         type: String,
         enum: ['SERVICE', 'SERVICE-CLIENTS', 'MERCHANDISING'],
         default: "SERVICE"
     },
-    typeDescription: String,
     description: String,
 });
 
