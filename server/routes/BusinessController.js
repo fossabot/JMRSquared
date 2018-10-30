@@ -5,67 +5,76 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Business from "../models/Business";
 
-router.get("/all/for/:userID", async function (req, res) {
+router.get("/all/for/:userID", async (req, res, next) => {
   var adminID = req.params.userID;
-
-  var admin = await Admin.findById(adminID).exec();
-  if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
-  Business.find({
-    adminID: adminID
-  }).then(businesses => {
-    if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
-    res.json(businesses);
-  });
+  try {
+    var admin = await Admin.findById(adminID).exec();
+    if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
+    Business.find({
+      adminID: adminID
+    }).then(businesses => {
+      if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
+      res.json(businesses);
+    });
+  } catch (e) {
+    next(e)
+  }
 });
 
-router.post("/add/business", async function (req, res) {
+router.post("/add/business", async (req, res, next) => {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
+  try {
+    var admin = await Admin.findById(adminID).exec();
+    if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
+    if (_business == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
 
-  var admin = await Admin.findById(adminID).exec();
-  if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
-  if (_business == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
+    var business = new Business({
+      _id: mongoose.Types.ObjectId(),
+      admin: [{
+        id: adminID,
+        authority: adminAuthority && adminAuthority.toUpperCase()
+      }],
+      name: _business.name,
+      icon: _business.icon,
+      logo: _business.logo,
+      type: _business.type && _business.type.toUpperCase(),
+      description: _business.description
+    });
 
-  var business = new Business({
-    _id: mongoose.Types.ObjectId(),
-    admin: [{
-      id: adminID,
-      authority: adminAuthority && adminAuthority.toUpperCase()
-    }],
-    name: _business.name,
-    icon: _business.icon,
-    logo: _business.logo,
-    type: _business.type && _business.type.toUpperCase(),
-    description: _business.description
-  });
-
-  business.save(function (err) {
-    if (err) return res.status(512).send(err);
-    res.send("Business successfully saved");
-  });
+    business.save(function (err) {
+      if (err) return res.status(512).send(err);
+      res.send("Business successfully saved");
+    });
+  } catch (e) {
+    next(e)
+  }
 });
 
-router.post("/assign/to/business", async function (req, res) {
+router.post("/assign/to/business", async (req, res, next) => {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
+  try {
+    var admin = await Admin.findById(adminID).exec();
+    if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
+    if (businessID == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
 
-  var admin = await Admin.findById(adminID).exec();
-  if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
-  if (businessID == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
-
-  Business.findById(businessID).then(business => {
-    if (business == null) return res.status(512).send("Error : 9032rtu834g9erbo");
-    business.admin.push({
-      id: adminID,
-      authority: adminAuthority && adminAuthority.toUpperCase()
+    Business.findById(businessID).then(business => {
+      if (business == null) return res.status(512).send("Error : 9032rtu834g9erbo");
+      business.admin.push({
+        id: adminID,
+        authority: adminAuthority && adminAuthority.toUpperCase()
+      });
+      business.save(function (err) {
+        if (err) return res.status(512).send(err);
+        res.send("Client successfully linked to business");
+      });
     });
-    business.save(function (err) {
-      if (err) return res.status(512).send(err);
-      res.send("Client successfully linked to business");
-    });
-  });
+  } catch (e) {
+    next(e)
+  }
 });
 
 module.exports = router;
