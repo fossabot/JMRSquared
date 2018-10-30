@@ -4,7 +4,7 @@ var router = express.Router();
 import mongoose from "mongoose";
 // import the models
 import Admin from "../models/Admin";
-import Business from "../models/Admin";
+import Business from "../models/Business";
 
 /*
   TODO : Add admin
