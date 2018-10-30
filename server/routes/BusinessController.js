@@ -8,8 +8,7 @@ import Business from "../models/Business";
 router.get("/all/for/:userID", async function (req, res) {
   var adminID = req.params.adminID;
 
-  var admin = await Admin.findById(adminID);
-  res.send(admin);
+  var admin = await Admin.findById(adminID).exec();
   if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
   Business.find({
     adminID: adminID
@@ -24,7 +23,7 @@ router.post("/add/business", async function (req, res) {
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
 
-  var admin = await Admin.findById(adminID);
+  var admin = await Admin.findById(adminID).exec();
   if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
   if (_business == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
 
@@ -52,7 +51,7 @@ router.post("/assign/to/business", async function (req, res) {
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
 
-  var admin = await Admin.findById(adminID);
+  var admin = await Admin.findById(adminID).exec();
   if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
   if (businessID == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
 
