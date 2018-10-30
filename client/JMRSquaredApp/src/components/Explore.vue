@@ -15,7 +15,7 @@
       <StackLayout class="p-y-20" alignSelf="center" width="100%">
         <FlexboxLayout flexDirection="column">
           <GridLayout columns="auto" rows="auto" justifyContent="center">
-            <Image src="~/images/logo/JMRSQUARED-blue.png" row="0" col="0" width="100%" alignSelf="center" stretch="aspectFit" />
+            <Image src="res://jmrlogo" row="0" col="0" width="100%" alignSelf="center" stretch="aspectFit" />
           </GridLayout>
         </FlexboxLayout>
       </StackLayout>
@@ -34,69 +34,68 @@
 </template>
 
 <script>
-  const dialogs = require('ui/dialogs')
-  import * as Toast from "nativescript-toast";
-  
-  var appSettings = require("application-settings");
-  
-  export default {
-    data() {
-      return {
-        layouts: [{
-            id: "housemates",
-            icon: "people",
-            title: "Tenants",
-            row: 0,
-            col: 0
-          }
-        ],
-        isLoaded: false
-      }
-    },
-    created() {
-      if (!this.isLoaded) {
-        this.pageLoaded();
-      }
-    },
-    mounted() {
-      if (!this.isLoaded) {
-        this.pageLoaded();
-      }
-    },
-    methods: {
-      pageLoaded() {
-  
-      },
-      eventChanged(event) {
-        dialogs.alert("Changed view").then(() => {
-          console.log("This is it")
-        });
-      },
-      switchPage(card) {
-        dialogs.alert("Going to " + card.redirect).then(() => {
-          console.log(card.redirect);
-        });
-        this.$router.push({
-          path: card.redirect
-        });
-      },
-      onItemTap(item) {
-        if (item.id == 'housemates') {
-          this.$router.push('/admin/fulham/students');
-        } else if (item.id == 'documents') {
-          this.$router.push('/admin/documents');
-        } else if (item.id == 'reminders') {
-          this.$router.push('/admin/reminders');
-        } else {
-          dialogs.alert("Not yet assigned").then(() => {
-            console.log("card.redirect");
-          });
+const dialogs = require("ui/dialogs");
+import * as Toast from "nativescript-toast";
+
+var appSettings = require("application-settings");
+
+export default {
+  data() {
+    return {
+      layouts: [
+        {
+          id: "housemates",
+          icon: "people",
+          title: "Tenants",
+          row: 0,
+          col: 0
         }
+      ],
+      isLoaded: false
+    };
+  },
+  created() {
+    if (!this.isLoaded) {
+      this.pageLoaded();
+    }
+  },
+  mounted() {
+    if (!this.isLoaded) {
+      this.pageLoaded();
+    }
+  },
+  methods: {
+    pageLoaded() {},
+    eventChanged(event) {
+      dialogs.alert("Changed view").then(() => {
+        console.log("This is it");
+      });
+    },
+    switchPage(card) {
+      dialogs.alert("Going to " + card.redirect).then(() => {
+        console.log(card.redirect);
+      });
+      this.$router.push({
+        path: card.redirect
+      });
+    },
+    onItemTap(item) {
+      if (item.id == "housemates") {
+        this.$router.push("/admin/fulham/students");
+      } else if (item.id == "documents") {
+        this.$router.push("/admin/documents");
+      } else if (item.id == "reminders") {
+        this.$router.push("/admin/reminders");
+      } else {
+        dialogs.alert("Not yet assigned").then(() => {
+          console.log("card.redirect");
+        });
       }
     }
   }
+};
 </script>
 
 <style lang="scss" scoped>
-  @import '../assets/variables';
+@import "../assets/variables";
 </style>

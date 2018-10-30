@@ -1,4 +1,6 @@
-const {exec} = require('child_process');
+const {
+  exec
+} = require('child_process');
 const winston = require('winston-color');
 
 const action = process.argv[2];
@@ -35,8 +37,7 @@ if (action !== 'run' && !platform) {
   let tnsiOSProcess = exec(`tns --path dist ${action} ios`);
   tnsAndroidProcess.stdout.pipe(process.stdout);
   tnsiOSProcess.stdout.pipe(process.stdout);
-}
-else {
+} else {
   let tnsProcess = exec(`tns --path dist ${action} ${platform || ''}`);
   tnsProcess.stdout.pipe(process.stdout);
 }

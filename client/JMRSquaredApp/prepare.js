@@ -1,15 +1,15 @@
 const fs = require('fs-extra');
 const path = require('path');
-const {execSync} = require('child_process');
+const {
+  execSync
+} = require('child_process');
 const winston = require('winston-color');
 
 const distPath = path.resolve(__dirname, './dist');
-const tplPath = path.resolve(__dirname, './template');
 
 const appPackage = require('./package.json');
-const tplPackage = require('./template/package.json');
 
-function copyNativeScriptPlugins () {
+function copyNativeScriptPlugins(tplPath, tplPackage) {
   winston.info('Copying NativeScript plugins to template dependencies...');
   const plugins = Object.keys(appPackage.dependencies)
     .filter(key => key.indexOf('nativescript-') !== -1)
@@ -21,14 +21,21 @@ function copyNativeScriptPlugins () {
   fs.writeFileSync(tplPath + '/package.json', JSON.stringify(tplPackage, null, 2));
 }
 
-function updateDistFromTemplate () {
+function updateDistFromTemplate(tplPath) {
   winston.info('Preparing NativeScript application from template...');
   fs.ensureDirSync(distPath);
-  fs.copySync(tplPath, distPath, {overwrite: false});
-  execSync('npm i', {cwd: 'dist'});
+  fs.copySync(tplPath, distPath, {
+    overwrite: false
+  });
+  execSync('npm i', {
+    cwd: 'dist'
+  });
 }
 
-module.exports = () => {
-  copyNativeScriptPlugins();
-  updateDistFromTemplate();
+module.exports = (env) => {
+  env.isDev ? winston.warn('Building for dev') : winston.warn('Building for LIVE');
+  let tplPath = env.isDev ? path.resolve(__dirname, './template/dev') : path.resolve(__dirname, './template/live');
+  let tplPackage = env.isDev ? require('./template/dev/package.json') : require('./template/live/package.json');
+  copyNativeScriptPlugins(tplPath, tplPackage);
+  updateDistFromTemplate(tplPath);
 };
