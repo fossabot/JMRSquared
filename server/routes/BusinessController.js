@@ -5,10 +5,9 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Business from "../models/Business";
 
-router.get("/all/for/:userID", async (req, res) => {
+router.get("/all/for/:userID", function (req, res) {
   var adminID = req.params.userID;
-  try {
-    var admin = await Admin.findById(adminID).exec();
+  Admin.findById(adminID).then(admin => {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
     Business.find({
       adminID: adminID
@@ -16,20 +15,19 @@ router.get("/all/for/:userID", async (req, res) => {
       if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
       res.json(businesses);
     });
-  } catch (e) {
-    return res.status(512).send(e)
-  }
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
 });
 
-router.post("/add/business", async (req, res) => {
+router.post("/add/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
-  try {
-    var admin = await Admin.findById(adminID).exec();
-    if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
-    if (_business == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
+  if (_business == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
 
+  Admin.findById(adminID).then(admin => {
+    if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
     var business = new Business({
       _id: mongoose.Types.ObjectId(),
       admin: [{
@@ -48,19 +46,18 @@ router.post("/add/business", async (req, res) => {
       if (err) return res.status(512).send(err);
       res.send("Business successfully saved");
     });
-  } catch (e) {
-    return res.status(512).send(e)
-  }
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
 });
 
-router.post("/assign/to/business", async (req, res) => {
+router.post("/assign/to/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
-  try {
-    var admin = await Admin.findById(adminID).exec();
+  if (businessID == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
+  Admin.findById(adminID).then(admin => {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
-    if (businessID == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
 
     Business.findById(businessID).then(business => {
       if (business == null) return res.status(512).send("Error : 9032rtu834g9erbo");
@@ -73,9 +70,9 @@ router.post("/assign/to/business", async (req, res) => {
         res.send("Client successfully linked to business");
       });
     });
-  } catch (e) {
-    return res.status(512).send(e)
-  }
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
 });
 
 module.exports = router;
