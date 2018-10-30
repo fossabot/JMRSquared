@@ -17,7 +17,7 @@ router.get("/all/for/:userID", async (req, res, next) => {
       res.json(businesses);
     });
   } catch (e) {
-    next(e)
+    return res.status(512).send(e)
   }
 });
 
@@ -48,7 +48,7 @@ router.post("/add/business", async (req, res, next) => {
       res.send("Business successfully saved");
     });
   } catch (e) {
-    next(e)
+    return res.status(512).send(e)
   }
 });
 
@@ -73,7 +73,7 @@ router.post("/assign/to/business", async (req, res, next) => {
       });
     });
   } catch (e) {
-    next(e)
+    return res.status(512).send(e)
   }
 });
 
