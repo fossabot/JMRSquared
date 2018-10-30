@@ -9,6 +9,7 @@ var app = express();
 
 import mongoose from "mongoose";
 import adminController from "./routes/AdminController";
+import businessController from "./routes/BusinessController";
 import studentController from "./routes/StudentController";
 import notificationController from "./routes/NotificationController";
 
@@ -18,11 +19,15 @@ app.set("view engine", "jade");
 
 app.use(favicon());
 app.use(logger("dev"));
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb" }));
+app.use(bodyParser.json({
+  limit: "50mb"
+}));
+app.use(bodyParser.urlencoded({
+  limit: "50mb"
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
@@ -57,12 +62,13 @@ mongoose
     console.log("Successfully connected to MONGO!");
   });
 
+app.use("/b", businessController);
 app.use("/s", studentController);
 app.use("/a", adminController);
 app.use("/n", notificationController);
 
 /// catch 404 and forwarding to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
   next(err);
@@ -73,7 +79,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get("env") === "development") {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render("error", {
       message: err.message,
@@ -84,7 +90,7 @@ if (app.get("env") === "development") {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error", {
     message: err.message,
