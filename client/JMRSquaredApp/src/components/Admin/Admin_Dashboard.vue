@@ -56,6 +56,7 @@ export default {
         {
           id: "taxify",
           icon: "local-taxi",
+          link: "/taxify/home",
           title: "Taxify",
           row: 0,
           col: 0
@@ -63,12 +64,14 @@ export default {
         {
           id: "cosmetics",
           icon: "local-florist",
+          link: "/cosmetics/home",
           title: "Cosmetics",
           row: 0,
           col: 1
         },
         {
           id: "fulham86",
+          link: "/admin/fulham/home",
           icon: "home",
           title: "Property",
           row: 0,
@@ -84,6 +87,7 @@ export default {
         {
           id: "bugReport",
           icon: "add",
+          link: "/admin/reminders",
           title: "Add Business",
           row: 1,
           col: 1
@@ -144,6 +148,20 @@ export default {
   },
   methods: {
     pageLoaded() {
+      this.layouts = [];
+
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          this.layouts.push({
+            id: r + "" + c,
+            icon: "add",
+            title: "Add Business",
+            link: "/business/add/business",
+            row: r,
+            col: c
+          });
+        }
+      }
       this.isLoaded = true;
       var firstTime = appSettings.getBoolean("shownChangeLog");
       if (firstTime != true) {
@@ -165,23 +183,7 @@ export default {
       });
     },
     onItemTap(item) {
-      if (item.id == "fulham86") {
-        this.$router.push("/admin/fulham/home");
-      } else if (item.id == "bugReport") {
-        this.reportBug();
-      } else if (item.id == "documents") {
-        this.$router.push("/admin/documents");
-      } else if (item.id == "reminders") {
-        this.$router.push("/admin/reminders");
-      } else if (item.id == "taxify") {
-        this.$router.push("/taxify/home");
-      } else if (item.id == "cosmetics") {
-        this.$router.push("/cosmetics/home");
-      } else {
-        dialogs.alert("Not yet assigned").then(() => {
-          console.log("card.redirect");
-        });
-      }
+      this.$router.push(item.link);
     },
     onBusinessTap(item) {}
   }

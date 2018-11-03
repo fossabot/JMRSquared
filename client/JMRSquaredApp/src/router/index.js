@@ -35,6 +35,8 @@ import TaxifyTransactions from '../components/Taxify/TaxifyTransactions.vue'
 import CosmeticsHome from '../components/Cosmetics/CosmeticsHome.vue'
 import CosmeticsTransactions from '../components/Cosmetics/CosmeticsTransactions.vue'
 
+import AddBusiness from '../components/Business/AddBusiness.vue'
+
 const http = require("http");
 
 import store from '../store';
@@ -253,6 +255,22 @@ const router = new VueRouter({
         authLevel: 1
       },
     },
+    /**
+     * Business stuff START
+     */
+    {
+      name: 'AddBusiness',
+      path: '/business/add/business',
+      component: AddBusiness,
+      meta: {
+        title: 'Add Business',
+        authLevel: 3,
+        source: null
+      },
+    },
+    /**
+     * Business stuff END
+     */
     {
       path: '*',
       redirect: '/home'
