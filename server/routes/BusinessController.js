@@ -5,8 +5,8 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Business from "../models/Business";
 
-router.get("/all/for/:userID", function (req, res) {
-  var adminID = req.params.userID;
+router.get("/all/for/:userid", function (req, res) {
+  var adminID = req.params.userid;
   Admin.findById(adminID).then(admin => {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
     Business.find({
