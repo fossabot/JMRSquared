@@ -16,32 +16,38 @@
                 </StackLayout>
                 <!-- PAGE 0 -->
                 <StackLayout v-show="currentPage == 0">
-                    <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+                    <CardView margin="20" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
                             <StackLayout>
                                 <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" verticalAlignment="center" textAlignment="center" text="Add a new business"></label>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name *"></label>
                                     <TextField v-model="business.name" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                     <label row="0" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-work' | fonticon"></label>
-                                    <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="Business Category"></label>
-                                    <ListPicker row="1" col="0" colSpan="2" @selectedIndexChange="changeSelectedBusinessCategory" :items="business.options.types" v-model="business.category" />
+                                    <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="Business Type *"></label>
+                                    <ListPicker row="1" col="0" colSpan="2" @selectedIndexChange="changeSelectedBusinessCategory" :items="business.options.types.map(t => t.type)" v-model="business.type.index" />
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business-center' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Type"></label>
-                                    <label :text="business.type" row="1" col="1" class="h4"></label>
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + business.type.icon | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Category *"></label>
+                                    <label :text="business.type.category" row="1" col="1" class="h4"></label>
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
+                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-description' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business description"></label>
+                                    <TextView v-model="business.description" row="1" col="1" class="h4" hint="More information about your business"></TextView>
+                                </GridLayout>
+                                <StackLayout width="100%" class="hr-light"></StackLayout>
                             </StackLayout>
                         </ScrollView>
                     </CardView>
@@ -50,34 +56,28 @@
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
                             <StackLayout>
-                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="`${business.name}'s images'`"></label>
+                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="`${business.name}'s logo`"></label>
     
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-home' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Room number"></label>
-                                    <TextField v-model="tenantRoom" row="1" col="1" class="h4" hint="e.g S1"></TextField>
-                                </GridLayout>
+                                <label class="p-x-10 t-15 font-italic text-mute text-light-blue" textWrap="true" verticalAlignment="center" textAlignment="center" text="Uploading the logo is not a requirement"></label>
+                                <label class="p-x-10 t-10 font-italic text-mute text-light-blue" textWrap="true" verticalAlignment="center" textAlignment="center" text="You can do it at a later stage as well."></label>
+    
+                                <Ripple @tap="uploadLogo()">
+                                    <GridLayout class="m-10 waves-effect" rows="auto,auto,*" columns="auto,*">
+                                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-camera' | fonticon"></label>
+                                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business logo"></label>
+                                        <label row="1" col="1" class="h3 font-weight-bold text-mute" text="Click to upload your business's logo"></label>
+                                        <Image row="2" col="0" colSpan="2" v-show="business.logo" :src="business.logo" stretch="aspectFill" width="100%" />
+                                    </GridLayout>
+                                </Ripple>
+
+                                <Ripple v-show="business.logo" @tap="business.logo = null">
+                                    <GridLayout class="m-10 waves-effect" rows="auto,auto" columns="auto,*">
+                                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-delete' | fonticon"></label>
+                                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Remove business logo"></label>
+                                        <label row="1" col="1" class="h3 font-weight-bold text-mute" text="Click to remove your business's logo"></label>
+                                    </GridLayout>
+                                </Ripple>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout @tap="changeLeaseDate(true)" class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="LEASE START DATE"></label>
-                                    <label row="1" col="1" class="h4" :text="leaseStartDate.toISOString().slice(0,10)"></label>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout @tap="changeLeaseDate(false)" class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="LEASE END DATE"></label>
-                                    <label row="1" col="1" class="h4" :text="leaseEndDate.toISOString().slice(0,10)"></label>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout v-show="leaseTotalMonths >= 0" class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-update' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="LEASE LENGTH"></label>
-                                    <label row="1" col="1" class="h4" :text="leaseTotalMonths + ' month/s'"></label>
-                                </GridLayout>
                             </StackLayout>
                         </ScrollView>
                     </CardView>
@@ -86,151 +86,49 @@
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
                             <StackLayout>
-                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" text="Rent details"></label>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="RENT AMOUNT"></label>
-                                    <TextField row="1" col="1" class="h4" keyboardType="number" hint="e.g 3000" v-model="rentAmount"></TextField>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout @tap="changeRentDueOn()" class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="RENT DUE ON"></label>
-                                    <label row="1" col="1" class="h4" :text="rentDueOn"></label>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout @tap="hasDeposit = !hasDeposit" class="m-10" rows="auto" columns="*,auto">
-                                    <label row="0" col="0" class="h3 font-weight-bold text-mute" text="DEPOSIT REQUIRED"></label>
-                                    <switch row="0" col="1" v-model="hasDeposit"></switch>
-                                </GridLayout>
-    
-                                <GridLayout v-show="hasDeposit" class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="DEPOSIT AMOUNT"></label>
-                                    <TextField row="1" col="1" class="h4" keyboardType="number" hint="e.g 3000" v-model="depositAmount"></TextField>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                            </StackLayout>
-                        </ScrollView>
-                    </CardView>
-                </StackLayout>
-                <StackLayout v-show="currentPage == 3">
-                    <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                        <ScrollView>
-                            <StackLayout>
-                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" text="Additional information"></label>
-    
-                                <GridLayout @tap="hasBusary = !hasBusary" class="m-10" rows="auto" columns="*,auto">
-                                    <label row="0" col="0" class="h3 font-weight-bold text-mute" text="Using a Busary"></label>
-                                    <switch row="0" col="1" v-model="hasBusary"></switch>
-                                </GridLayout>
-    
-                                <GridLayout v-show="hasBusary" class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Busary provider"></label>
-                                    <TextField row="1" col="1" class="h4" hint="e.g Investec" v-model="busaryProvider"></TextField>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout class="m-10" rows="auto" columns="*,auto">
-                                    <label row="0" col="0" class="h3 font-weight-bold text-mute" text="Next of kin"></label>
-                                </GridLayout>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full Names"></label>
-                                    <TextField row="1" col="1" class="h4" hint="e.g Sirwali Joe" v-model="nextOfKin.name"></TextField>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-phone' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Contact Numbers"></label>
-                                    <TextField row="1" col="1" class="h4" keyboardType="number" hint="e.g 076 048 7292" v-model="nextOfKin.contact"></TextField>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-group-work' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Relationship"></label>
-                                    <TextField row="1" col="1" class="h4" hint="e.g Father" v-model="nextOfKin.relationship"></TextField>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                            </StackLayout>
-                        </ScrollView>
-                    </CardView>
-                </StackLayout>
-                <StackLayout v-show="currentPage == 4">
-                    <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
-                        <ScrollView>
-                            <StackLayout>
                                 <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" text="Verify information"></label>
     
                                 <label class="m-10 t-10 font-italic" textWrap="true" verticalAlignment="center" text="Please validate if the following information is correct and click proceed or go back and fix all the mistakes."></label>
-    
-    
+
                                 <GridLayout class="m-10" rows="auto" columns="*,auto">
-                                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Tenant information"></label>
+                                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Business information"></label>
                                 </GridLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="User name"></label>
-                                    <label :text="tenantUserName" row="1" col="1" class="h4"></label>
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name"></label>
+                                    <label :text="business.name" row="1" col="1" class="h4"></label>
                                 </GridLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full Names"></label>
-                                    <label :text="tenantName" row="1" col="1" class="h4"></label>
+                                    <label row="0" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-work' | fonticon"></label>
+                                    <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="Business Type"></label>
+                                    <label :text="business.type.type" row="1" col="1" class="h4"></label>
                                 </GridLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-phone' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Contact numbers"></label>
-                                    <label :text="tenantNumbers" row="1" col="1" class="h4"></label>
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + business.type.icon | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Category"></label>
+                                    <label :text="business.type.category" row="1" col="1" class="h4"></label>
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
-    
+
                                 <GridLayout class="m-10" rows="auto" columns="*,auto">
-                                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Lease information"></label>
+                                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Optional information"></label>
                                 </GridLayout>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-home' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Room number"></label>
-                                    <label :text="tenantRoom" row="1" col="1" class="h4"></label>
+
+                                <GridLayout v-show="business.description.length != 0" class="m-10" rows="auto,auto" columns="auto,*">
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-description' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business description"></label>
+                                    <label :text="business.description" row="1" col="1" class="h4"></label>
                                 </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="LEASE START DATE"></label>
-                                    <label row="1" col="1" class="h4" :text="leaseStartDate.toISOString().slice(0,10)"></label>
-                                </GridLayout>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-date-range' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="LEASE END DATE"></label>
-                                    <label row="1" col="1" class="h4" :text="leaseEndDate.toISOString().slice(0,10)"></label>
-                                </GridLayout>
-    
-                                <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-update' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="LEASE LENGTH"></label>
-                                    <label row="1" col="1" class="h4" :text="leaseTotalMonths + ' month/s'"></label>
-                                </GridLayout>
-                                <StackLayout width="100%" class="hr-light"></StackLayout>
-    
-                                <GridLayout class="m-10" rows="auto" columns="*,auto">
-                                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Rent information"></label>
-                                </GridLayout>
+
+                                    <GridLayout v-show="business.logo" class="m-10 waves-effect" rows="auto,*" columns="auto,*">
+                                        <label row="0" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-camera' | fonticon"></label>
+                                        <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business logo"></label>
+                                        <Image row="1" col="0" colSpan="2" :src="business.logo" stretch="aspectFill" width="100%" />
+                                    </GridLayout>
+
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-attach-money' | fonticon"></label>
                                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="RENT AMOUNT"></label>
@@ -306,6 +204,9 @@ const dialogs = require("ui/dialogs");
 import * as Toast from "nativescript-toast";
 import * as LocalNotifications from "nativescript-local-notifications";
 const http = require("http");
+import * as imageSource from "tns-core-modules/image-source";
+
+import * as imagepicker from "nativescript-imagepicker";
 
 import * as connectivity from "tns-core-modules/connectivity";
 
@@ -314,10 +215,16 @@ export default {
     return {
       business: {
         name: "",
-        type: "",
-        category: "",
+        logo: null,
+        description: "",
+        type: {
+          icon: "",
+          type: "",
+          index: -1,
+          category: ""
+        },
         options: {
-          types: ["SERVICE", "MANUFACTORING", "MERCHANDISING"]
+          types: []
         }
       },
       txtError: "",
@@ -353,6 +260,8 @@ export default {
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
+      this.business.options.types = [];
+
       var connectionType = connectivity.getConnectionType();
       if (connectionType == connectivity.connectionType.none) {
         this.$feedback.error({
@@ -360,29 +269,24 @@ export default {
           duration: 4000,
           message: "Please switch on your data/wifi."
         });
-      }else{
-         this.business.options.types = [];
-         
-         http
-          .request({
-            url: this.$store.state.settings.baseLink + "/settings/options/business/types",
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json"
-            }
-          })
-          .then((response)=> {
-              this.$feedback.success({
-                  title:JSON.stringify(response)
-               });
+      } else {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink +
+              "/settings/options/business/types"
+          )
+          .then(
+            response => {
               this.business.options.types = response;
+              this.changeSelectedBusinessCategory(0);
             },
-            (err) => {
+            err => {
               dialogs.alert(e).then(() => {
                 console.log("Error occurred " + e);
               });
             }
-          ).catch(err => {
+          )
+          .catch(err => {
             this.$feedback.error({
               title: "Server error",
               duration: 4000,
@@ -393,21 +297,19 @@ export default {
             });
           });
       }
-
-
     },
     changeRentDueOn() {
       var self = this;
       this.$showModal({
         template: ` 
-                                                                                                                    <Page>
-                                                                                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                                            <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
-                                                                                                                            <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
-                                                                                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                                                        </GridLayout>
-                                                                                                                    </Page>
-                                                                                                                    `,
+                                                                                                                        <Page>
+                                                                                                                            <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                                                                                <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
+                                                                                                                                <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
+                                                                                                                                <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                                                                                            </GridLayout>
+                                                                                                                        </Page>
+                                                                                                                        `,
         data: function() {
           return {
             datesDue: [
@@ -535,42 +437,19 @@ export default {
     canGoForward() {
       this.txtError = "";
       if (this.currentPage == 0) {
-        if(this.business.name.length < 2){
-            this.txtError = "Provide a valid business name.";
-            return false;
+        if (this.business.name.length < 2) {
+          this.txtError = "Provide a valid business name.";
+          return false;
+        } else if (this.business.type.index < 0) {
+          this.txtError =
+            "Please pick a business type, make sure you have internet connection.";
+          return false;
         }
         return true;
       } else if (this.currentPage == 1) {
-        this.txtError =
-          this.leaseTotalMonths > 0
-            ? ""
-            : "Please provide a start date that is before the end date";
-        if (this.txtError.length < 2) {
-          this.txtError =
-            this.tenantRoom.length > 0
-              ? ""
-              : "Please provide a valid room number";
-        }
-        return this.leaseTotalMonths >= 0 && this.tenantRoom.length > 0;
+        return true;
       } else if (this.currentPage == 2) {
-        let answer =
-          !isNaN(this.rentAmount) &&
-          this.rentAmount > 0 &&
-          (!this.hasDeposit ||
-            (this.hasDeposit &&
-              !isNaN(this.depositAmount) &&
-              this.depositAmount > 0));
-        this.txtError = answer ? "" : "All fields are required";
-        return answer;
-      } else if (this.currentPage == 3) {
-        let answer =
-          (!this.hasBusary ||
-            (this.hasBusary && this.busaryProvider.length > 2)) &&
-          this.nextOfKin.name.length > 2 &&
-          this.nextOfKin.contact.length > 2 &&
-          this.nextOfKin.relationship.length > 2;
-        this.txtError = answer ? "" : "All fields are required";
-        return answer;
+        return true;
       } else {
         return false;
       }
@@ -584,14 +463,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                                                <Page>
-                                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
-                                                                        <DatePicker row="1" v-model="selectedDueDate" />
-                                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                    </GridLayout>
-                                                                </Page>
-                                                                `,
+                                                                    <Page>
+                                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                            <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
+                                                                            <DatePicker row="1" v-model="selectedDueDate" />
+                                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                                        </GridLayout>
+                                                                    </Page>
+                                                                    `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -618,11 +497,50 @@ export default {
         }
       });
     },
-    changeSelectedBusinessCategory(index){
+    changeSelectedBusinessCategory(index) {
+      if (
+        this.business.options.types.length > 0 &&
+        this.business.options.types.length > this.business.type.index
+      ) {
+        this.business.type.category = this.business.options.types[
+          this.business.type.index
+        ].category;
 
-        this.$feedback.success({
-            title:'At index ' + JSON.stringify(index)
+        this.business.type.type = this.business.options.types[
+          this.business.type.index
+        ].type;
+
+        this.business.type.icon = this.business.options.types[
+          this.business.type.index
+        ].icon;
+      }
+    },
+    uploadLogo() {
+      let context = imagepicker.create({
+        mode: "single" // use "multiple" for multiple selection
+      });
+
+      context
+        .authorize()
+        .then(function() {
+          return context.present();
         })
+        .then(selection => {
+          selection.forEach(selected => {
+            // process the selected image
+            this.business.logo = selected;
+          });
+        })
+        .catch(err => {
+          // process error
+          this.$feedback.error({
+            title: "No file selected",
+            message: "Please select a valid image file",
+            duration: 4000,
+            position: 1,
+            onTap: () => {}
+          });
+        });
     }
   }
 };
