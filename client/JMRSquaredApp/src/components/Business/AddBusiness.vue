@@ -24,21 +24,21 @@
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
                                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name"></label>
-                                    <TextField v-model="tenantUserName" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
+                                    <TextField v-model="business.name" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full Names"></label>
-                                    <TextField v-model="tenantName" row="1" col="1" class="h4" hint="e.g Sirwali Joe"></TextField>
+                                    <label row="0" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-work' | fonticon"></label>
+                                    <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="Business Category"></label>
+                                    <ListPicker row="1" col="0" colSpan="2" @selectedIndexChange="changeSelectedBusinessCategory" :items="business.options.types" v-model="business.category" />
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-phone' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Contact numbers"></label>
-                                    <TextField v-model="tenantNumbers" row="1" col="1" class="h4" keyboardType="number" hint="e.g 076 048 7292"></TextField>
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business-center' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Type"></label>
+                                    <label :text="business.type" row="1" col="1" class="h4"></label>
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
@@ -50,7 +50,7 @@
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
                             <StackLayout>
-                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text=" tenantUserName + '\'s Lease dates'"></label>
+                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="`${business.name}'s images'`"></label>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-home' | fonticon"></label>
@@ -312,6 +312,14 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
+      business: {
+        name: "",
+        type: "",
+        category: "",
+        options: {
+          types: ["SERVICE", "MANUFACTORING", "MERCHANDISING"]
+        }
+      },
       txtError: "",
       currentPage: 0,
       tenantName: "",
@@ -345,19 +353,61 @@ export default {
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "NO INTERNET CONNECTION",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+      }else{
+         this.business.options.types = [];
+         
+         http
+          .request({
+            url: this.$store.state.settings.baseLink + "/settings/options/business/types",
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+          .then((response)=> {
+              this.$feedback.success({
+                  title:JSON.stringify(response)
+               });
+              this.business.options.types = response;
+            },
+            (err) => {
+              dialogs.alert(e).then(() => {
+                console.log("Error occurred " + e);
+              });
+            }
+          ).catch(err => {
+            this.$feedback.error({
+              title: "Server error",
+              duration: 4000,
+              message: err,
+              onTap: () => {
+                dialogs.alert("TODO : Handle the error");
+              }
+            });
+          });
+      }
+
+
     },
     changeRentDueOn() {
       var self = this;
       this.$showModal({
         template: ` 
-                                                                                                    <Page>
-                                                                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                            <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
-                                                                                                            <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
-                                                                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                                        </GridLayout>
-                                                                                                    </Page>
-                                                                                                    `,
+                                                                                                                    <Page>
+                                                                                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                                                                            <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
+                                                                                                                            <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
+                                                                                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                                                                                        </GridLayout>
+                                                                                                                    </Page>
+                                                                                                                    `,
         data: function() {
           return {
             datesDue: [
@@ -483,20 +533,13 @@ export default {
       }
     },
     canGoForward() {
+      this.txtError = "";
       if (this.currentPage == 0) {
-        let answer =
-          this.tenantUserName.length > 2 &&
-          this.tenantName.length > 2 &&
-          this.tenantNumbers.length == 10 &&
-          this.tenantName.split(" ").length > 1;
-        this.txtError =
-          this.tenantName.split(" ").length > 1
-            ? ""
-            : "Please provide a surname and name separated by a space under full name";
-        if (this.txtError.length < 2) {
-          this.txtError = answer ? "" : "All fields are required";
+        if(this.business.name.length < 2){
+            this.txtError = "Provide a valid business name.";
+            return false;
         }
-        return answer;
+        return true;
       } else if (this.currentPage == 1) {
         this.txtError =
           this.leaseTotalMonths > 0
@@ -541,14 +584,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                                <Page>
-                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
-                                                        <DatePicker row="1" v-model="selectedDueDate" />
-                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                    </GridLayout>
-                                                </Page>
-                                                `,
+                                                                <Page>
+                                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
+                                                                        <DatePicker row="1" v-model="selectedDueDate" />
+                                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
+                                                                    </GridLayout>
+                                                                </Page>
+                                                                `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -575,10 +618,11 @@ export default {
         }
       });
     },
-    AddStudents() {
-      dialogs.alert("Add new student").then(() => {
-        console.log("FIne");
-      });
+    changeSelectedBusinessCategory(index){
+
+        this.$feedback.success({
+            title:'At index ' + JSON.stringify(index)
+        })
     }
   }
 };

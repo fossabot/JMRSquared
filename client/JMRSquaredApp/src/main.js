@@ -77,6 +77,13 @@ Vue.mixin({
       toggleSearch: false
     };
   },
+  computed: {
+    adminProfile: {
+      get() {
+        return this.$store.state.cache.cachedAdmin;
+      }
+    },
+  },
   methods: {
     showChangeLog() {
       var log = ChangeLog.GetLogs("0.3");
