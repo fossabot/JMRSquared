@@ -12,6 +12,7 @@ import adminController from "./routes/AdminController";
 import businessController from "./routes/BusinessController";
 import studentController from "./routes/StudentController";
 import notificationController from "./routes/NotificationController";
+import settingController from "./routes/SettingController";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -66,6 +67,7 @@ app.use("/b", businessController);
 app.use("/s", studentController);
 app.use("/a", adminController);
 app.use("/n", notificationController);
+app.use("/settings", settingController);
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {
