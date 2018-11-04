@@ -291,6 +291,11 @@ router.beforeEach((to, from, next) => {
     appSettings.setNumber("authLevel", authLevel);
   }
 
+  feedback.error({
+    title: "Your level " + authLevel,
+    message: "You have permissions to access " + store.state.cache.cachedAdmin.role + " only ... Trying to access " + to.meta.authLevel + " " + to.name
+  });
+
   switch (to.meta.authLevel) {
     case 1:
       if (authLevel < 1) {

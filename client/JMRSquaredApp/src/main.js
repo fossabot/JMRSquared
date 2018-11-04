@@ -160,6 +160,13 @@ Vue.mixin({
             ]
           };
         },
+        computed: {
+          adminProfile: {
+            get() {
+              return this.$store.state.cache.cachedAdmin;
+            }
+          },
+        },
         methods: {
           getBugScreenshot(id) {
             // TODO : Add a page for an individual bug discussion.

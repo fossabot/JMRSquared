@@ -6,8 +6,8 @@
                     <CardView elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <GridLayout class="m-20" rows="auto" columns="*,auto">
                             <StackLayout row="0" col="0">
-                                <label class="h3" text="Adding a tenant for : "></label>
-                                <label class="h4 m-l-20" text="Fulham 86"></label>
+                                <label class="h3" text="Adding a business for : "></label>
+                                <label class="h4 m-l-20" :text="adminProfile.userName"></label>
                             </StackLayout>
                             <Button row="0" col="1" @tap="$router.back()" selfAlign="right" text="Cancel"></Button>
                         </GridLayout>
@@ -19,12 +19,12 @@
                     <CardView margin="30" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
                         <ScrollView>
                             <StackLayout>
-                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" verticalAlignment="center" textAlignment="center" text="Add new tenants"></label>
+                                <label class="h2 p-15 font-weight-bold text-mute text-dark-blue" verticalAlignment="center" textAlignment="center" text="Add a new business"></label>
     
                                 <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
-                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="User name"></label>
-                                    <TextField v-model="tenantUserName" row="1" col="1" class="h4" hint="e.g Joe"></TextField>
+                                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
+                                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name"></label>
+                                    <TextField v-model="tenantUserName" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
                                 </GridLayout>
                                 <StackLayout width="100%" class="hr-light"></StackLayout>
     
