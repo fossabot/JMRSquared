@@ -151,11 +151,15 @@
         <CardView class="bg-white m-t-10 p-t-10" elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
           <StackLayout>
             <FlexboxLayout v-show="!isLoading" flexDirection="column" alignContent="flex-end" justifyContent="flex-end" width="100%">
-              <GridLayout rows="auto,auto" columns="*,*">
+              <GridLayout v-show="!savedBusiness" rows="auto,auto" columns="*,*">
                 <Label row="0" colSpan="2" :text="txtError.length < 2 ? 'You can proceed' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
                 <Button row="1" col="1" @tap="submitBusiness()" v-show="currentPage == 2" class="btn-primary bg-light-green" :text="`save ${business.name}`"></Button>
                 <Button row="1" col="0" @tap="currentPage--" v-show="currentPage > 0" :isEnabled="currentPage > 0" class="btn-primary bg-light-red" text="back"></Button>
                 <Button row="1" col="1" @tap="moveForward()" v-show="currentPage != 2" class="btn-primary bg-light-blue" text="proceed"></Button>
+              </GridLayout>
+              <GridLayout v-show="savedBusiness" rows="auto,auto" columns="*">
+                <Label row="0" text="Your business is ready!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
+                <Button row="1" @tap="GoToBusiness(savedBusiness)" class="btn-primary bg-light-blue" :text="`Open ${business.name}`"></Button>
               </GridLayout>
             </FlexboxLayout>
             <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
@@ -196,6 +200,7 @@ export default {
           types: []
         }
       },
+      savedBusiness:false,
       txtError: "",
       currentPage: 0,
       currentPageTitle: "General Information",
@@ -314,31 +319,22 @@ export default {
         }
       });
     },
-    generatePassword() {
-      var text = "";
-      var possible =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-      for (var i = 0; i < 5; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-      return text;
-    },
     submitBusiness() {
-      var self = this;
-
-      self.isLoading = true;
+      this.isLoading = true;
 
       var connectionType = connectivity.getConnectionType();
       if (connectionType == connectivity.connectionType.none) {
-        self.$feedback.error({
+        this.$feedback.error({
           title: "NO INTERNET CONNECTION",
           duration: 4000,
           message: "Please switch on your data/wifi."
         });
-        self.isLoading = false;
+        this.isLoading = false;
       } else {
-        http
+        if(this.business.logo){
+          new imageSource.ImageSource().fromAsset(this.business.logo).then(img => {
+            this.business.logo = "data:image/png;base64," + img.toBase64String("png");
+            http
           .request({
             url: this.$store.state.settings.baseLink + "/b/add/business",
             method: "POST",
@@ -357,40 +353,36 @@ export default {
               var result = response.content.toString();
 
               if (statusCode == 200) {
-                var result = response.content.toString();
+                this.savedBusiness = response.content.toString();
 
                 this.$feedback
                   .success({
                     title: this.business.name + " successfully added",
                     duration: 30000,
                     onTap: () => {
-                      this.$router.replace(
-                        "/admin/fulham/student/profile/" + result
-                      );
+                         this.GoToBusiness(this.savedBusiness);
                     }
                   })
                   .then(() => {
-                    self.router.replace("/admin/dashboard");
                   });
               } else {
-                self.$feedback.error({
+                this.$feedback.error({
                   title: "Error (" + statusCode + ")",
                   duration: 4000,
                   message: result
                 });
               }
-              self.isLoading = false;
-            },
-            function(e) {
+              this.isLoading = false;
+            },(e) => {
               dialogs.alert(e).then(() => {
                 console.log("Error occurred " + e);
               });
 
-              self.isLoading = false;
+              this.isLoading = false;
             }
           )
           .catch(err => {
-            self.$feedback.error({
+            this.$feedback.error({
               title: "Server error",
               duration: 4000,
               message: err,
@@ -398,8 +390,75 @@ export default {
                 dialogs.alert("TODO : Handle the error");
               }
             });
-            self.isLoading = false;
+            this.isLoading = false;
           });
+          }).catch(err=>{
+            this.$feedback.error({
+              title: "Unable to upload your logo",
+              message:"Please choose another image, or go back and remove it.",
+              duration: 4000
+            });
+          });
+        }else{
+          http
+          .request({
+            url: this.$store.state.settings.baseLink + "/b/add/business",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            content: JSON.stringify({
+              adminID: this.$store.state.cache.cachedAdmin._id,
+              adminAuthority: "ADMIN",
+              business: this.business
+            })
+          })
+          .then(
+            response => {
+              var statusCode = response.statusCode;
+              var result = response.content.toString();
+
+              if (statusCode == 200) {
+                this.savedBusiness = response.content.toString();
+
+                this.$feedback
+                  .success({
+                    title: this.business.name + " successfully added",
+                    duration: 30000,
+                    onTap: () => {
+                         this.GoToBusiness(this.savedBusiness);
+                    }
+                  })
+                  .then(() => {
+                  });
+              } else {
+                this.$feedback.error({
+                  title: "Error (" + statusCode + ")",
+                  duration: 4000,
+                  message: result
+                });
+              }
+              this.isLoading = false;
+            },(e) => {
+              dialogs.alert(e).then(() => {
+                console.log("Error occurred " + e);
+              });
+
+              this.isLoading = false;
+            }
+          )
+          .catch(err => {
+            this.$feedback.error({
+              title: "Server error",
+              duration: 4000,
+              message: err,
+              onTap: () => {
+                dialogs.alert("TODO : Handle the error");
+              }
+            });
+            this.isLoading = false;
+          });
+        }
       }
     },
     canGoForward() {
