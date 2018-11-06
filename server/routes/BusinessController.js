@@ -35,11 +35,9 @@ router.post("/add/business", function (req, res) {
         authority: adminAuthority && adminAuthority.toUpperCase()
       }],
       name: _business.name,
-      icon: _business.icon,
       logo: _business.logo,
-      type: _business.type && _business.type.toUpperCase(),
-      category: _business.category && _business.category.toUpperCase(),
-      description: _business.description
+      description: _business.description,
+      type: _business.type,
     });
 
     business.save(function (err) {
