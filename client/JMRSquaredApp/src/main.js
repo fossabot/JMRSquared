@@ -58,6 +58,11 @@ Vue.registerElement(
   () => require("nativescript-floatingactionbutton").Fab
 );
 
+Vue.registerElement(
+  "DropDown",
+  () => require("nativescript-drop-down//drop-down").DropDown
+);
+
 Vue.filter("fonticon", fonticon);
 
 Vue.prototype.$db = new Couchbase("jmrdb");
@@ -166,13 +171,6 @@ Vue.mixin({
               //  {text:'This is the first bug',reporter:'joe',date:new Date(),profilePic:''},{text:'This is the second bug',reporter:'uzzie',date:new Date(),profilePic:''}
             ]
           };
-        },
-        computed: {
-          adminProfile: {
-            get() {
-              return this.$store.state.cache.cachedAdmin;
-            }
-          },
         },
         methods: {
           getBugScreenshot(id) {
