@@ -1,40 +1,43 @@
 <template>
-    <page @loaded="pageLoaded()">
-        <ActionBar>
-            <GridLayout rows="*" columns="auto,*,auto,auto" orientation="horizontal">
-                <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
-                </Ripple>
-                <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + user.userName"></Label>
-                <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
-                </Ripple>
-                <Ripple class="p-10" @tap="logOut()" verticalAlignment="center" col="3" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
-                </Ripple>
-            </GridLayout>
-        </ActionBar>
-        <StackLayout>
-            <StackLayout class="p-y-20" alignSelf="center" width="100%">
-                <Image alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
-                <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.userName"></label>
-                <Label class="h3 m-5" textAlignment="center" :text="user.email"></Label>
-            </StackLayout>
-            <Ripple @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
-                <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
+  <page @loaded="pageLoaded()">
+    <ActionBar>
+      <GridLayout rows="*" columns="auto,*,auto,auto" orientation="horizontal">
+        <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+        </Ripple>
+        <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + user.userName"></Label>
+        <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+        </Ripple>
+        <Ripple class="p-10" @tap="logOut()" verticalAlignment="center" col="3" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
+        </Ripple>
+      </GridLayout>
+    </ActionBar>
+    <StackLayout>
+      <StackLayout class="p-y-20" alignSelf="center" width="100%">
+        <Image alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
+        <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.userName"></label>
+        <Label class="h3 m-5" textAlignment="center" :text="user.email"></Label>
+      </StackLayout>
+      <Ripple @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
+        <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
+      </Ripple>
+      <GridLayout class="m-20" rows="*,*" columns="*,*,*">
+        <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
+          <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
+            <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
+              <GridLayout rows="*" columns="*">
+                <ActivityIndicator v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
+                <Label v-show="item.title" class="mdi" textAlignment="center" fontSize="25%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
+              </GridLayout>
             </Ripple>
-            <GridLayout class="m-20" rows="*,*" columns="*,*,*">
-                <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
-                    <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
-                        <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
-                            <Label class="mdi" textAlignment="center" fontSize="25%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
-                        </Ripple>
-                    </CardView>
-                    <Label class="p-t-10" :text="item.title" textAlignment="center" />
-                </StackLayout>
-            </GridLayout>
+          </CardView>
+          <Label v-show="item.title" class="p-t-10" :text="item.title" textAlignment="center" />
         </StackLayout>
-    </page>
+      </GridLayout>
+    </StackLayout>
+  </page>
 </template>
 
 <script>
@@ -45,7 +48,8 @@ import * as Toast from "nativescript-toast";
 import * as imagepicker from "nativescript-imagepicker";
 
 var appSettings = require("application-settings");
-
+import * as connectivity from "tns-core-modules/connectivity";
+const http = require("http");
 export default {
   components: {
     Documents
@@ -149,20 +153,72 @@ export default {
   methods: {
     pageLoaded() {
       this.layouts = [];
+      this.isLoaded = true;
 
       for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 3; c++) {
           this.layouts.push({
             id: r + "" + c,
-            icon: "add",
-            title: "Add Business",
-            link: "/business/add/business",
             row: r,
             col: c
           });
         }
       }
-      this.isLoaded = true;
+
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+      } else {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink +
+              "/b/all/for/" +
+              this.$store.state.cache.cachedAdmin._id
+          )
+          .then(results => {
+            var count = results.length;
+            if (count > this.layouts.length) {
+              count = this.layouts.length;
+            }
+
+            this.$feedback.success({
+              title: "Loaded",
+              duration: 4000,
+              message: "Back with " + count
+            });
+
+            for (let i = 0; i < count; i++) {
+              this.layouts[i].icon = results[i].type.icon;
+              this.layouts[i].title = results[i].name;
+              this.layouts[i].link = "/business/view/" + results[i]._id;
+              this.$forceUpdate();
+            }
+
+            this.layouts.filter(l => !l.title && !l.icon).forEach(layout => {
+              layout.icon = "add";
+              layout.title = "Add Business";
+              layout.link = "/business/add/business";
+              this.$forceUpdate();
+            });
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Unable to load your businesses",
+              duration: 4000,
+              message: "Please try again later"
+            });
+            this.layouts.forEach(layout => {
+              layout.icon = "bug-report";
+              layout.title = "Invalid";
+            });
+            this.$forceUpdate();
+          });
+      }
+
       var firstTime = appSettings.getBoolean("shownChangeLog");
       if (firstTime != true) {
         this.showChangeLog();
