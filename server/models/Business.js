@@ -20,13 +20,8 @@ const BusinessSchema = new mongoose.Schema({
     name: String,
     icon: String,
     logo: String,
-    type: {
-        type: String,
-        enum: ['SERVICE', 'MANUFACTORING', 'MERCHANDISING'],
-        default: "SERVICE"
-    },
+    type: Object,
     // e.g Taxify , Cosmetics , Property
-    category: String,
     description: String,
     transactions: [{
         type: Schema.Types.ObjectId,
