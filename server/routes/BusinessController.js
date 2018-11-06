@@ -10,7 +10,7 @@ router.get("/all/for/:userid", function (req, res) {
   Admin.findById(adminID).then(admin => {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
     Business.find({
-      adminID: adminID
+      'admin.id': adminID
     }).then(businesses => {
       if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
       res.json(businesses);
