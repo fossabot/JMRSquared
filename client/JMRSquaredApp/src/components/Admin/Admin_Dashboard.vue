@@ -24,17 +24,15 @@
         <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
       </Ripple>
       <GridLayout class="m-20" rows="*,*" columns="*,*,*">
-        <StackLayout :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts">
-          <CardView radius="50" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20" width="60" height="60">
-            <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%" width="60" height="60">
-              <GridLayout rows="*" columns="*">
-                <ActivityIndicator v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
-                <Label v-show="item.title" class="mdi" textAlignment="center" fontSize="25%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
-              </GridLayout>
-            </Ripple>
-          </CardView>
-          <Label v-show="item.title" class="p-t-10" :text="item.title" textAlignment="center" />
-        </StackLayout>
+        <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+          <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
+            <GridLayout rows="*,*" columns="*">
+              <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
+              <Label v-show="item.title" :class="{'visible':item.title}" class="mdi businessIcon" textAlignment="center" fontSize="50%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
+              <Label row="1" v-show="item.title" class="p-t-10" :text="item.title" textAlignment="center" />
+            </GridLayout>
+          </Ripple>
+        </CardView>
       </GridLayout>
     </StackLayout>
   </page>
@@ -184,24 +182,34 @@ export default {
             if (count > this.layouts.length) {
               count = this.layouts.length;
             }
-
-            for (let i = 0; i < count; i++) {
-              this.layouts[i].icon = results[i].type.icon;
-              this.layouts[i].title = results[i].name;
-              this.layouts[i].link = {
-                name: "BusinessHome",
-                params: {
-                  businessID: results[i]._id
+            var i = 0;
+            var tank = [];
+            var timer = setInterval(() => {
+              if (tank.filter(t => t == i).length == 0) {
+                if (i < count) {
+                  this.layouts[i].icon = results[i].type.icon;
+                  this.layouts[i].title = results[i].name;
+                  this.layouts[i].link = {
+                    name: "BusinessHome",
+                    params: {
+                      businessID: results[i]._id
+                    }
+                  };
+                } else {
+                  this.layouts
+                    .filter(l => !l.title && !l.icon)
+                    .forEach(layout => {
+                      layout.icon = "add";
+                      layout.title = "Add Business";
+                      layout.link = "/business/add/business";
+                    });
+                  clearInterval(timer);
                 }
-              };
-            }
-
-            this.layouts.filter(l => !l.title && !l.icon).forEach(layout => {
-              layout.icon = "add";
-              layout.title = "Add Business";
-              layout.link = "/business/add/business";
-            });
-            this.$forceUpdate();
+                tank.push(i);
+                i++;
+                this.$forceUpdate();
+              }
+            }, 700);
           })
           .catch(err => {
             this.$feedback.error({
@@ -248,4 +256,21 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/variables";
+.businessIcon {
+  &.visible {
+    animation-name: show;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+  }
+  @keyframes show {
+    from {
+      transform: scale(5);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
 </style>
