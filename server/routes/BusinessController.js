@@ -12,8 +12,8 @@ router.get("/all/for/:userid", function (req, res) {
     Business.find({
       'admin.id': adminID
     }, {
-      logo: null,
-      transactions: null
+      logo: 0,
+      transactions: 0
     }).then(businesses => {
       if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
       res.json(businesses);
