@@ -185,12 +185,6 @@ export default {
               count = this.layouts.length;
             }
 
-            this.$feedback.success({
-              title: "Loaded",
-              duration: 4000,
-              message: "Back with " + count
-            });
-
             for (let i = 0; i < count; i++) {
               this.layouts[i].icon = results[i].type.icon;
               this.layouts[i].title = results[i].name;
