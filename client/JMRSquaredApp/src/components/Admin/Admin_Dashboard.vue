@@ -188,16 +188,20 @@ export default {
             for (let i = 0; i < count; i++) {
               this.layouts[i].icon = results[i].type.icon;
               this.layouts[i].title = results[i].name;
-              this.layouts[i].link = "/business/view/" + results[i]._id;
-              this.$forceUpdate();
+              this.layouts[i].link = {
+                name: "BusinessHome",
+                params: {
+                  businessID: results[i]._id
+                }
+              };
             }
 
             this.layouts.filter(l => !l.title && !l.icon).forEach(layout => {
               layout.icon = "add";
               layout.title = "Add Business";
               layout.link = "/business/add/business";
-              this.$forceUpdate();
             });
+            this.$forceUpdate();
           })
           .catch(err => {
             this.$feedback.error({
@@ -233,7 +237,9 @@ export default {
       });
     },
     onItemTap(item) {
-      this.$router.push(item.link);
+      if (item.link) {
+        this.$router.push(item.link);
+      }
     },
     onBusinessTap(item) {}
   }
