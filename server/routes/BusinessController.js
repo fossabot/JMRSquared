@@ -28,7 +28,7 @@ router.get("/get/:business/for/:userid", function (req, res) {
   var adminID = req.params.userid;
   Business.findById(businessID).then(business => {
     if (business == null) return res.status(512).send("The requested business is not avaliable");
-    if (!business.admin || business.admin.id != adminID) return res.status(512).send("You are not part of the requested business");
+    if (!business.admin || !business.admin.id || business.admin.id.valueOf() != adminID) return res.status(512).send("You are not part of the requested business");
     res.json(business);
   }).catch(err => {
     return res.status(512).send(err);
