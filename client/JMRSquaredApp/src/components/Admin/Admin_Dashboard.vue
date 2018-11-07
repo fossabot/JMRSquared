@@ -1,28 +1,41 @@
 <template>
-  <page @loaded="pageLoaded()">
-    <ActionBar>
-      <GridLayout rows="*" columns="auto,*,auto,auto" orientation="horizontal">
-        <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
-          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
-        </Ripple>
-        <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Home - ' + user.userName"></Label>
-        <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
-          <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
-        </Ripple>
-        <Ripple class="p-10" @tap="logOut()" verticalAlignment="center" col="3" borderRadius="50%">
+  <page actionBarHidden="true">
+    <GridLayout rows="auto,*">
+    <CardView row="0" class="m-b-15 p-y-15" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+       <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
+       <Ripple row="0" col="2" class="p-10" @tap="logOut()" textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
           <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
         </Ripple>
+        <Image row="0" rowSpan="3" col="0" class="m-5 circle" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
+        <label row="0" verticalAlignment="bottom" col="1" class="h2 m-5 font-weight-bold text-mute text-dark-blue" :text="user.userName"></label>
+        <Label row="1" verticalAlignment="bottom" col="1" class="h3 m-5" :text="user.email"></Label>
+        <Ripple row="2" col="2" @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
+          <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
+        </Ripple>
+     </GridLayout>
+    </CardView>
+
+<StackLayout class="m-x-15" row="1">
+    <GridLayout rows="auto" columns="*">
+        <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Quick Settings"></label>
       </GridLayout>
-    </ActionBar>
-    <StackLayout>
-      <StackLayout class="p-y-20" alignSelf="center" width="100%">
-        <Image alignSelf="center" class="m-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" width="100" height="100" borderRadius="50%" />
-        <label class="h2 m-5 font-weight-bold text-mute text-dark-blue" row="0" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" :text="user.userName"></label>
-        <Label class="h3 m-5" textAlignment="center" :text="user.email"></Label>
-      </StackLayout>
-      <Ripple @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
-        <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
-      </Ripple>
+
+      <GridLayout class="p-y-15" rows="auto,auto,auto" columns="auto,*,auto">
+        <Ripple row="0" col="2" class="p-10" @tap="logOut()" textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
+          <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
+        </Ripple>
+        <Image row="0" rowSpan="3" col="0" class="m-5 circle" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
+        <label row="0" col="1" class="h2 m-5 font-weight-bold text-mute text-dark-blue" verticalAlignment="center" :text="user.userName"></label>
+        <Label row="1" col="1" class="h3 m-5" :text="user.email"></Label>
+        <Ripple row="2" col="2" @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
+          <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
+        </Ripple>
+     </GridLayout>
+
+      <GridLayout rows="auto" columns="*">
+        <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Businesses"></label>
+      </GridLayout>
+
       <GridLayout class="m-20" rows="*,*" columns="*,*,*">
         <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
           <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
@@ -34,7 +47,8 @@
           </Ripple>
         </CardView>
       </GridLayout>
-    </StackLayout>
+</StackLayout>
+    </GridLayout>
   </page>
 </template>
 
@@ -259,12 +273,12 @@ export default {
 .businessIcon {
   &.visible {
     animation-name: show;
-    animation-duration: 2s;
+    animation-duration: 1s;
     animation-fill-mode: forwards;
   }
   @keyframes show {
     from {
-      transform: scale(5);
+      transform: scale(4);
       opacity: 0;
     }
     to {

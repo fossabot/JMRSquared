@@ -108,6 +108,13 @@ CardView{
   background-color:white;
 }
 
+.circle {
+position: relative;
+border-radius: 50%;
+width: 25%;
+height: auto;
+}
+
 .bottom-line-red{
   border-bottom-color: $redColor;
   border-bottom-width:  5px;
