@@ -11,6 +11,9 @@ router.get("/all/for/:userid", function (req, res) {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
     Business.find({
       'admin.id': adminID
+    }, {
+      logo: undefined,
+      transactions: undefined
     }).then(businesses => {
       if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
       res.json(businesses);
@@ -19,6 +22,18 @@ router.get("/all/for/:userid", function (req, res) {
     return res.status(512).send(err);
   });
 });
+
+router.get("/get/:business/for/:userid", function (req, res) {
+  var businessID = req.params.business;
+  var adminID = req.params.userid;
+  Business.findById(businessID).then(business => {
+    if (business == null) return res.status(512).send("The requested business is not avaliable");
+    if (!business.admin || business.admin.id != adminID) return res.status(512).send("You are not part of the requested business");
+    res.json(business);
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
+})
 
 router.post("/add/business", function (req, res) {
   var adminID = req.body.adminID;
