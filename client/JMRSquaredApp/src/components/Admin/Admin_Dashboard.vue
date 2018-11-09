@@ -37,7 +37,7 @@
       </GridLayout>
 
       <GridLayout class="m-20" rows="*,*" columns="*,*,*">
-        <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+        <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts" textAlignment="center">
           <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
             <GridLayout rows="*,*" columns="*">
               <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
@@ -273,7 +273,7 @@ export default {
 .businessIcon {
   &.visible {
     animation-name: show;
-    animation-duration: 1s;
+    animation-duration: 0.5s;
     animation-fill-mode: forwards;
   }
   @keyframes show {

@@ -1,9 +1,7 @@
 <template>
-  <page actionBarHidden="true" class="page">
-    <FlexboxLayout v-if="!isMainScreen">
-        <Label>This is the business stats</Label>
-    </FlexboxLayout>
-  </page>
+    <GridLayout rows="*" columns="*">
+        <Label verticalAlignment="center" textAlignment="center" text="Stats"></Label>
+    </GridLayout>
 </template>
 
 <script>

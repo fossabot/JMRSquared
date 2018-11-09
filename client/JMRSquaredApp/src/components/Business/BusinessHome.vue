@@ -1,16 +1,13 @@
 <template>
-  <page>
-    <ActionBar></ActionBar>
-  
-    <GridLayout rows="*,auto" columns="*">
-      <StackLayout row="0">
-        <Label verticalAlignment="center" textAlignment="center" :text="BusinessID"></Label>
-        <component :is="tabs[currentTab].view"></component>
-        <ActivityIndicator verticalAlignment="center" :busy="!tabs[currentTab].isLoaded"></ActivityIndicator>
-      </StackLayout>
-      <SegmentedBar row="1" #tabs borderColor="$blueDarkColor" class="mdi" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
+  <page actionBarHidden="true">
+      <GridLayout v-if="business" rows="*,auto" columns="*">
+       <component row="0" :business="business" :is="tabs[currentTab].view"></component>
+      <SegmentedBar v-show="business" :class="{'visible':business}" row="1" #tabs borderColor="$blueDarkColor" class="mdi businessIcon" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
         <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" @tap="currentTab = i" style="font-size:25%" :title="tab.icon | fonticon"></SegmentedBarItem>
       </SegmentedBar>
+    </GridLayout>
+    <GridLayout v-show="!business" rows="*" columns="*">
+       <ActivityIndicator v-if="!business" verticalAlignment="center" textAlignment="center" :busy="!business"></ActivityIndicator>
     </GridLayout>
   </page>
 </template>
@@ -37,33 +34,29 @@ export default {
   data() {
     return {
       count: 20,
-      currentTab: 1,
+      currentTab: 0,
       business: null,
       isLoaded: false,
       tabs: [
         {
           text: "Notifications",
-          icon: "mdi-people",
-          view: "BusinessProfile",
-          isLoaded: true
+          icon: "mdi-home",
+          view: "BusinessProfile"
         },
         {
           text: "Students",
           icon: "mdi-receipt",
-          view: "BusinessTransactions",
-          isLoaded: false
+          view: "BusinessTransactions"
         },
         {
           text: "Transactions",
           icon: "mdi-bubble-chart",
-          view: "BusinessStats",
-          isLoaded: true
+          view: "BusinessStats"
         },
         {
           text: "Stats",
           icon: "mdi-settings",
-          view: "BusinessSettings",
-          isLoaded: true
+          view: "BusinessSettings"
         }
       ]
     };
@@ -88,7 +81,6 @@ export default {
           duration: 4000,
           message: "Data loaded is not recent."
         });
-        this.isLoading = false;
       } else {
         http
           .getJSON(
@@ -100,13 +92,15 @@ export default {
           )
           .then(results => {
             this.business = results;
-          })
+            this.tabs[0].icon = 'mdi-'+ this.business.type.icon;
+            this.$forceUpdate();
+            })
           .catch(err => {
-            // this.$feedback.error({
-            //   title: "Unable to load your business",
-            //   duration: 4000,
-            //   message: "Please try again later"
-            // });
+            this.$feedback.error({
+              title: "Unable to load your business",
+              duration: 4000,
+              message: "Please try again later"
+            });
           });
       }
     }
@@ -116,4 +110,21 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/variables";
+.businessIcon {
+  &.visible {
+    animation-name: show;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+  }
+  @keyframes show {
+    from {
+      transform: scale(4);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
 </style>
