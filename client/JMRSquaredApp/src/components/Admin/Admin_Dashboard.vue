@@ -1,54 +1,55 @@
 <template>
   <page actionBarHidden="true">
-    <GridLayout rows="auto,*">
-    <CardView row="0" class="m-b-15 p-y-15" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-       <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
-       <Ripple row="0" col="2" class="p-10" @tap="logOut()" textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
-          <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
-        </Ripple>
-        <Image row="0" rowSpan="3" col="0" class="m-5 circle" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
-        <label row="0" verticalAlignment="bottom" col="1" class="h2 m-5 font-weight-bold text-mute text-dark-blue" :text="user.userName"></label>
-        <Label row="1" verticalAlignment="bottom" col="1" class="h3 m-5" :text="user.email"></Label>
-        <Ripple row="2" col="2" @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
-          <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
-        </Ripple>
-     </GridLayout>
-    </CardView>
-
-<StackLayout class="m-x-15" row="1">
-    <GridLayout rows="auto" columns="*">
-        <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Quick Settings"></label>
-      </GridLayout>
-
-      <GridLayout class="p-y-15" rows="auto,auto,auto" columns="auto,*,auto">
-        <Ripple row="0" col="2" class="p-10" @tap="logOut()" textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
-          <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
-        </Ripple>
-        <Image row="0" rowSpan="3" col="0" class="m-5 circle" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
-        <label row="0" col="1" class="h2 m-5 font-weight-bold text-mute text-dark-blue" verticalAlignment="center" :text="user.userName"></label>
-        <Label row="1" col="1" class="h3 m-5" :text="user.email"></Label>
-        <Ripple row="2" col="2" @tap="$router.push('/admin/profile/edit')" class="m-5" borderWidth="5px" width="40" height="40" borderRadius="50%">
-          <Label class="mdi" textAlignment="center" verticalAlignment="center" fontSize="25%" :text="'mdi-mode-edit' | fonticon"></Label>
-        </Ripple>
-     </GridLayout>
-
-      <GridLayout rows="auto" columns="*">
-        <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Businesses"></label>
-      </GridLayout>
-
-      <GridLayout class="m-20" rows="*,*" columns="*,*,*">
-        <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts" textAlignment="center">
-          <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
-            <GridLayout rows="*,*" columns="*">
-              <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
-              <Label v-show="item.title" :class="{'visible':item.title}" class="mdi businessIcon" textAlignment="center" fontSize="50%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
-              <Label row="1" v-show="item.title" class="p-t-10" :text="item.title" textAlignment="center" />
-            </GridLayout>
+   <GridLayout rows="auto,*">
+         <CardView row="0" class="m-b-15 p-y-15" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+        <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
+          <Ripple row="0" col="2" class="p-10" @tap="logOut()" textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-more-vert' | fonticon"></Label>
           </Ripple>
-        </CardView>
-      </GridLayout>
-</StackLayout>
-    </GridLayout>
+          <Image row="0" rowSpan="3" col="0" verticalAlignment="center" width="60" height="60" class="m-5 circle" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
+          <label row="0" verticalAlignment="bottom" col="1" class="h2 m-5 font-weight-bold text-mute text-dark-blue" :text="user.userName"></label>
+          <Label row="1" verticalAlignment="bottom" col="1" class="h3 m-5" :text="user.email"></Label>
+        </GridLayout>
+      </CardView>
+        <ScrollView class="m-x-15" row="1">
+       <StackLayout>
+      <GridLayout rows="auto" columns="*">
+          <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Notifications"></label>
+        </GridLayout>
+  
+        <GridLayout rows="auto" columns="*,auto">
+              <CardView col="0" elevation="5" margin="5">
+                <Ripple>
+                  <GridLayout class="p-10" rows="auto,auto,auto" columns="auto,*">
+                    <Image row="0" rowSpan="2" verticalAlignment="center" width="60" height="60" col="0" stretch="aspectFill" src="https://picsum.photos/200/300"/>
+                    <label row="0" col="1" textWrap="true" class="h3 font-weight-bold text-mute text-dark-blue p-x-5" verticalAlignment="center" text="Food was bought by nolo for R400 and this is soo sad"></label>
+                    <Label row="1" col="1" class="h4 text-mute p-x-5" verticalAlignment="bottom" textAlignment="right" text="a days ago"></Label>
+                  </GridLayout>
+                </Ripple>
+              </CardView>
+              <Ripple row="0" col="1" class="p-10 pulse" @tap="logOut()" textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
+                <Label verticalAlignment="center" class="mdi" fontSize="50%" :text="'mdi-chevron-right' | fonticon"></Label>
+             </Ripple>
+              </GridLayout>
+  
+        <GridLayout rows="auto" columns="*">
+          <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Businesses"></label>
+        </GridLayout>
+  
+        <GridLayout class="m-20" rows="auto,auto" columns="*,*,*">
+          <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts.filter(l => l.link)" textAlignment="center">
+            <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
+              <GridLayout rows="*,*" columns="*">
+                <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
+                <Label v-show="item.title" :class="{'visible':item.title}" class="mdi businessIcon" textAlignment="center" fontSize="50%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
+                <Label row="1" v-show="item.title" textWrap="true" class="p-t-10" :text="item.title" textAlignment="center" />
+              </GridLayout>
+            </Ripple>
+          </CardView>
+        </GridLayout>
+      </StackLayout>
+        </ScrollView>
+       </GridLayout>
   </page>
 </template>
 
@@ -62,6 +63,7 @@ import * as imagepicker from "nativescript-imagepicker";
 var appSettings = require("application-settings");
 import * as connectivity from "tns-core-modules/connectivity";
 const http = require("http");
+
 export default {
   components: {
     Documents
@@ -210,13 +212,20 @@ export default {
                     }
                   };
                 } else {
-                  this.layouts
-                    .filter(l => !l.title && !l.icon)
-                    .forEach(layout => {
-                      layout.icon = "add";
-                      layout.title = "Add Business";
-                      layout.link = "/business/add/business";
-                    });
+                  if (
+                    this.layouts.filter(l => !l.title && !l.icon).length > 0
+                  ) {
+                    var first = this.layouts.filter(
+                      l => !l.title && !l.icon
+                    )[0];
+                    first.icon = "add";
+                    first.title = "Add Business";
+                    first.link = "/business/add/business";
+                  }
+                  this.layouts.filter(l => !l.title && !l.icon).map(layout => {
+                    layout.icon = " ";
+                    layout.title = " ";
+                  });
                   clearInterval(timer);
                 }
                 tank.push(i);
@@ -284,6 +293,21 @@ export default {
     to {
       transform: scale(1);
       opacity: 1;
+    }
+  }
+}
+
+.pulse {
+  animation-name: pulse;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  @keyframes pulse {
+    0% {
+      transform: translateX(0) scale(1);
+    }
+    25% {
+      transform: translateX(10) scale(0.7);
     }
   }
 }
