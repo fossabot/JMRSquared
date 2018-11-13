@@ -13,7 +13,7 @@ import businessController from "./routes/BusinessController";
 import studentController from "./routes/StudentController";
 import notificationController from "./routes/NotificationController";
 import settingController from "./routes/SettingController";
-import authController from "./router/AuthController"
+import authController from "./routes/AuthController"
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
