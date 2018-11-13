@@ -8,10 +8,7 @@ const UserSchema = new Schema({
     email: String,
     hash: String,
     salt: String,
-    createdDate: {
-        type: Date,
-        default: Date.now
-    },
+    createdDate: Date,
     lastUsedDate: {
         type: Date,
         default: Date.now

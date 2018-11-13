@@ -29,7 +29,7 @@ router.post('/register', auth.optional, (req, res, next) => {
     }
 
     const finalUser = new User(user);
-
+    finalUser.createdDate = Date.now;
     finalUser.setPassword(user.password);
 
     return finalUser.save()
