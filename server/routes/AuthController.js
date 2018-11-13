@@ -5,7 +5,11 @@ const router = require('express').Router();
 
 import User from "../models/User";
 
-router.post('/', auth.optional, (req, res, next) => {
+router.get('/', auth.required, (req, res, next) => {
+    res.send("You are authenticated!");
+});
+
+router.post('/register', auth.optional, (req, res, next) => {
     const { body: { user } } = req;
 
     if (!user.email) {
@@ -30,10 +34,6 @@ router.post('/', auth.optional, (req, res, next) => {
 
     return finalUser.save()
         .then(() => res.json({ user: finalUser.toAuthJSON() }));
-});
-
-router.get('/current', auth.required, (req, res, next) => {
-    res.send("You are authenticated!");
 });
 
 router.post('/login', auth.optional, (req, res, next) => {
