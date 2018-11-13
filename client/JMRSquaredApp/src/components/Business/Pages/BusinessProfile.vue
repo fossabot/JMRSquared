@@ -31,12 +31,14 @@
             <CardView class="p-15" row="0" col="0" margin="5" elevation="1">
               <GridLayout rows="auto,auto" columns="*,*,*">
                 <label row="0" col="0" colSpan="2" verticalAlignment="center" class="h3 font-weight-bold text-mute text-light-blue p-5" text="Expenses"></label>
-                <Ripple row="0" col="2" class="p-5" textAlignment="right" verticalAlignment="center" borderRadius="50%">
+                <Ripple row="0" col="2" class="m-5" textAlignment="right" verticalAlignment="center" borderRadius="50%">
                   <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-add' | fonticon"></Label>
                 </Ripple>
                 <StackLayout row="1" col="0" class="p-15 b-r-15">
-                  <label row="0" class="h3 font-weight-bold text-dark-blue" fontSize="30%" text="1"></label>
+                  <label row="0" class="h3 font-weight-bold text-dark-blue" fontSize="25%" text=""></label>
+                  <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
                   <label row="1" vertialAlignment="center" textAlignment="center" text="3"></label>
+                  <StackLayout v-show="isRent" width="100%" class="hr-light"></StackLayout>
                 </StackLayout>
                 <StackLayout row="1" col="1" class="p-15">
                   <label row="0" class="h3 font-weight-bold text-dark-blue" fontSize="30%" text="1"></label>
@@ -64,10 +66,10 @@
 const dialogs = require("ui/dialogs");
 import application from "application";
 
-import PartnersList from '../../Modals/PartnersList'
+import PartnersList from "../../Modals/PartnersList";
 
 export default {
-  components:{
+  components: {
     PartnersList
   },
   data() {
@@ -118,9 +120,11 @@ export default {
   props: ["business"],
   methods: {
     showPartners() {
-    this.$showModal(PartnersList, { 
-      props: { businessName: "this.business.name" }
-    });
+      this.$showModal(PartnersList, {
+        props: {
+          businessName: "this.business.name"
+        }
+      });
     }
   }
 };

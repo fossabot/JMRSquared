@@ -1,13 +1,13 @@
 <template>
   <page actionBarHidden="true">
-      <GridLayout v-if="business" rows="*,auto" columns="*">
-       <component row="0" :business="business" :is="tabs[currentTab].view"></component>
-      <SegmentedBar v-show="business" :class="{'visible':business}" row="1" #tabs borderColor="$blueDarkColor" class="mdi businessIcon" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
+    <GridLayout v-if="business" rows="*,auto" columns="*">
+      <component @swipe="SegmentedBarSwipe" row="0" class="enterAnimation" :business="business" :is="tabs[currentTab].view"></component>
+      <SegmentedBar @swipe="SegmentedBarSwipe" v-show="business" :class="{'visible':business}" row="1" #tabs borderColor="$blueDarkColor" class="mdi businessIcon" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
         <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" @tap="currentTab = i" style="font-size:25%" :title="tab.icon | fonticon"></SegmentedBarItem>
       </SegmentedBar>
     </GridLayout>
     <GridLayout v-show="!business" rows="*" columns="*">
-       <ActivityIndicator v-if="!business" verticalAlignment="center" textAlignment="center" :busy="!business"></ActivityIndicator>
+      <ActivityIndicator v-if="!business" verticalAlignment="center" textAlignment="center" :busy="!business"></ActivityIndicator>
     </GridLayout>
   </page>
 </template>
@@ -23,6 +23,9 @@ import BusinessTransactions from "./Pages/BusinessTransactions.vue";
 
 import * as connectivity from "tns-core-modules/connectivity";
 const http = require("http");
+
+const SwipeDirection = require("tns-core-modules/ui/gestures").SwipeDirection;
+
 export default {
   name: "BusinessHome",
   components: {
@@ -92,9 +95,9 @@ export default {
           )
           .then(results => {
             this.business = results;
-            this.tabs[0].icon = 'mdi-'+ this.business.type.icon;
+            this.tabs[0].icon = "mdi-" + this.business.type.icon;
             this.$forceUpdate();
-            })
+          })
           .catch(err => {
             this.$feedback.error({
               title: "Unable to load your business",
@@ -102,6 +105,22 @@ export default {
               message: "Please try again later"
             });
           });
+      }
+    },
+    SegmentedBarSwipe(args) {
+      let direction =
+        args.direction == SwipeDirection.down
+          ? "down"
+          : args.direction == SwipeDirection.up
+            ? "up"
+            : args.direction == SwipeDirection.left
+              ? "left"
+              : "right";
+
+      if (direction == "left" && this.currentTab < this.tabs.length - 1) {
+        this.currentTab++;
+      } else if (direction == "right" && this.currentTab > 0) {
+        this.currentTab--;
       }
     }
   }
@@ -124,6 +143,23 @@ export default {
     to {
       transform: scale(1);
       opacity: 1;
+    }
+  }
+}
+
+.enterAnimation {
+  animation-name: show;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  @keyframes show {
+    20% {
+      transform: translateX(-10);
+    }
+    80% {
+      transform: translateX(-2);
+    }
+    100% {
+      transform: translateX(0);
     }
   }
 }
