@@ -8,6 +8,14 @@ const UserSchema = new Schema({
     email: String,
     hash: String,
     salt: String,
+    createdDate: {
+        type: Date,
+        default: Date.now
+    },
+    lastUsedDate: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 UserSchema.methods.setPassword = function(password) {
@@ -37,6 +45,8 @@ UserSchema.methods.toAuthJSON = function() {
         _id: this._id,
         email: this.email,
         token: this.generateJWT(),
+        createdDate: this.createdDate,
+        lastUsedDate: this.lastUsedDate
     };
 };
 

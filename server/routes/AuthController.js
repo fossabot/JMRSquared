@@ -63,7 +63,7 @@ router.post('/login', auth.optional, (req, res, next) => {
         if (passportUser) {
             const user = passportUser;
             user.token = passportUser.generateJWT();
-
+            user.lastUsedDate = Date.now;
             return res.json({ user: user.toAuthJSON() });
         }
 
