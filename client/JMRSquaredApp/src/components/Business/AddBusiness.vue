@@ -27,7 +27,7 @@
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name *"></label>
-                    <TextField v-model="business.name" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
+                    <TextField returnKeyType="next" v-model="business.name" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
@@ -48,14 +48,14 @@
                   <GridLayout class="m-10" v-if="business.type.optionals" v-for="(optional,o) in business.type.optionals" :key="o" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
-                    <TextField v-model="optional.answer" :keyboardType="optional.type" row="1" col="1" class="h4" :hint="optional.hint"></TextField>
+                    <TextField returnKeyType="next" v-model="optional.answer" :keyboardType="optional.type" row="1" col="1" class="h4" :hint="optional.hint"></TextField>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-description' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business description"></label>
-                    <TextView v-model="business.description" row="1" col="1" class="h4" hint="More information about your business"></TextView>
+                    <TextView returnKeyType="done" v-model="business.description" row="1" col="1" class="h4" hint="More information about your business"></TextView>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
                 </StackLayout>
@@ -200,7 +200,7 @@ export default {
           types: []
         }
       },
-      savedBusiness:false,
+      savedBusiness: false,
       txtError: "",
       currentPage: 0,
       currentPageTitle: "General Information",
@@ -331,133 +331,138 @@ export default {
         });
         this.isLoading = false;
       } else {
-        if(this.business.logo){
-          new imageSource.ImageSource().fromAsset(this.business.logo).then(img => {
-            this.business.logo = "data:image/png;base64," + img.toBase64String("png");
-            http
-          .request({
-            url: this.$store.state.settings.baseLink + "/b/add/business",
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            content: JSON.stringify({
-              adminID: this.$store.state.cache.cachedAdmin._id,
-              adminAuthority: "ADMIN",
-              business: this.business
-            })
-          })
-          .then(
-            response => {
-              var statusCode = response.statusCode;
-              var result = response.content.toString();
-
-              if (statusCode == 200) {
-                this.savedBusiness = response.content.toString();
-
-                this.$feedback
-                  .success({
-                    title: this.business.name + " successfully added",
-                    duration: 30000,
-                    onTap: () => {
-                         this.GoToBusiness(this.savedBusiness);
-                    }
+        if (this.business.logo) {
+          new imageSource.ImageSource()
+            .fromAsset(this.business.logo)
+            .then(img => {
+              this.business.logo =
+                "data:image/png;base64," + img.toBase64String("png");
+              http
+                .request({
+                  url: this.$store.state.settings.baseLink + "/b/add/business",
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  content: JSON.stringify({
+                    adminID: this.$store.state.cache.cachedAdmin._id,
+                    adminAuthority: "ADMIN",
+                    business: this.business
                   })
-                  .then(() => {
-                  });
-              } else {
-                this.$feedback.error({
-                  title: "Error (" + statusCode + ")",
-                  duration: 4000,
-                  message: result
-                });
-              }
-              this.isLoading = false;
-            },(e) => {
-              dialogs.alert(e).then(() => {
-                console.log("Error occurred " + e);
-              });
+                })
+                .then(
+                  response => {
+                    var statusCode = response.statusCode;
+                    var result = response.content.toString();
 
-              this.isLoading = false;
-            }
-          )
-          .catch(err => {
-            this.$feedback.error({
-              title: "Server error",
-              duration: 4000,
-              message: err,
-              onTap: () => {
-                dialogs.alert("TODO : Handle the error");
-              }
+                    if (statusCode == 200) {
+                      this.savedBusiness = response.content.toString();
+
+                      this.$feedback
+                        .success({
+                          title: this.business.name + " successfully added",
+                          duration: 30000,
+                          onTap: () => {
+                            this.GoToBusiness(this.savedBusiness);
+                          }
+                        })
+                        .then(() => {});
+                    } else {
+                      this.$feedback.error({
+                        title: "Error (" + statusCode + ")",
+                        duration: 4000,
+                        message: result
+                      });
+                    }
+                    this.isLoading = false;
+                  },
+                  e => {
+                    dialogs.alert(e).then(() => {
+                      console.log("Error occurred " + e);
+                    });
+
+                    this.isLoading = false;
+                  }
+                )
+                .catch(err => {
+                  this.$feedback.error({
+                    title: "Server error",
+                    duration: 4000,
+                    message: err,
+                    onTap: () => {
+                      dialogs.alert("TODO : Handle the error");
+                    }
+                  });
+                  this.isLoading = false;
+                });
+            })
+            .catch(err => {
+              this.$feedback.error({
+                title: "Unable to upload your logo",
+                message:
+                  "Please choose another image, or go back and remove it.",
+                duration: 4000
+              });
             });
-            this.isLoading = false;
-          });
-          }).catch(err=>{
-            this.$feedback.error({
-              title: "Unable to upload your logo",
-              message:"Please choose another image, or go back and remove it.",
-              duration: 4000
-            });
-          });
-        }else{
+        } else {
           http
-          .request({
-            url: this.$store.state.settings.baseLink + "/b/add/business",
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            content: JSON.stringify({
-              adminID: this.$store.state.cache.cachedAdmin._id,
-              adminAuthority: "ADMIN",
-              business: this.business
+            .request({
+              url: this.$store.state.settings.baseLink + "/b/add/business",
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              content: JSON.stringify({
+                adminID: this.$store.state.cache.cachedAdmin._id,
+                adminAuthority: "ADMIN",
+                business: this.business
+              })
             })
-          })
-          .then(
-            response => {
-              var statusCode = response.statusCode;
-              var result = response.content.toString();
+            .then(
+              response => {
+                var statusCode = response.statusCode;
+                var result = response.content.toString();
 
-              if (statusCode == 200) {
-                this.savedBusiness = response.content.toString();
+                if (statusCode == 200) {
+                  this.savedBusiness = response.content.toString();
 
-                this.$feedback
-                  .success({
-                    title: this.business.name + " successfully added",
-                    duration: 30000,
-                    onTap: () => {
-                         this.GoToBusiness(this.savedBusiness);
-                    }
-                  })
-                  .then(() => {
+                  this.$feedback
+                    .success({
+                      title: this.business.name + " successfully added",
+                      duration: 30000,
+                      onTap: () => {
+                        this.GoToBusiness(this.savedBusiness);
+                      }
+                    })
+                    .then(() => {});
+                } else {
+                  this.$feedback.error({
+                    title: "Error (" + statusCode + ")",
+                    duration: 4000,
+                    message: result
                   });
-              } else {
-                this.$feedback.error({
-                  title: "Error (" + statusCode + ")",
-                  duration: 4000,
-                  message: result
+                }
+                this.isLoading = false;
+              },
+              e => {
+                dialogs.alert(e).then(() => {
+                  console.log("Error occurred " + e);
                 });
-              }
-              this.isLoading = false;
-            },(e) => {
-              dialogs.alert(e).then(() => {
-                console.log("Error occurred " + e);
-              });
 
-              this.isLoading = false;
-            }
-          )
-          .catch(err => {
-            this.$feedback.error({
-              title: "Server error",
-              duration: 4000,
-              message: err,
-              onTap: () => {
-                dialogs.alert("TODO : Handle the error");
+                this.isLoading = false;
               }
+            )
+            .catch(err => {
+              this.$feedback.error({
+                title: "Server error",
+                duration: 4000,
+                message: err,
+                onTap: () => {
+                  dialogs.alert("TODO : Handle the error");
+                }
+              });
+              this.isLoading = false;
             });
-            this.isLoading = false;
-          });
         }
       }
     },
