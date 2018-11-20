@@ -37,7 +37,9 @@ import CosmeticsTransactions from '../components/Cosmetics/CosmeticsTransactions
 
 // Business
 import AddBusiness from '../components/Business/AddBusiness.vue'
+import AddPartner from '../components/Business/AddPartner.vue'
 import BusinessHome from '../components/Business/BusinessHome.vue'
+import PartnersList from '../components/Modals/PartnersList.vue'
 
 const http = require("http");
 
@@ -271,11 +273,32 @@ const router = new VueRouter({
       },
     },
     {
+      name: 'AddPartner',
+      path: '/business/add/partner/:businessId/:businessName',
+      component: AddPartner,
+      meta: {
+        title: 'Add Partner',
+        authLevel: 3,
+        source: null
+      },
+      props: true
+    },
+    {
       name: 'BusinessHome',
       path: '/business/home/:businessID',
       component: BusinessHome,
       meta: {
         title: 'Business Home',
+        authLevel: 3,
+        source: null
+      },
+      props: true
+    }, {
+      name: 'PartnersList',
+      path: '/business/partners/list/:businessID/:businessName',
+      component: PartnersList,
+      meta: {
+        title: 'Partners list',
         authLevel: 3,
         source: null
       },

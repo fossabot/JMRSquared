@@ -1,8 +1,8 @@
 <template>
   <page actionBarHidden="true">
-    <GridLayout v-if="business" rows="*,auto" columns="*">
-      <component @swipe="SegmentedBarSwipe" row="0" class="enterAnimation" :business="business" :is="tabs[currentTab].view"></component>
-      <SegmentedBar @swipe="SegmentedBarSwipe" v-show="business" :class="{'visible':business}" row="1" #tabs borderColor="$blueDarkColor" class="mdi businessIcon" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
+    <GridLayout @swipe="SegmentedBarSwipe" v-if="business" rows="*,auto" columns="*">
+      <component row="0" class="enterAnimation" :business="business" :is="tabs[currentTab].view"></component>
+      <SegmentedBar v-show="business" :class="{'visible':business}" row="1" #tabs borderColor="$blueDarkColor" class="mdi businessIcon" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
         <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" @tap="currentTab = i" style="font-size:25%" :title="tab.icon | fonticon"></SegmentedBarItem>
       </SegmentedBar>
     </GridLayout>
@@ -152,14 +152,13 @@ export default {
   animation-duration: 1s;
   animation-fill-mode: forwards;
   @keyframes show {
-    20% {
-      transform: translateX(-10);
-    }
-    80% {
-      transform: translateX(-2);
+    0% {
+      transform: translateY(-10);
+      opacity: 0.5;
     }
     100% {
-      transform: translateX(0);
+      transform: translateY(0);
+      opacity: 1;
     }
   }
 }
