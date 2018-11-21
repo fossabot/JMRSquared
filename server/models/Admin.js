@@ -7,12 +7,13 @@ const AdminSchema = new mongoose.Schema({
         default: mongoose.Types.ObjectId()
     },
     userName: String,
+    fullName: String,
     pass: String,
     email: String,
     role: {
         type: String,
-        enum: ['ALL', 'PROPERTY', 'TAXIFY', 'COSMETICS'],
-        default: 'PROPERTY'
+        enum: ['ALL', 'PROPERTY', 'TAXIFY', 'COSMETICS', 'WORKER'],
+        default: 'WORKER'
     },
     numbers: Number,
     profilePic: String,

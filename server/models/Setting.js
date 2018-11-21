@@ -6,6 +6,7 @@ const SettingSchema = new mongoose.Schema({
     settings: [{
          type:Array, default:new Array() 
     }],
+    options:Object,
     date: { type: Date, default: Date.now },
     removed: { type: Boolean, default: false }
 });

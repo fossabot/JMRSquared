@@ -10,7 +10,10 @@ router.get("/all/for/:userid", function (req, res) {
   Admin.findById(adminID).then(admin => {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
     Business.find({
-      adminID: adminID
+      'admin.id': adminID
+    }, {
+      logo: 0,
+      transactions: 0
     }).then(businesses => {
       if (businesses == null) return res.status(512).send("Error : 9032rtu834g9erbo");
       res.json(businesses);
@@ -19,6 +22,29 @@ router.get("/all/for/:userid", function (req, res) {
     return res.status(512).send(err);
   });
 });
+
+router.get("/get/:business/for/:userid", function (req, res) {
+  var businessID = req.params.business;
+  var adminID = req.params.userid;
+  Business.findById(businessID).then(business => {
+    if (business == null) return res.status(512).send("The requested business is not avaliable");
+    if (!business.admin || !business.admin || business.admin.filter(a => a.id == adminID).length == 0) return res.status(512).send("You are not part of the requested business");
+    res.json(business);
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
+})
+
+router.get("/get/partners/for/:business", function (req, res) {
+  var businessID = req.params.business;
+  Business.findById(businessID).then(business => {
+    if (business == null) return res.status(512).send("The requested business is not avaliable");
+    if (!business.admin) res.json([]);
+    res.json(business.admin);
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
+})
 
 router.post("/add/business", function (req, res) {
   var adminID = req.body.adminID;
@@ -35,11 +61,9 @@ router.post("/add/business", function (req, res) {
         authority: adminAuthority && adminAuthority.toUpperCase()
       }],
       name: _business.name,
-      icon: _business.icon,
       logo: _business.logo,
-      type: _business.type && _business.type.toUpperCase(),
-      category: _business.category && _business.category.toUpperCase(),
-      description: _business.description
+      description: _business.description,
+      type: _business.type,
     });
 
     business.save(function (err) {
@@ -55,6 +79,7 @@ router.post("/assign/to/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
+  var assignedBY = req.body.assignedBY;
   if (businessID == null) return res.status(512).send("Invalid request , make sure you have all the required attributes");
   Admin.findById(adminID).then(admin => {
     if (admin == null) return res.status(512).send("Admin of id " + adminID + " does not exist");
@@ -63,6 +88,7 @@ router.post("/assign/to/business", function (req, res) {
       if (business == null) return res.status(512).send("Error : 9032rtu834g9erbo");
       business.admin.push({
         id: adminID,
+        assignedBY: assignedBY,
         authority: adminAuthority && adminAuthority.toUpperCase()
       });
       business.save(function (err) {
