@@ -208,6 +208,9 @@ export default {
       var self = this;
       this.ApplyNavigation(self);
     },
+    GeneratePassword() {
+      return Math.floor(100000 + Math.random() * 900000);
+    },
     submitPartner() {
       this.isLoading = true;
 
@@ -237,8 +240,8 @@ export default {
             })
           })
           .then(answer => {
-            var statusCode = response.statusCode;
-            var userID = response.content.toString();
+            var statusCode = answer.statusCode;
+            var userID = answer.content.toString();
             if (statusCode == 200) {
               http
                 .request({
@@ -258,7 +261,7 @@ export default {
                 })
                 .then(
                   response => {
-                    var statusCode = response.statusCode;
+                    statusCode = response.statusCode;
                     var result = response.content.toString();
 
                     if (statusCode == 200) {
@@ -266,7 +269,11 @@ export default {
 
                       this.$feedback
                         .success({
-                          title: this.business.name + " successfully added",
+                          title: this.partner.username + " successfully added",
+                          message:
+                            this.partner.username +
+                            " is now linked to " +
+                            this.businessName,
                           duration: 30000,
                           onTap: () => {
                             this.GoToBusiness(this.savedPartner);
