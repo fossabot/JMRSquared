@@ -220,23 +220,40 @@ export default {
         });
         this.isLoading = false;
       } else {
-        if (this.business.logo) {
-          new imageSource.ImageSource()
-            .fromAsset(this.business.logo)
-            .then(img => {
-              this.business.logo =
-                "data:image/png;base64," + img.toBase64String("png");
+        http
+          .request({
+            url: this.$store.state.settings.baseLink + "/a/add",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            content: JSON.stringify({
+              email: this.partner.email,
+              pass: this.GeneratePassword(),
+              numbers: this.partner.contactNumbers,
+              role: "WORKER",
+              userName: this.partner.username,
+              fullName: this.partner.fullName
+            })
+          })
+          .then(answer => {
+            var statusCode = response.statusCode;
+            var userID = response.content.toString();
+            if (statusCode == 200) {
               http
                 .request({
-                  url: this.$store.state.settings.baseLink + "/b/add/business",
+                  url:
+                    this.$store.state.settings.baseLink +
+                    "/b/assign/to/business",
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json"
                   },
                   content: JSON.stringify({
-                    adminID: this.$store.state.cache.cachedAdmin._id,
-                    adminAuthority: "ADMIN",
-                    business: this.business
+                    assignedBY: this.$store.state.cache.cachedAdmin._id,
+                    adminID: userID,
+                    adminAuthority: "WORKER",
+                    businessID: this.businessId
                   })
                 })
                 .then(
@@ -274,85 +291,24 @@ export default {
                   }
                 )
                 .catch(err => {
-                  this.$feedback.error({
-                    title: "Server error",
-                    duration: 4000,
-                    message: err,
-                    onTap: () => {
-                      dialogs.alert("TODO : Handle the error");
-                    }
-                  });
+                  throw new Error(err);
                   this.isLoading = false;
                 });
-            })
-            .catch(err => {
-              this.$feedback.error({
-                title: "Unable to upload your logo",
-                message:
-                  "Please choose another image, or go back and remove it.",
-                duration: 4000
-              });
-            });
-        } else {
-          http
-            .request({
-              url: this.$store.state.settings.baseLink + "/b/add/business",
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              content: JSON.stringify({
-                adminID: this.$store.state.cache.cachedAdmin._id,
-                adminAuthority: "ADMIN",
-                business: this.business
-              })
-            })
-            .then(
-              response => {
-                var statusCode = response.statusCode;
-                var result = response.content.toString();
-
-                if (statusCode == 200) {
-                  this.savedPartner = response.content.toString();
-
-                  this.$feedback
-                    .success({
-                      title: this.business.name + " successfully added",
-                      duration: 30000,
-                      onTap: () => {
-                        this.GoToBusiness(this.savedPartner);
-                      }
-                    })
-                    .then(() => {});
-                } else {
-                  this.$feedback.error({
-                    title: "Error (" + statusCode + ")",
-                    duration: 4000,
-                    message: result
-                  });
-                }
-                this.isLoading = false;
-              },
-              e => {
-                dialogs.alert(e).then(() => {
-                  console.log("Error occurred " + e);
-                });
-
-                this.isLoading = false;
+            } else {
+              throw new Error("Unable to save the Admin");
+            }
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Server error",
+              duration: 4000,
+              message: err,
+              onTap: () => {
+                dialogs.alert("TODO : Handle the error");
               }
-            )
-            .catch(err => {
-              this.$feedback.error({
-                title: "Server error",
-                duration: 4000,
-                message: err,
-                onTap: () => {
-                  dialogs.alert("TODO : Handle the error");
-                }
-              });
-              this.isLoading = false;
             });
-        }
+            this.isLoading = false;
+          });
       }
     },
     canGoForward() {
