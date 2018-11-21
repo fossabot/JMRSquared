@@ -105,7 +105,7 @@
               </GridLayout>
               <GridLayout v-show="savedPartner" rows="auto,auto" columns="*">
                 <Label row="0" text="Partner successfully added!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
-                <Button row="1" @tap="GoToPartnerProfile(savedPartner)" class="btn-primary bg-light-blue" :text="`Save ${partner.username}`"></Button>
+                <Button row="1" @tap="GoToPartnerProfile(savedPartner)" class="btn-primary bg-light-blue" :text="`Open ${partner.username}`"></Button>
               </GridLayout>
             </FlexboxLayout>
             <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
@@ -241,8 +241,8 @@ export default {
           })
           .then(answer => {
             var statusCode = answer.statusCode;
-            var userID = answer.content.toString();
             if (statusCode == 200) {
+              var userID = answer.content;
               http
                 .request({
                   url:
@@ -276,7 +276,7 @@ export default {
                             this.businessName,
                           duration: 30000,
                           onTap: () => {
-                            this.GoToBusiness(this.savedPartner);
+                            this.GoToPartner(this.savedPartner);
                           }
                         })
                         .then(() => {});
@@ -302,17 +302,14 @@ export default {
                   this.isLoading = false;
                 });
             } else {
-              throw new Error("Unable to save the Admin");
+              throw new Error(answer.content);
             }
           })
           .catch(err => {
             this.$feedback.error({
               title: "Server error",
               duration: 4000,
-              message: err,
-              onTap: () => {
-                dialogs.alert("TODO : Handle the error");
-              }
+              message: err
             });
             this.isLoading = false;
           });
@@ -322,7 +319,7 @@ export default {
       this.txtError = "";
       if (this.currentPage == 0) {
         if (this.partner.username.length < 2) {
-          this.txtError = "Provide a valid partner user name.";
+          this.txtError = "Provide a valid partner username.";
           return false;
         } else if (
           isNaN(this.partner.contactNumbers) ||

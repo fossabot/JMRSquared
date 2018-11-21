@@ -14,7 +14,7 @@
           <Ripple class="m-15" v-for="(partner,i) in partners" :key="i">
             <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
               <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70" borderRadius="50%" />
-              <Label row="0" col="1" textAlignment="center" class="h2" :text="partner.userName"></Label>
+              <Label row="0" col="1" textAlignment="center" class="h2" :textWrap="true" :text="JSON.stringify(partner)"></Label>
               <Label row="1" col="1" textAlignment="center" :text="`${partner.email} ${partner.fullName}`"></Label>
               <Label row="2" col="1" textAlignment="center" v-if="partner.transactions" :text="`${partner.transactions.length} transactions`"></Label>
               <Label row="2" col="2" textAlignment="center" verticalAlignment="center" text="Paid"></Label>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+const http = require("http");
 export default {
   name: "PartnersList",
   data() {
@@ -37,12 +38,17 @@ export default {
   mounted() {
     this.businessId = this.$route.params["businessID"];
     this.businessName = this.$route.params["businessName"];
+    this.GetPartnersForBusiness();
   },
   props: ["businessName", "businessId"],
   methods: {
-    GetPartnersForBusiness(businessID) {
+    GetPartnersForBusiness() {
       http
-        .getJSON("/b/get/partners/for/" + this.businessId)
+        .getJSON(
+          this.$store.state.settings.baseLink +
+            "/b/get/partners/for/" +
+            this.businessId
+        )
         .then(results => {
           this.partners = results;
         })
