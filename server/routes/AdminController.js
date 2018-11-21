@@ -89,12 +89,13 @@ router.post("/add", function (req, res) {
     pass: req.body.pass,
     numbers: req.body.numbers,
     role: req.body.role.toUpperCase(),
-    userName: req.body.username
+    userName: req.body.username,
+    fullName: req.body.fullName
   });
 
   admin.save(function (err) {
     if (err) res.send(err);
-    res.send("User successfully saved");
+    res.send(admin._id);
   });
 });
 

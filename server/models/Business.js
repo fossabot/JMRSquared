@@ -15,6 +15,11 @@ const BusinessSchema = new mongoose.Schema({
             type: String,
             enum: ['ADMIN', 'CLIENT', 'WORKER'],
             default: "WORKER"
+        },
+        assignedBY: {
+            type: Schema.Types.ObjectId,
+            default: null,
+            ref: 'Admin'
         }
     }],
     name: String,
