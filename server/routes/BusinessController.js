@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Business from "../models/Business";
 
-router.get("/all/for/:userid", function(req, res) {
+router.get("/all/for/:userid", function (req, res) {
   var adminID = req.params.userid;
   Admin.findById(adminID)
     .then(admin => {
@@ -13,15 +13,12 @@ router.get("/all/for/:userid", function(req, res) {
         return res
           .status(512)
           .send("Admin of id " + adminID + " does not exist");
-      Business.find(
-        {
-          "admin.id": adminID
-        },
-        {
-          logo: 0,
-          transactions: 0
-        }
-      ).then(businesses => {
+      Business.find({
+        "admin.id": adminID
+      }, {
+        logo: 0,
+        transactions: 0
+      }).then(businesses => {
         if (businesses == null)
           return res.status(512).send("Error : 9032rtu834g9erbo");
         res.json(businesses);
@@ -32,7 +29,7 @@ router.get("/all/for/:userid", function(req, res) {
     });
 });
 
-router.get("/get/:business/for/:userid", function(req, res) {
+router.get("/get/:business/for/:userid", function (req, res) {
   var businessID = req.params.business;
   var adminID = req.params.userid;
   Business.findById(businessID)
@@ -54,7 +51,7 @@ router.get("/get/:business/for/:userid", function(req, res) {
     });
 });
 
-router.get("/get/all/partners/for/:business", function(req, res) {
+router.get("/get/all/partners/for/:business", function (req, res) {
   var businessID = req.params.business;
   Business.findById(businessID)
     .populate("admin.id")
@@ -62,14 +59,14 @@ router.get("/get/all/partners/for/:business", function(req, res) {
       if (business == null)
         return res.status(512).send("The requested business is not avaliable");
       if (!business.admin) res.json([]);
-      res.json(business.admin);
+      res.json(business.admin.map(b => b.id));
     })
     .catch(err => {
       return res.status(512).send(err);
     });
 });
 
-router.post("/add/business", function(req, res) {
+router.post("/add/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
@@ -86,19 +83,17 @@ router.post("/add/business", function(req, res) {
           .send("Admin of id " + adminID + " does not exist");
       var business = new Business({
         _id: mongoose.Types.ObjectId(),
-        admin: [
-          {
-            id: adminID,
-            authority: adminAuthority && adminAuthority.toUpperCase()
-          }
-        ],
+        admin: [{
+          id: adminID,
+          authority: adminAuthority && adminAuthority.toUpperCase()
+        }],
         name: _business.name,
         logo: _business.logo,
         description: _business.description,
         type: _business.type
       });
 
-      business.save(function(err) {
+      business.save(function (err) {
         if (err) return res.status(512).send(err);
         res.send("Business successfully saved");
       });
@@ -108,7 +103,7 @@ router.post("/add/business", function(req, res) {
     });
 });
 
-router.post("/assign/to/business", function(req, res) {
+router.post("/assign/to/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
@@ -132,7 +127,7 @@ router.post("/assign/to/business", function(req, res) {
           assignedBY: assignedBY,
           authority: adminAuthority && adminAuthority.toUpperCase()
         });
-        business.save(function(err) {
+        business.save(function (err) {
           if (err) return res.status(512).send(err);
           res.send("Client successfully linked to business");
         });
