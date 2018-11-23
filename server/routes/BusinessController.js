@@ -57,7 +57,7 @@ router.get("/get/:business/for/:userid", function(req, res) {
 router.get("/get/all/partners/for/:business", function(req, res) {
   var businessID = req.params.business;
   Business.findById(businessID)
-    .populate("[admin]")
+    .populate("[admin.id]")
     .then(business => {
       if (business == null)
         return res.status(512).send("The requested business is not avaliable");
