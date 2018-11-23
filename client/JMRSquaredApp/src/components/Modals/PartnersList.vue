@@ -46,7 +46,7 @@ export default {
       http
         .getJSON(
           this.$store.state.settings.baseLink +
-            "/b/get/partners/for/" +
+            "/b/get/all/partners/for/" +
             this.businessId
         )
         .then(results => {
