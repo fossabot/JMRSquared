@@ -235,7 +235,7 @@ export default {
               pass: this.GeneratePassword(),
               numbers: this.partner.contactNumbers,
               role: "WORKER",
-              userName: this.partner.username,
+              username: this.partner.username,
               fullName: this.partner.fullName
             })
           })

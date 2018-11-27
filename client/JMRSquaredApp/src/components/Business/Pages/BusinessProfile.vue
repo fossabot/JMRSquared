@@ -12,7 +12,7 @@
         <CardView margin="15" elevation="10">
           <GridLayout rows="*,*" columns="*,*,*">
             <StackLayout row="0" :col="i" v-for="(summary,i) in summaryStats" :key="i">
-              <Ripple @tap="showPartners()">
+              <Ripple @tap="showStats(summary.link,summary.isToParent)">
                 <StackLayout class="p-15">
                   <label class="h3 font-weight-bold text-dark-blue summaryStats" :text="summary.value" :class="{'visible':true}" fontSize="30%" vertialAlignment="center" textAlignment="center"></label>
                   <label vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
@@ -21,10 +21,10 @@
             </StackLayout>
           </GridLayout>
         </CardView>
-           <GridLayout rows="auto" columns="*">
-      <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Ca$h flow"></label>
-       </GridLayout>
-        <GridLayout rows="auto,auto,*" columns="*,auto">
+        <GridLayout rows="auto" columns="*">
+          <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Ca$h flow"></label>
+        </GridLayout>
+        <GridLayout class="m-t-15" rows="auto,auto,*" columns="*,auto">
           <SegmentedBar row="0" colSpan="2" #tabs borderColor="$blueDarkColor" class="businessIcon snapTop" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="selectedStat">
             <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" @tap="currentTab = i" :title="tab"></SegmentedBarItem>
           </SegmentedBar>
@@ -83,11 +83,17 @@ export default {
   mounted() {
     this.summaryStats.push({
       title: "Partners",
+      isToParent: false,
+      link: `/business/partners/list/${this.business._id}/${
+        this.business.name
+      }`,
       value: 12
     });
 
     this.summaryStats.push({
       title: "Revenue",
+      isToParent: true,
+      link: `Stats`,
       value:
         "R" +
         this.$approx(90829, {
@@ -97,6 +103,8 @@ export default {
 
     this.summaryStats.push({
       title: "Profit",
+      isToParent: true,
+      link: `Stats`,
       value:
         "R" +
         this.$approx(78239, {
@@ -106,10 +114,12 @@ export default {
   },
   props: ["business"],
   methods: {
-    showPartners() {
-      this.$router.push(
-        `/business/partners/list/${this.business._id}/${this.business.name}`
-      );
+    showStats(link, toParent) {
+      if (!toParent) {
+        this.$router.push(link);
+      } else {
+        this.$emit("changeTab", link);
+      }
     }
   }
 };

@@ -1,35 +1,26 @@
 <template>
   <StackLayout>
-     <ScrollView>
-      <GridLayout rows="auto,auto,*" columns="*">
-      <CardView row="0">
-        <Label class="text-dark-blue font-weight-bold m-10 h3" fontSize="25%" verticalAlignment="center" textAlignment="center" text="Corolla"></Label>
-      </CardView>
-      <Image width="200" height="200" row="1" src="https://content.linkedin.com/content/dam/brand/site/img/visual-guidelines.png" alignSelf="center" stretch="aspectFit" />
-       <StackLayout row="2">
-          <Label class="font-weight-bold m-10 h3" fontSize="20%" verticalAlignment="center" textAlignment="center" text="Taxify"></Label>
-          <Label class="m-10" textWrap="true" verticalAlignment="center" textAlignment="center" text="Taxify byubbuysyaf asuyfbsayufvaufw qfyuvayusfbqw fyasbuf wqufuybsayfuv fqwuashyvfuafb wqufhysabfuh fwqyusvbusfwq"></Label>
-          <CardView margin="15" radius="10" elevation="10">
-            <Ripple>
-              <StackLayout class="p-10">
-                <label row="0" class="h3 font-weight-bold text-dark-blue" text="Partners"></label>
-                <label :row="a" class="p-y-5 p-x-20" v-for="a in 4" :key="a" :text="`value ${a}`"></label>
-              </StackLayout>
-            </Ripple>
-          </CardView>
-          <CardView margin="15" radius="10" elevation="10">
-            <Ripple>
-              <StackLayout class="p-10">
-                <label row="0" class="h3 font-weight-bold text-dark-blue" text="Expenses"></label>
-                <label :row="a" class="p-y-5 p-x-20" v-for="a in 4" :key="a" :text="`value ${a}`"></label>
-              </StackLayout>
-            </Ripple>
+    <ScrollView>
+      <GridLayout rows="auto,*" columns="*">
+        <Image height="200" row="0" :src="business.logo ? business.logo : 'https://content.linkedin.com/content/dam/brand/site/img/visual-guidelines.png'" alignSelf="center" stretch="aspectFit" />
+        <StackLayout row="1">
+          <Label class="font-weight-bold m-10 h3" fontSize="25%" verticalAlignment="center" textAlignment="center" :text="business.name"></Label>
+          <Label class="m-10" textWrap="true" verticalAlignment="center" textAlignment="center" :text="business.description"></Label>
+          <Fab icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
+          <CardView margin="10" elevation="5">
+            <StackLayout>
+              <Ripple v-for="(option,i) in options" :key="i" @tap="GoTo(option.link)">
+                <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
+                  <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + option.icon | fonticon"></Label>
+                  <label row="0" col="1" class="p-x-15 h3 font-weight-bold" :text="option.title"></label>
+                  <label row="1" col="1" class="p-x-15 h4" :text="option.text"></label>
+                </GridLayout>
+              </Ripple>
+            </StackLayout>
           </CardView>
         </StackLayout>
-    </GridLayout>
-      </ScrollView>
-      <Fab icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
-      
+      </GridLayout>
+    </ScrollView>
   </StackLayout>
 </template>
 
@@ -42,26 +33,28 @@ export default {
     return {
       isMainScreen: false,
       selectedScreen: "",
-      cards: [
-        {
-          text: "new new 86",
-          img: "",
-          redirect: "/admin/fulham/home",
-          type: "page"
-        },
-        {
-          text: "Hot Cash",
-          img: "",
-          redirect: "/home",
-          type: "page"
-        }
-      ]
+      options: []
     };
   },
   mounted() {
-    console.log(application);
+    this.options.push({
+      title: "Partners",
+      text: `List of ${this.business.name} partners`,
+      link: `/business/partners/list/${this.business._id}/${
+        this.business.name
+      }`,
+      icon: "group"
+    });
+    this.options.push({
+      title: "Expences",
+      text: `Expences of the business`,
+      link: "",
+      icon: "trending-down"
+    });
   },
+  props: ["business"],
   methods: {
+    GoTo(link) {},
     switchPage(card) {
       dialogs.alert("Going to " + card.redirect).then(() => {
         console.log(card.redirect);

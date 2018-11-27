@@ -1,7 +1,7 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout @swipe="SegmentedBarSwipe" v-if="business" rows="*,auto" columns="*">
-      <component row="0" class="enterAnimation" :business="business" :is="tabs[currentTab].view"></component>
+      <component row="0" class="enterAnimation" @changeTab="changeTabByChild" :business="business" :is="tabs[currentTab].view"></component>
       <SegmentedBar v-show="business" :class="{'visible':business}" row="1" #tabs borderColor="$blueDarkColor" class="mdi businessIcon" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="currentTab">
         <SegmentedBarItem v-for="(tab,i) in tabs" :key="i" :class="{'text-dark-blue':i == currentTab}" @tap="currentTab = i" style="font-size:25%" :title="tab.icon | fonticon"></SegmentedBarItem>
       </SegmentedBar>
@@ -47,17 +47,17 @@ export default {
           view: "BusinessProfile"
         },
         {
-          text: "Students",
+          text: "Transactions",
           icon: "mdi-receipt",
           view: "BusinessTransactions"
         },
         {
-          text: "Transactions",
+          text: "Stats",
           icon: "mdi-bubble-chart",
           view: "BusinessStats"
         },
         {
-          text: "Stats",
+          text: "Settings",
           icon: "mdi-settings",
           view: "BusinessSettings"
         }
@@ -105,6 +105,12 @@ export default {
               message: "Please try again later"
             });
           });
+      }
+    },
+    changeTabByChild(link) {
+      var tab = this.tabs.filter(t => t.text == link);
+      if (tab && tab.length > 0) {
+        this.currentTab = this.tabs.indexOf(tab[0]);
       }
     },
     SegmentedBarSwipe(args) {
