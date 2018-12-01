@@ -46,7 +46,7 @@
           </GridLayout>
   
           <GridLayout v-show="layouts.filter(l => l.title).length != 0" class="m-20" rows="auto,auto" columns="*,*,*">
-            <CardView :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts.filter(l => l.link)" textAlignment="center">
+            <CardView class="m-y-15" elevation="0" :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts.filter(l => l.link)" textAlignment="center">
               <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
                 <GridLayout rows="*,*" columns="*">
                   <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
@@ -151,11 +151,9 @@ export default {
                 if (i < count) {
                   this.layouts[i].icon = results[i].type.icon;
                   this.layouts[i].title = results[i].name;
-                  this.layouts[i].link = {
-                    name: "BusinessHome",
-                    params: {
-                      businessID: results[i]._id
-                    }
+                  this.layouts[i].link = "/business/home";
+                  this.layouts[i].props = {
+                    businessID: results[i]._id
                   };
                 } else {
                   if (
@@ -209,7 +207,7 @@ export default {
     },
     onItemTap(item) {
       if (item.link) {
-        this.navigate(item.link);
+        this.navigate(item.link, item.props);
       }
     },
     onBusinessTap(item) {}

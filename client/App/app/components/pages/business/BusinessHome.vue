@@ -53,7 +53,7 @@ export default {
         },
         {
           text: "Stats",
-          icon: "mdi-bubble-chart",
+          icon: "mdi-finance",
           view: "BusinessStats"
         },
         {
@@ -89,7 +89,7 @@ export default {
           .getJSON(
             this.$store.state.settings.baseLink +
               "/b/get/" +
-              this.$route.params.businessID +
+              this.businessID +
               "/for/" +
               this.$store.state.cache.cachedAdmin._id
           )

@@ -64,6 +64,7 @@ Vue.prototype.$route = null;
 
 //master.initFCM();
 const dialogs = require("ui/dialogs");
+var application = require("application");
 
 Vue.mixin({
   data() {
@@ -89,9 +90,18 @@ Vue.mixin({
     },
   },
   methods: {
-    navigate(to) {
+    navigate(to, props = null) {
       console.log('Navigating to -> ', to);
-      this.$navigator.navigate(to, {});
+      if (to == null) {
+        this.$navigator.back();
+      } else {
+        var options = {};
+        if (props != null) {
+          console.log('props -> ', props);
+          options.props = props
+        }
+        this.$navigator.navigate(to, options);
+      }
     },
     showChangeLog() {
       var log = master.ChangeLog.GetLogs("0.3");
@@ -305,9 +315,9 @@ Vue.mixin({
           self.currentPage--;
         } else {
           activity.onBackPressed = function () {
-            self.$router.back();
+            self.navigate(null);
           };
-          self.$router.back();
+          self.navigate(null);
         }
       };
     },

@@ -25,14 +25,13 @@
                 <StackLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-domain' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name *"></label>
                     <TextField returnKeyType="next" v-model="business.name" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
                   </GridLayout>
-                  <StackLayout width="100%" class="hr-light"></StackLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-work' | fonticon"></label>
+                    <label row="0" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-briefcase' | fonticon"></label>
                     <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="Business Type *"></label>
                     <ListPicker row="1" col="0" colSpan="2" @selectedIndexChange="changeSelectedBusinessCategory" :items="business.options.types.map(t => t.type)" v-model="business.type.index" />
                   </GridLayout>
@@ -43,8 +42,7 @@
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Category *"></label>
                     <label :text="business.type.category" row="1" col="1" class="h4"></label>
                   </GridLayout>
-                  <StackLayout width="100%" class="hr-light"></StackLayout>
-  
+
                   <GridLayout class="m-10" v-if="business.type.optionals" v-for="(optional,o) in business.type.optionals" :key="o" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
@@ -53,9 +51,9 @@
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-description' | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business description"></label>
-                    <TextView returnKeyType="done" v-model="business.description" row="1" col="1" class="h4" hint="More information about your business"></TextView>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-bulleted' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business slogan"></label>
+                    <TextView returnKeyType="done" v-model="business.description" row="1" col="1" class="h4" hint="A short phrase that serves as a very brief representation of your business"></TextView>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
                 </StackLayout>
@@ -99,13 +97,13 @@
                   </GridLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-business' | fonticon"></label>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-domain' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name"></label>
                     <label :text="business.name" row="1" col="1" class="h4"></label>
                   </GridLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-work' | fonticon"></label>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-briefcase' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Type"></label>
                     <label :text="business.type.type" row="1" col="1" class="h4"></label>
                   </GridLayout>
@@ -122,8 +120,8 @@
                   </GridLayout>
   
                   <GridLayout v-show="business.description.length != 0" class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-description' | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business description"></label>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-bulleted' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business slogan"></label>
                     <label :text="business.description" row="1" col="1" class="h4"></label>
                   </GridLayout>
   
@@ -288,36 +286,6 @@ export default {
             });
           });
       }
-    },
-    changeRentDueOn() {
-      var self = this;
-      this.$showModal({
-        template: ` 
-                                                                                                                                                    <Page>
-                                                                                                                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                                                                            <Label row="0" class="h2 m-5" textAlignment="center" text="Select when the rent is due"></Label>
-                                                                                                                                                            <ListPicker row="1" :items="datesDue" v-model="selectedDueDateOn" />
-                                                                                                                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,datesDue[selectedDueDateOn])" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                                                                                        </GridLayout>
-                                                                                                                                                    </Page>
-                                                                                                                                                    `,
-        data: function() {
-          return {
-            datesDue: [
-              "1st of each month",
-              "15th of each month",
-              "22nd of each month"
-            ],
-            selectedDueDateOn: 0
-          };
-        },
-        methods: {
-          changeDueRent(modal, value) {
-            self.rentDueOn = value;
-            this.$modal.close();
-          }
-        }
-      });
     },
     submitBusiness() {
       this.isLoading = true;
@@ -498,44 +466,6 @@ export default {
       if (this.canGoForward()) {
         this.currentPage++;
       }
-    },
-    changeLeaseDate(isStart) {
-      var self = this;
-      this.$showModal({
-        template: ` 
-                                                                                                <Page>
-                                                                                                    <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                        <Label row="0" class="h2 m-5" textAlignment="center" text="Select a date"></Label>
-                                                                                                        <DatePicker row="1" v-model="selectedDueDate" />
-                                                                                                        <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-done' | fonticon"></Label>
-                                                                                                    </GridLayout>
-                                                                                                </Page>
-                                                                                                `,
-        data: function() {
-          return {
-            selectedDueDate: new Date()
-          };
-        },
-        methods: {
-          changeDueRent(modal, value) {
-            if (isStart) {
-              self.leaseStartDate = value;
-              self.leaseStartDate.setDate(value.getDate() + 1);
-            } else {
-              self.leaseEndDate = value;
-              self.leaseEndDate.setDate(value.getDate() + 1);
-            }
-
-            let d1 = self.leaseStartDate;
-            let d2 = self.leaseEndDate;
-            let months = (d2.getFullYear() - d1.getFullYear()) * 12;
-            months -= d1.getMonth() + 1;
-            months += d2.getMonth();
-            self.leaseTotalMonths = months + 1;
-            this.$modal.close();
-          }
-        }
-      });
     },
     changeSelectedBusinessCategory(index) {
       if (
