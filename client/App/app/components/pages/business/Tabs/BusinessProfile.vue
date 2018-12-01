@@ -12,7 +12,7 @@
         <CardView margin="15" elevation="10">
           <GridLayout rows="*,*" columns="*,*,*">
             <StackLayout row="0" :col="i" v-for="(summary,i) in summaryStats" :key="i">
-              <Ripple @tap="showStats(summary.link,summary.isToParent)">
+              <Ripple @tap="showStats(summary,summary.isToParent)">
                 <StackLayout class="p-15">
                   <label class="h3 font-weight-bold text-dark-blue summaryStats" :text="summary.value" :class="{'visible':true}" fontSize="30%" vertialAlignment="center" textAlignment="center"></label>
                   <label vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
@@ -84,9 +84,11 @@ export default {
     this.summaryStats.push({
       title: "Partners",
       isToParent: false,
-      link: `/business/partners/list/${this.business._id}/${
-        this.business.name
-      }`,
+      link: `/business/partners/list`,
+      props: {
+        businessId: this.business._id,
+        businessName: this.business.name
+      },
       value: 12
     });
 
@@ -114,11 +116,16 @@ export default {
   },
   props: ["business"],
   methods: {
-    showStats(link, toParent) {
+    showStats(option, toParent) {
       if (!toParent) {
-        this.$router.push(link);
+        this.GoTo(option);
       } else {
-        this.$emit("changeTab", link);
+        this.$emit("changeTab", option.link);
+      }
+    },
+    GoTo(option) {
+      if (option.link) {
+        this.navigate(option.link, option.props);
       }
     }
   }

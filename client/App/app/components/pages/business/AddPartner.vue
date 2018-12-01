@@ -42,7 +42,7 @@
                   </GridLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-card-details' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full name"></label>
                     <TextView v-model="partner.fullName" returnKeyType="done" row="1" col="1" class="h4" hint="e.g Sirwali Joseph"></TextView>
                   </GridLayout>
@@ -82,7 +82,7 @@
                   </GridLayout>
   
                   <GridLayout v-show="partner.fullName.length > 2" class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-person' | fonticon"></label>
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-card-details' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full name"></label>
                     <label :text="partner.fullName" row="1" col="1" class="h4"></label>
                   </GridLayout>
@@ -132,8 +132,6 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      businessId: "",
-      businessName: "",
       partner: {
         username: "",
         contactNumbers: "",
@@ -199,11 +197,9 @@ export default {
   mounted() {
     this.pageLoaded();
   },
+  props: ["businessName", "businessId"],
   methods: {
     pageLoaded(args) {
-      this.businessId = this.$route.params.businessId;
-      this.businessName = this.$route.params.businessName;
-
       this.currentPage = 0;
       var self = this;
       this.ApplyNavigation(self);

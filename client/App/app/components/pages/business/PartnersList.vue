@@ -2,20 +2,24 @@
   <page actionBarHidden="true">
     <StackLayout backgroundColor="white">
       <Label class="h2 m-15 p-15" textAlignment="center" :text="`All partners of ${businessName}`"></Label>
-      <Ripple class="m-15 p-15" @tap="GoToPage(`/business/add/partner/${businessId}/${businessName}`)">
-        <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
-          <Label row="0" rowSpan="3" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-add' | fonticon"></Label>
-          <Label row="0" col="1" textAlignment="center" class="h2" text="Add new partner"></Label>
-          <Label row="1" col="1" textAlignment="center" :text="`Assign a new worker to ${businessName}`"></Label>
-        </GridLayout>
-      </Ripple>
+      <CardView margin="10" elevation="20">
+        <StackLayout>
+          <Ripple @tap="GoTo(option)">
+            <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
+              <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-account-multiple-plus' | fonticon"></Label>
+              <label row="0" col="1" class="p-x-15 h3" fontSize="20%" text="Add new partner"></label>
+              <label row="1" col="1" class="p-x-15 h4" :text="`Assign a new worker to ${businessName}`"></label>
+            </GridLayout>
+          </Ripple>
+        </StackLayout>
+      </CardView>
       <ScrollView>
         <StackLayout>
-          <Ripple class="m-15" v-for="(partner,i) in partners" :key="i">
-            <GridLayout padding="2%" columns="auto,*,auto" rows="auto,auto,auto">
+          <Ripple v-for="(partner,i) in partners" :key="i">
+            <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
               <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70" borderRadius="50%" />
-              <Label row="0" col="0" colSpan="3" textAlignment="center" class="h2" :textWrap="true" :text="partner.userName"></Label>
-              <Label row="2" col="0" colSpan="3" textAlignment="center" verticalAlignment="center" :text="`0${partner.numbers}`"></Label>
+              <label row="0" col="1" class="p-x-15 h2" verticalAlignment="bottom" :text="partner.userName"></label>
+              <label row="1" col="1" class="p-x-15 h3" verticalAlignment="bottom" :text="`0${partner.numbers}`"></label>
             </GridLayout>
           </Ripple>
         </StackLayout>
@@ -30,13 +34,19 @@ export default {
   name: "PartnersList",
   data() {
     return {
+      option: {},
       partners: []
     };
   },
   mounted() {
-    this.businessId = this.$route.params["businessID"];
-    this.businessName = this.$route.params["businessName"];
     this.GetPartnersForBusiness();
+    this.option = {
+      link: "/business/add/partner",
+      props: {
+        businessId: this.businessId,
+        businessName: this.businessName
+      }
+    };
   },
   props: ["businessName", "businessId"],
   methods: {
@@ -58,8 +68,10 @@ export default {
           });
         });
     },
-    GoToPage(link) {
-      this.$router.push(link);
+    GoTo(option) {
+      if (option.link) {
+        this.navigate(option.link, option.props);
+      }
     }
   }
 };

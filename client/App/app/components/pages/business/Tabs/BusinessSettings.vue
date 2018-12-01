@@ -9,7 +9,7 @@
           <Fab icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
           <CardView margin="10" elevation="5">
             <StackLayout>
-              <Ripple v-for="(option,i) in options" :key="i" @tap="GoTo(option.link)">
+              <Ripple v-for="(option,i) in options" :key="i" @tap="GoTo(option)">
                 <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
                   <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + option.icon | fonticon"></Label>
                   <label row="0" col="1" class="p-x-15 h3 font-weight-bold" :text="option.title"></label>
@@ -40,10 +40,12 @@ export default {
     this.options.push({
       title: "Partners",
       text: `List of ${this.business.name} partners`,
-      link: `/business/partners/list/${this.business._id}/${
-        this.business.name
-      }`,
-      icon: "group"
+      link: `/business/partners/list`,
+      props: {
+        businessId: this.business._id,
+        businessName: this.business.name
+      },
+      icon: "worker"
     });
     this.options.push({
       title: "Expences",
@@ -54,7 +56,11 @@ export default {
   },
   props: ["business"],
   methods: {
-    GoTo(link) {},
+    GoTo(option) {
+      if (option.link) {
+        this.navigate(option.link, option.props);
+      }
+    },
     switchPage(card) {
       dialogs.alert("Going to " + card.redirect).then(() => {
         console.log(card.redirect);
