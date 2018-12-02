@@ -8,6 +8,8 @@ import {
     FeedbackPosition
 }
 from "nativescript-feedback";
+import API from "./http";
+import store from '../store';
 var firebase = require("nativescript-plugin-firebase");
 
 master.couchDB = new Couchbase("jmrdb");
@@ -15,6 +17,10 @@ master.feedback = new Feedback();
 master.approximateNumber = require('../lib/approximate-number');
 master.appSettings = require("application-settings");
 master.firebase = firebase;
+master.device_token = null;
+
+master.http = new API(store.state.settings.baseLink);
+console.log('http', master.http);
 
 master.ChangeLog = {
     GetLogs: (version) => {
@@ -41,7 +47,6 @@ master.ChangeLog = {
 }
 
 master.initFCM = function (self) {
-    let device_token = null;
     return new Promise((resolve, reject) => {
         firebase
             .init({
@@ -64,12 +69,12 @@ master.initFCM = function (self) {
                 },
                 onPushTokenReceivedCallback: token => {
                     master.feedback.success({
-                        title: "Got your access token",
-                        duration: 4000,
-                        message: token
+                        title: "Welcome",
+                        duration: 10000,
+                        message: "We managed to set you up for push notifications"
                     });
                     master.appSettings.setString("device_token", token);
-                    device_token = token;
+                    master.device_token = token;
                 }
             })
             .then(
@@ -77,7 +82,7 @@ master.initFCM = function (self) {
                     if (master.appSettings.getString("device_token") == null) {
                         firebase.getCurrentPushToken().then((token) => {
                             master.appSettings.setString("device_token", token);
-                            device_token = token;
+                            master.device_token = token;
                         });
                     }
                     resolve(instance);
@@ -87,7 +92,7 @@ master.initFCM = function (self) {
                         if (master.appSettings.getString("device_token") == null) {
                             firebase.getCurrentPushToken().then((token) => {
                                 master.appSettings.setString("device_token", token);
-                                device_token = token;
+                                master.device_token = token;
                             });
                         }
                         resolve();

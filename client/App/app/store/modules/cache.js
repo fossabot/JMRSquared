@@ -1,35 +1,43 @@
 const state = {
-  tenantLoggedInString:'reuygfdoijcufvibiydksgiesahlbowhofvoeighkibuowuthoeguisku',
-  adminLoggedInString:'j56herwgfassnytedmumnrbtnyjdtnbrsfvsbtrnyjehhtnwybtgvgtrr',
-  cachedAdmin:null,
-  cachedTenant:null,
-  lastUpdated:null
+  tenantLoggedInString: 'reuygfdoijcufvibiydksgiesahlbowhofvoeighkibuowuthoeguisku',
+  adminLoggedInString: 'j56herwgfassnytedmumnrbtnyjdtnbrsfvsbtrnyjehhtnwybtgvgtrr',
+  cachedAdmin: null,
+  cachedTenant: null,
+  lastUpdated: null
 };
 
 const mutations = {
-   refreshCache(state,obj){
+  refreshCache(state, obj) {
     let documentID = obj.appSettings.getString(state.adminLoggedInString);
-    
+
     if (documentID != null) {
-        let user = obj.db.getDocument(documentID);
-        state.cachedAdmin = user.result;
-        state.lastUpdated = user.date;
+      let user = obj.db.getDocument(documentID);
+      state.cachedAdmin = user.result;
+      state.lastUpdated = user.date;
     }
 
     documentID = obj.appSettings.getString(state.tenantLoggedInString);
 
     if (documentID != null) {
-        let user = obj.db.getDocument(documentID);
-        state.cachedTenant = user.result;
-        state.lastUpdated = user.date;
+      let user = obj.db.getDocument(documentID);
+      state.cachedTenant = user.result;
+      state.lastUpdated = user.date;
     }
-   
-   },
-   cacheUser(state,obj){
+
+  },
+  cacheUser(state, obj) {
     var cacheString = obj.isAdmin ? state.adminLoggedInString : state.tenantLoggedInString;
-    
+
     let documentID = obj.appSettings.getString(cacheString);
-    
+    if (obj.user.device_token != obj.appSettings.getString("device_token")) {
+      obj.user.device_token = obj.appSettings.getString("device_token");
+      obj.api.addUserDeviceToken(obj.user._id, obj.user.device_token).then(result => {
+
+      }).catch(err => {
+
+      });
+    }
+
     if (documentID == null) {
       var doc = obj.db.createDocument({
         "date": new Date(),
@@ -46,19 +54,19 @@ const mutations = {
       console.log("Document exists , " + documentID + " , we Updated");
     }
 
-    if(obj.isAdmin){
+    if (obj.isAdmin) {
       state.cachedAdmin = obj.user;
       state.lastUpdated = new Date();
-    }else{
+    } else {
       state.cachedTenant = obj.user;
       state.lastUpdated = new Date();
     }
-    
-  }
- };
 
- const actions = {
-  
+  }
+};
+
+const actions = {
+
 };
 
 export default {

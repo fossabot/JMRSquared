@@ -54,6 +54,7 @@ Vue.prototype.$feedback = master.feedback;
 Vue.prototype.$approx = master.approximateNumber;
 Vue.prototype.appSettings = master.appSettings;
 Vue.prototype.$firebase = master.firebase;
+Vue.prototype.$api = master.http;
 
 import router from "./services/router";
 import Navigator from "nativescript-vue-navigator";
@@ -97,7 +98,14 @@ Vue.mixin({
           });
         });
     }
+    console.log('Device_Token', this.appSettings.getString("device_token"));
+    if (this.$store.state.cache.cachedAdmin) {
+      console.log('LoggedIn device Token', this.$store.state.cache.cachedAdmin.device_token);
+    } else {
+      console.log('LoggedIn device Token', 'No cached user');
+    }
     console.log(this.$route);
+    console.log('API', this.$api);
     console.log("Auth level", this.$router.current.userAuthLevel());
 
   },
@@ -366,6 +374,7 @@ Vue.mixin({
 
       self.$store.commit("cacheUser", {
         db: self.$db,
+        api: self.$api,
         appSettings: this.appSettings,
         user: result,
         isAdmin: false
@@ -388,6 +397,7 @@ Vue.mixin({
 
       self.$store.commit("cacheUser", {
         db: self.$db,
+        api: self.$api,
         appSettings: this.appSettings,
         user: result,
         isAdmin: true
