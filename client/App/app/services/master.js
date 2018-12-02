@@ -14,6 +14,7 @@ master.couchDB = new Couchbase("jmrdb");
 master.feedback = new Feedback();
 master.approximateNumber = require('../lib/approximate-number');
 master.appSettings = require("application-settings");
+master.firebase = firebase;
 
 master.ChangeLog = {
     GetLogs: (version) => {
@@ -39,52 +40,63 @@ master.ChangeLog = {
     }
 }
 
-master.initFCM = function () {
+master.initFCM = function (self) {
     let device_token = null;
-    firebase
-        .init({
-            onMessageReceivedCallback: message => {
-                master.feedback.success({
-                    title: message.title,
-                    duration: 4000,
-                    message: message.body
-                });
-                // if your server passed a custom property called 'foo', then do this:
-                // console.log("Value of 'foo': " + message.data.foo);
-            },
-            onPushTokenReceivedCallback: token => {
-                master.feedback.success({
-                    title: "Got your access token",
-                    duration: 4000,
-                    message: token
-                });
-                appSettings.setString("device_token", token);
-                device_token = token;
-            }
-        })
-        .then(
-            instance => {
-                console.log('tag', "firebase.init done")
-                master.feedback.success({
-                    title: "firebase.init done",
-                    duration: 4000
-                });
-            },
-            err => {
-                console.log('tag', err)
-                master.feedback.success({
-                    title: "Firebase cannot connect",
-                    duration: 4000,
-                    message: err.message
-                });
-            }
-        );
-    if (appSettings.getString("device_token") == null) {
-        firebase.getCurrentPushToken().then((token) => {
-            appSettings.setString("device_token", token);
-            device_token = token;
-        });
-    }
+    return new Promise((resolve, reject) => {
+        firebase
+            .init({
+                onMessageReceivedCallback: (message) => {
+                    console.log("Notification", message);
+                    if (message.foreground) {
+                        master.feedback.success({
+                            title: message.title,
+                            duration: 4000,
+                            message: message.body,
+                            onTap: () => {
+                                if (message.data && message.data.link) {
+                                    self.navigate(message.data.link, message.data.props);
+                                }
+                            }
+                        })
+                    } else {
+                        self.navigate("/login");
+                    }
+                },
+                onPushTokenReceivedCallback: token => {
+                    master.feedback.success({
+                        title: "Got your access token",
+                        duration: 4000,
+                        message: token
+                    });
+                    master.appSettings.setString("device_token", token);
+                    device_token = token;
+                }
+            })
+            .then(
+                instance => {
+                    if (master.appSettings.getString("device_token") == null) {
+                        firebase.getCurrentPushToken().then((token) => {
+                            master.appSettings.setString("device_token", token);
+                            device_token = token;
+                        });
+                    }
+                    resolve(instance);
+                },
+                err => {
+                    if (err.message.indexOf('already') >= 0) {
+                        if (master.appSettings.getString("device_token") == null) {
+                            firebase.getCurrentPushToken().then((token) => {
+                                master.appSettings.setString("device_token", token);
+                                device_token = token;
+                            });
+                        }
+                        resolve();
+                    } else {
+                        reject(err);
+                    }
+                }
+            );
+    });
 }
 
 export default master;

@@ -1,18 +1,23 @@
 <template>
-    <Navigator :defaultRoute="'/home'"/>
+    <Navigator :defaultRoute="this.$router.current.userAuthLevel() != 3 ? currentPage : adminDashboard"/>
 </template>
 
 <script>
 export default {
   name: "App",
   data() {
-    return {};
+    return {
+      currentPage: "/home",
+      adminDashboard: "/admin/dashboard"
+    };
   },
-  beforeCreate(){
-
+  beforeCreate() {
+    this.$store.commit("refreshCache", {
+      db: this.$db,
+      appSettings: this.appSettings
+    });
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {}
 };
 </script>

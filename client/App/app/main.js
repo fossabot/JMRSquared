@@ -1,5 +1,5 @@
-import Vue from 'nativescript-vue'
-import App from './components/App'
+import Vue from "nativescript-vue";
+import App from "./components/App";
 
 import store from "./store";
 
@@ -23,7 +23,7 @@ TNSFontIcon.paths = {
 };
 TNSFontIcon.loadCss();
 
-Vue.config.silent = (TNS_ENV === 'production')
+Vue.config.silent = TNS_ENV === "production";
 Vue.registerElement(
   "CardView",
   () => require("nativescript-cardview").CardView
@@ -48,21 +48,21 @@ Vue.registerElement(
 
 Vue.filter("fonticon", fonticon);
 
-import master from './services/master';
+import master from "./services/master";
 Vue.prototype.$db = master.couchDB;
 Vue.prototype.$feedback = master.feedback;
 Vue.prototype.$approx = master.approximateNumber;
 Vue.prototype.appSettings = master.appSettings;
+Vue.prototype.$firebase = master.firebase;
 
 import router from "./services/router";
-import Navigator from 'nativescript-vue-navigator'
+import Navigator from "nativescript-vue-navigator";
 Vue.use(Navigator, {
   routes: router.routes
-})
+});
 Vue.prototype.$router = router;
 Vue.prototype.$route = null;
 
-//master.initFCM();
 const dialogs = require("ui/dialogs");
 var application = require("application");
 
@@ -70,35 +70,57 @@ Vue.mixin({
   data() {
     return {
       isLoading: false,
-      toggleSearch: false,
+      toggleSearch: false
     };
   },
   beforeCreate() {
     if (!this.$route) {
-      this.$route = this.$navigator.route
+      this.$route = this.$navigator.route;
       //this.$route.meta.userAuthLevel = 0;
     }
+    if (!this.$firebase || !this.$firebase.initialized) {
+      master
+        .initFCM(this)
+        .then(instance => {
+          console.log("firebase instance", instance);
+          master.feedback.success({
+            title: "firebase.init done",
+            duration: 4000
+          });
+        })
+        .catch(err => {
+          console.log("tag", err);
+          master.feedback.success({
+            title: "Firebase cannot connect",
+            duration: 4000,
+            message: err.message
+          });
+        });
+    }
     console.log(this.$route);
-    console.log('Auth level', this.$router.current.userAuthLevel())
+    console.log("Auth level", this.$router.current.userAuthLevel());
+
   },
-  mounted() {},
+  mounted() {
+
+  },
   computed: {
     adminProfile: {
       get() {
         return this.$store.state.cache.cachedAdmin;
       }
-    },
+    }
   },
   methods: {
     navigate(to, props = null) {
-      console.log('Navigating to -> ', to);
+      console.log("Navigating to -> ", to);
       if (to == null) {
         this.$navigator.back();
       } else {
         var options = {};
         if (props != null) {
-          console.log('props -> ', props);
-          options.props = props
+          console.log("props -> ", props);
+          options.props = props;
         }
         this.$navigator.navigate(to, options);
       }
@@ -429,7 +451,8 @@ Vue.mixin({
         .then(result => {
           if (result) {
             this.appSettings.setNumber("authLevel", -1);
-            this.$router.replace("/home");
+            this.$router.userAuthLevel = null;
+            this.navigate("/home");
           }
         });
     }
@@ -439,4 +462,4 @@ Vue.mixin({
 new Vue({
   store,
   render: h => h(App)
-}).$start()
+}).$start();
