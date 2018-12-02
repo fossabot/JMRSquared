@@ -118,7 +118,7 @@ router.post("/device/token/add", function (req, res) {
           token: deviceToken
         });
         admin.save(function (err) {
-          if (err) return res.status(512).send("Unable to update token");
+          if (err) return res.status(512).send(err);
           return res.send("Successfully added the new token");
         })
       } else {
