@@ -111,10 +111,10 @@ router.post("/device/token/add", function (req, res) {
         admin.deviceTokens = new Array();
       }
 
-      var exist = admin.deviceTokens.filter(v => v.token == deviceToken).length;
+      var exist = admin.deviceTokens.filter(v => v.token == deviceToken && !v.removed).length;
       if (exist == 0) {
         admin.deviceTokens.push({
-          date: Date.now,
+          date: Date.now(),
           token: deviceToken
         });
         admin.save(function (err) {

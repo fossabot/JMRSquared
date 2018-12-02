@@ -44,6 +44,10 @@ const AdminSchema = new mongoose.Schema({
         },
         token: {
             type: String
+        },
+        removed: {
+            type: Boolean,
+            default: false
         }
     }]
 });
