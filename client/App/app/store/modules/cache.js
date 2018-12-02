@@ -31,10 +31,18 @@ const mutations = {
     let documentID = obj.appSettings.getString(cacheString);
     if (obj.user.device_token != obj.appSettings.getString("device_token")) {
       obj.user.device_token = obj.appSettings.getString("device_token");
-      obj.api.addUserDeviceToken(obj.user._id, obj.user.device_token).then(result => {
-
+      console.log("ADDTOKEN-request", obj.user._id);
+      console.log("ADDTOKEN-request-token", obj.user.device_token);
+      obj.api.addUserDeviceToken(obj.user._id, obj.user.device_token).then(response => {
+        var statusCode = response.statusCode;
+        if (statusCode == 200) {
+          console.log("ADDTOKEN-success", response)
+        } else {
+          var error = response.content;
+          throw new Error(error);
+        }
       }).catch(err => {
-
+        console.log("ADDTOKEN-error", err)
       });
     }
 

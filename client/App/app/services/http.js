@@ -1,8 +1,8 @@
+const http = require("http");
 export default class API {
     constructor(base) {
         console.log('imported', 'called constructor')
         this.baseUrl = base;
-        this.http = require("http");
     }
 
     makePost(url, content = {}) {
@@ -20,15 +20,17 @@ export default class API {
         return this.baseUrl + url
     }
 
-    addUserDeviceToken(userID, deviceToken) {
+    addUserDeviceToken(adminID, deviceToken) {
         return new Promise((resolve, reject) => {
             console.log('Update device token', deviceToken);
             http.request(this.makePost("/a/device/token/add", {
-                userID: userID,
+                adminID: adminID,
                 deviceToken: deviceToken
             })).then((result) => {
+                console.log("ADDTOKEN-success", result)
                 resolve(result)
             }).catch(err => {
+                console.log("ADDTOKEN-error", err)
                 reject(err);
             });
         });

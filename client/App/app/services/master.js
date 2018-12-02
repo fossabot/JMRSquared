@@ -20,7 +20,6 @@ master.firebase = firebase;
 master.device_token = null;
 
 master.http = new API(store.state.settings.baseLink);
-console.log('http', master.http);
 
 master.ChangeLog = {
     GetLogs: (version) => {
