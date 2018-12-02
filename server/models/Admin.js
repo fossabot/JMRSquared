@@ -37,6 +37,14 @@ const AdminSchema = new mongoose.Schema({
     documents: [{
         type: Schema.Types.ObjectId,
         ref: 'Document'
+    }],
+    deviceTokens: [{
+        date: {
+            type: Date
+        },
+        token: {
+            type: String
+        }
     }]
 });
 

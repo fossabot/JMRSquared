@@ -99,6 +99,37 @@ router.post("/add", function (req, res) {
   });
 });
 
+router.post("/device/token/add", function (req, res) {
+  var adminID = req.body.adminID;
+  var deviceToken = req.body.deviceToken;
+  Admin.findById(adminID)
+    .then(admin => {
+      if (admin == null) {
+        return res.status(512).send("Invalid user");
+      }
+      if (!admin.deviceTokens) {
+        admin.deviceTokens = new Array();
+      }
+
+      var exist = admin.deviceTokens.filter(v => v.token == deviceToken).length;
+      if (exist == 0) {
+        admin.deviceTokens.push({
+          date: Date.now,
+          token: deviceToken
+        });
+        admin.save(function (err) {
+          if (err) return res.status(512).send("Unable to update token");
+          return res.send("Successfully added the new token");
+        })
+      } else {
+        return res.send("Token was already linked to user");
+      }
+    })
+    .catch(err => {
+      return res.status(512).send(err.message);
+    });
+});
+
 router.get("/bug/get/:bugId", function (req, res) {
   var bugID = req.params.bugId;
   Bug.findById(bugID).then(bug => {
@@ -200,10 +231,12 @@ router.get("/transaction/get/:transactionId", function (req, res) {
 router.get("/transaction/all", function (req, res) {
   Transaction.find({
         $or: [{
-          source: "PROPERTY"
-        }, {
-          source: null
-        }]
+            source: "PROPERTY"
+          },
+          {
+            source: null
+          }
+        ]
       },
       "_id adminID amount type rentTenantName rentMonth description date"
     )
@@ -215,7 +248,8 @@ router.get("/transaction/all", function (req, res) {
       }
       transactions.reverse();
       res.json(transactions);
-    }).catch(err => {
+    })
+    .catch(err => {
       res.status(500);
       res.send("Error : " + err.message);
     });
