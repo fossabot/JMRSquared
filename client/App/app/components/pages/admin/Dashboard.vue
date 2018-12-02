@@ -14,35 +14,8 @@
       </CardView>
       <ScrollView class="m-x-15" row="1">
         <StackLayout>
-          <GridLayout rows="auto" columns="*,*">
-            <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Notifications"></label>
-            <Label row="0" col="1" verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-user' | fonticon"></Label>
-          </GridLayout>
-  
-          <GridLayout rows="auto,auto,auto" columns="*,auto">
-            <StackLayout row="0" colSpan="2">
-              <CardView elevation="5" margin="5">
-                <Ripple>
-                  <GridLayout class="p-10" rows="auto,auto,auto" columns="auto,*">
-                    <Image row="0" rowSpan="2" verticalAlignment="center" width="60" height="60" col="0" stretch="aspectFill" src="https://picsum.photos/200/300" />
-                    <label row="0" col="1" textWrap="true" class="h3 font-weight-bold text-mute text-dark-blue p-x-5" verticalAlignment="center" text="Food was bought by nolo for R400 and this is soo sad"></label>
-                    <Label row="1" col="1" class="h4 text-mute p-x-5" verticalAlignment="bottom" textAlignment="right" text="a days ago"></Label>
-                  </GridLayout>
-                </Ripple>
-              </CardView>
-            </StackLayout>
-            <StackLayout class="p-10" row="1" col="1" orientation="horizontal">
-              <Ripple textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
-                <Label textAlignmemt="center" verticalAlignment="center" class="mdi" fontSize="40%" :text="'mdi-chevron-left' | fonticon"></Label>
-              </Ripple>
-              <Ripple textAlignmemt="right" verticalAlignment="center" borderRadius="50%">
-                <Label textAlignmemt="center" verticalAlignment="center" class="mdi" fontSize="40%" :text="'mdi-chevron-right' | fonticon"></Label>
-              </Ripple>
-            </StackLayout>
-          </GridLayout>
-  
           <GridLayout rows="auto" columns="*">
-            <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Businesses"></label>
+            <label class="h3 font-weight-bold text-mute text-dark-blue" text="Pick a business or Add new one"></label>
           </GridLayout>
   
           <GridLayout v-show="layouts.filter(l => l.title).length != 0" class="m-20" rows="auto,auto" columns="*,*,*">
@@ -60,7 +33,6 @@
           <GridLayout v-show="layouts.filter(l => l.title).length == 0" class="m-20" rows="*" columns="*">
             <ActivityIndicator textAlignment="center" verticalAlignment="center" :busy="layouts.filter(l => l.title).length == 0"></ActivityIndicator>
           </GridLayout>
-  
         </StackLayout>
       </ScrollView>
     </GridLayout>

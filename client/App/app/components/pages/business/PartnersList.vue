@@ -1,7 +1,6 @@
 <template>
   <page actionBarHidden="true">
     <StackLayout backgroundColor="white">
-      <Label class="h2 m-15 p-15" textAlignment="center" :text="`All partners of ${businessName}`"></Label>
       <CardView margin="10" elevation="20">
         <StackLayout>
           <Ripple @tap="GoTo(option)">
