@@ -47,7 +47,7 @@ router.post("/push/notification/to/admin", function (req, res) {
     Admin.find({
         email: email
     }).then(users => {
-        if (users == null || user.length == 0) return res.status(514).send("User of email " + email + " not found");
+        if (users == null || users.length == 0) return res.status(514).send("User of email " + email + " not found");
         var tokens = users[0].deviceTokens.filter(v => v.token == deviceToken && !v.removed);
         if (tokens.length > 0) {
             var deviceToken = token[0];
