@@ -57,7 +57,7 @@ router.post("/push/notification/to/admin", function (req, res) {
     }
     Admin.findById(adminID).then(user => {
         if (user == null) return res.status(514).send("User of id " + adminID + " not found");
-        var tokens = user.deviceTokens.filter(v => !v.removed);
+        var tokens = user.deviceTokens.filter(v => !v.removed).map(v => v.token);
         if (tokens) {
             var payload = {
                 notification: notification,
