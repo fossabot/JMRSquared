@@ -42,6 +42,40 @@ router.post("/test/push/notification", function (req, res) {
         });
 });
 
+router.post("/push/notification/to/admin/:adminEmail", function (req, res) {
+    var email = req.params.adminEmail;
+    Admin.find({
+        email: email
+    }).then(users => {
+        if (users == null || user.length == 0) return res.status(514).send("User of email " + email + " not found");
+        var tokens = users[0].deviceTokens.filter(v => v.token == deviceToken && !v.removed);
+        if (tokens.length > 0) {
+            var deviceToken = token[0];
+            var payload = {
+                notification: {
+                    title: "Testing push!!",
+                    body: "This is the body of the push"
+                },
+                data: {
+                    link: "/home",
+                    props: JSON.stringify({
+                        device_token: deviceToken
+                    })
+                }
+            };
+            FCM.sendToDevice(deviceToken, payload)
+                .then(response => {
+                    return res.json(response);
+                })
+                .catch(err => {
+                    return res.status(512).send(err);
+                });
+        } else {
+            return res.status(514).send("User has no device_token");
+        }
+    });
+});
+
 router.post("/test/push/notification/schedule", function (req, res) {
     var deviceToken = req.body.token;
     var payload = {
