@@ -44,34 +44,44 @@ router.post("/test/push/notification", function (req, res) {
 
 router.post("/push/notification/to/admin", function (req, res) {
     var email = req.body.email;
+    var notification = req.body.notification;
+    var data = req.body.data;
+    var link = req.body.link;
+    var props = req.body.props;
+
+    if (!notification) {
+        notification = {
+            title: "Testing push!!",
+            body: "This is the body of the push"
+        }
+    }
     Admin.find({
         email: email
     }).then(users => {
         if (users == null || users.length == 0) return res.status(514).send("User of email " + email + " not found");
-        var tokens = users[0].deviceTokens.filter(v => v.token == deviceToken && !v.removed);
-        if (tokens.length > 0) {
-            var deviceToken = token[0];
+        var tokens = users[0].deviceTokens.filter(v => !v.removed);
+        if (tokens) {
             var payload = {
-                notification: {
-                    title: "Testing push!!",
-                    body: "This is the body of the push"
-                },
+                notification: notification,
                 data: {
-                    link: "/home",
-                    props: JSON.stringify({
-                        device_token: deviceToken
-                    })
+                    link: link,
+                    props: JSON.stringify(props),
+                    data: JSON.stringify(data),
+
                 }
             };
-            FCM.sendToDevice(deviceToken, payload)
-                .then(response => {
-                    return res.json(response);
-                })
-                .catch(err => {
-                    return res.status(512).send(err);
-                });
+            tokens.forEach(deviceToken => {
+                FCM.sendToDevice(deviceToken, payload)
+                    .then(response => {
+
+                    })
+                    .catch(err => {
+                        // return res.status(512).send(err);
+                    });
+            });
+            return res.json("Notification will be sent to " + tokens.length + " devices");
         } else {
-            return res.status(514).send("User has no device_token");
+            return res.status(514).send("User has no device");
         }
     });
 });
