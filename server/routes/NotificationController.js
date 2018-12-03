@@ -43,7 +43,7 @@ router.post("/test/push/notification", function (req, res) {
 });
 
 router.post("/push/notification/to/admin", function (req, res) {
-    var email = req.body.email;
+    var adminID = req.body.adminID;
     var notification = req.body.notification;
     var data = req.body.data;
     var link = req.body.link;
@@ -55,11 +55,9 @@ router.post("/push/notification/to/admin", function (req, res) {
             body: "This is the body of the push"
         }
     }
-    Admin.find({
-        email: email
-    }).then(users => {
-        if (users == null || users.length == 0) return res.status(514).send("User of email " + email + " not found");
-        var tokens = users[0].deviceTokens.filter(v => !v.removed);
+    Admin.findById(adminID).then(user => {
+        if (user == null) return res.status(514).send("User of id " + adminID + " not found");
+        var tokens = user.deviceTokens.filter(v => !v.removed);
         if (tokens) {
             var payload = {
                 notification: notification,
@@ -83,6 +81,8 @@ router.post("/push/notification/to/admin", function (req, res) {
         } else {
             return res.status(514).send("User has no device");
         }
+    }).catch(err => {
+        return res.status(514).send(err);
     });
 });
 
