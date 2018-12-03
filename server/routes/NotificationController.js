@@ -42,8 +42,8 @@ router.post("/test/push/notification", function (req, res) {
         });
 });
 
-router.post("/push/notification/to/admin/:adminEmail", function (req, res) {
-    var email = req.params.adminEmail;
+router.post("/push/notification/to/admin", function (req, res) {
+    var email = req.body.email;
     Admin.find({
         email: email
     }).then(users => {
