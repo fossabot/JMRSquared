@@ -32,6 +32,10 @@ const BusinessSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Transaction'
     }],
+    notifications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Notification'
+    }]
 });
 
 BusinessSchema.methods.findSimilarTypes = function (cb) {
