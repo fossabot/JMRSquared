@@ -98,7 +98,7 @@
           <StackLayout>
             <FlexboxLayout v-show="!isLoading" flexDirection="column" alignContent="flex-end" justifyContent="flex-end" width="100%">
               <GridLayout v-show="!savedPartner" rows="auto,auto" columns="*,*">
-                <Label row="0" colSpan="2" :text="txtError.length < 2 ? 'You can proceed' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
+                <Label row="0" colSpan="2" :text="txtError.length < 2 ? '' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
                 <Button row="1" col="1" @tap="submitPartner()" v-show="currentPage == 1" class="btn-primary bg-light-green" :text="`Save ${partner.username}`"></Button>
                 <Button row="1" col="0" @tap="currentPage--" v-show="currentPage > 0" :isEnabled="currentPage > 0" class="btn-primary bg-light-red" text="back"></Button>
                 <Button row="1" col="1" @tap="moveForward()" v-show="currentPage != 1" class="btn-primary bg-light-blue" text="proceed"></Button>

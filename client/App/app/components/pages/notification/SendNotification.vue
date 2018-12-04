@@ -5,9 +5,8 @@
         <CardView elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
           <StackLayout>
             <GridLayout class="m-10" rows="auto" columns="*,auto">
-              <StackLayout row="0" col="0">
-                <label class="h3" text="Adding a business for : "></label>
-                <label class="h4 m-l-20" :text="adminProfile.userName"></label>
+              <StackLayout verticalAlignment="center" row="0" col="0">
+                <label class="h3" text="Sending a notification"></label>
               </StackLayout>
               <Button row="0" col="1" @tap="$router.back()" selfAlign="right" text="Cancel"></Button>
             </GridLayout>
@@ -23,26 +22,36 @@
             <CardView margin="10" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
               <ScrollView>
                 <StackLayout>
+                  <Ripple @tap="changeNotificationTo">
+                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + notification.to.icon | fonticon"></label>
+                      <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Send Notification to:"></label>
+                      <label row="1" col="1" class="h4" :text="notification.to.text"></label>
+                    </GridLayout>
+                  </Ripple>
   
-                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-domain' | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business name *"></label>
-                    <TextField returnKeyType="next" v-model="business.name" row="1" col="1" class="h4" hint="e.g JMRSquared"></TextField>
+                  <GridLayout v-if="notification.to.index == 1" class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-worker' | fonticon"></label>
+                    <Label row="0" col="1" text="Pick the partner to send the notification to" class="h3 font-weight-bold text-mute"></Label>
+                    <DropDown row="1" col="1" :items="notificationPartners.map(v => v.text)" v-model="notification.partners"></DropDown>
                   </GridLayout>
-  
-                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-briefcase' | fonticon"></label>
-                    <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="Business Type *"></label>
-                    <ListPicker row="1" col="0" colSpan="2" @selectedIndexChange="changeSelectedBusinessCategory" :items="business.options.types.map(t => t.type)" v-model="business.type.index" />
-                  </GridLayout>
+                  
+                  <ScrollView v-if="notification.to.index == 2" orientation="horizontal">
+                    <StackLayout orientation="horizontal">
+                      <GridLayout class="m-10" rows="auto,auto" columns="*,*,*">
+                        <CheckBox v-for="(sendToPartner,i) in notificationPartners" :key="i" :row="sendToPartner.row" :col="sendToPartner.col" v-model="notification.partners" fillColor="#0093a4" :text="sendToPartner.text"></CheckBox>
+                      </GridLayout>
+                    </StackLayout>
+                  </ScrollView>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
+  
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + business.type.icon | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Category *"></label>
                     <label :text="business.type.category" row="1" col="1" class="h4"></label>
                   </GridLayout>
-
+  
                   <GridLayout class="m-10" v-if="business.type.optionals" v-for="(optional,o) in business.type.optionals" :key="o" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
@@ -183,6 +192,46 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
+      notificationPartners: [
+        {
+          row: 0,
+          col: 0,
+          value: false,
+          text: "Joe Sirwali"
+        },
+        {
+          row: 0,
+          col: 1,
+          value: false,
+          text: "Joe"
+        },
+        {
+          row: 0,
+          col: 2,
+          value: false,
+          text: "Joe Lavhe"
+        },
+        {
+          row: 1,
+          col: 0,
+          value: false,
+          text: "Joe Mulavhe"
+        },
+        {
+          row: 1,
+          col: 1,
+          value: false,
+          text: "Joe"
+        }
+      ],
+      notificationTo: [],
+      notification: {
+        to: {
+          index: -1,
+          text: ""
+        },
+        partners: []
+      },
       business: {
         name: "",
         logo: null,
@@ -222,6 +271,7 @@ export default {
       }
     };
   },
+  props: ["businessName", "businessId"],
   watch: {
     currentPage(newVal, oldVal) {
       switch (newVal) {
@@ -239,9 +289,6 @@ export default {
       }
     }
   },
-  created() {
-    this.pageLoaded();
-  },
   mounted() {
     this.pageLoaded();
   },
@@ -250,6 +297,25 @@ export default {
       var self = this;
       this.ApplyNavigation(self);
       this.business.options.types = [];
+
+      this.notificationTo = [
+        {
+          index: 0,
+          text: "All " + this.businessName + " partners",
+          icon: "account-group"
+        },
+        {
+          index: 1,
+          text: "A single partner",
+          icon: "worker"
+        },
+        {
+          index: 2,
+          text: "Multiple partners",
+          icon: "account-switch"
+        }
+      ];
+      this.changeNotificationTo();
 
       var connectionType = connectivity.getConnectionType();
       if (connectionType == connectivity.connectionType.none) {
@@ -286,6 +352,14 @@ export default {
             });
           });
       }
+    },
+    changeNotificationTo() {
+      var index = this.notification.to.index;
+      index++;
+      if (index == this.notificationTo.length) {
+        index = 0;
+      }
+      this.notification.to = this.notificationTo[index];
     },
     submitBusiness() {
       this.isLoading = true;

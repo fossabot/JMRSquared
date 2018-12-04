@@ -1,6 +1,6 @@
 <template>
   <page actionBarHidden="true">
-    <GridLayout rows="auto,*">
+    <GridLayout rows="auto,auto,*">
       <CardView row="0" class="m-b-15 p-y-15" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
         <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
           <Ripple row="0" rowSpan="3" col="2" class="p-10" @tap="logOut()" textAlignmemt="left" verticalAlignment="center" borderRadius="50%">
@@ -12,29 +12,33 @@
           <Label row="1" verticalAlignment="bottom" col="1" class="h3 m-5" :text="user.email"></Label>
         </GridLayout>
       </CardView>
-      <ScrollView class="m-x-15" row="1">
-        <StackLayout>
-          <GridLayout rows="auto" columns="*">
-            <label class="h3 font-weight-bold text-mute text-dark-blue" text="Pick a business or Add new one"></label>
-          </GridLayout>
   
-          <GridLayout v-show="layouts.filter(l => l.title).length != 0" class="m-20" rows="auto,auto" columns="*,*,*">
-            <CardView class="m-y-15" elevation="0" :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts.filter(l => l.link)" textAlignment="center">
-              <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
-                <GridLayout rows="*,*" columns="*">
-                  <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
-                  <Label v-show="item.title" :class="{'visible':item.title}" class="mdi businessIcon" textAlignment="center" fontSize="50%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
-                  <Label row="1" v-show="item.title" textWrap="true" class="p-t-10" :text="item.title" textAlignment="center" />
-                </GridLayout>
-              </Ripple>
-            </CardView>
-          </GridLayout>
+      <StackLayout class="m-x-15" row="1">
+        <GridLayout rows="auto" columns="*">
+          <label class="h3 font-weight-bold text-mute text-dark-blue" text="Pick a business or Add new one"></label>
+        </GridLayout>
+      </StackLayout>
   
-          <GridLayout v-show="layouts.filter(l => l.title).length == 0" class="m-20" rows="*" columns="*">
-            <ActivityIndicator textAlignment="center" verticalAlignment="center" :busy="layouts.filter(l => l.title).length == 0"></ActivityIndicator>
-          </GridLayout>
-        </StackLayout>
-      </ScrollView>
+      <PullToRefresh row="2" @refresh="refreshList($event)">
+        <ScrollView class="m-x-15">
+          <StackLayout>
+            <GridLayout v-show="layouts.filter(l => l.title).length != 0" class="m-20" rows="auto,auto" columns="*,*,*">
+              <CardView class="m-y-15" elevation="0" :row="item.row" :col="item.col" :key="i" v-for="(item,i) in layouts.filter(l => l.link)" textAlignment="center">
+                <Ripple @tap="onItemTap(item)" rippleColor="$blueColor" borderRadius="50%">
+                  <GridLayout rows="*,*" columns="*">
+                    <ActivityIndicator rowSpan="2" v-if="!item.title" textAlignment="center" verticalAlignment="center" :busy="!item.title"></ActivityIndicator>
+                    <Label v-show="item.title" :class="{'visible':item.title}" class="mdi businessIcon" textAlignment="center" fontSize="50%" verticalAlignment="center" :text="'mdi-' + item.icon | fonticon"></Label>
+                    <Label row="1" v-show="item.title" textWrap="true" class="p-t-10" :text="item.title" textAlignment="center" />
+                  </GridLayout>
+                </Ripple>
+              </CardView>
+            </GridLayout>
+            <GridLayout v-show="layouts.filter(l => l.title).length == 0" class="m-20" rows="*" columns="*">
+              <ActivityIndicator textAlignment="center" verticalAlignment="center" :busy="layouts.filter(l => l.title).length == 0"></ActivityIndicator>
+            </GridLayout>
+          </StackLayout>
+        </ScrollView>
+      </PullToRefresh>
     </GridLayout>
   </page>
 </template>
@@ -83,7 +87,7 @@ export default {
     }
   },
   methods: {
-    pageLoaded() {
+    pageLoaded(args = null) {
       this.layouts = [];
       this.isLoaded = true;
 
@@ -145,12 +149,15 @@ export default {
                       layout.title = " ";
                     });
                   clearInterval(timer);
+                  if (args) {
+                    args.object.refreshing = false;
+                  }
                 }
                 tank.push(i);
                 i++;
                 this.$forceUpdate();
               }
-            }, 700);
+            }, 300);
           })
           .catch(err => {
             this.$feedback.error({
@@ -162,15 +169,21 @@ export default {
               layout.icon = "bug-report";
               layout.title = "Invalid";
             });
+            if (args) {
+              args.object.refreshing = false;
+            }
             this.$forceUpdate();
           });
       }
 
       var firstTime = appSettings.getBoolean("shownChangeLog");
-      if (firstTime != true) {
+      if (!firstTime) {
         this.showChangeLog();
         appSettings.setBoolean("shownChangeLog", true);
       }
+    },
+    refreshList(args) {
+      this.pageLoaded(args);
     },
     eventChanged(event) {
       dialogs.alert("Changed view").then(() => {

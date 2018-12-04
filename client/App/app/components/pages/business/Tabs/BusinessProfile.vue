@@ -27,12 +27,19 @@
               </StackLayout>
               <ScrollView row="2" col="0" colSpan="3">
                 <StackLayout>
-                  <Ripple class="p-15" v-for="a in 10" :key="a">
-                    <GridLayout rows="auto,auto,auto" columns="auto,*">
+                   <Ripple class="p-15" @tap="GoTo(sendNotificationPage)">
+                    <GridLayout rows="auto,auto" columns="auto,*">
+                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell-plus' | fonticon"></label>
+                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" text="Send new"></label>
+                      <label row="1" col="1" class="h4" text="Send a notification to a partner/s"></label>
+                    </GridLayout>
+                  </Ripple>
+                  <Ripple class="m-x-15 p-15" v-for="a in 10" :key="a">
+                    <GridLayout rows="auto,auto" columns="auto,*,auto">
                       <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
-                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" text="optional.title"></label>
-                      <label row="1" col="1" class="h3" text="optional.answer"></label>
-                      <Label row="2" col="1" class="h4 text-mute p-x-5" verticalAlignment="bottom" textAlignment="right" text="a days ago"></Label>
+                      <label row="0" col="1" verticalAlignment="center" class="h3 text-mute" fontSize="20%" text="optional.title"></label>
+                      <label row="1" col="1" verticalAlignment="center" class="" text="optional.answer"></label>
+                      <Label row="1" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" text="a days ago"></Label>
                     </GridLayout>
                   </Ripple>
                 </StackLayout>
@@ -91,6 +98,7 @@ export default {
   data() {
     return {
       tabs: ["Summary", "Expenses", "Activities"],
+      sendNotificationPage: {},
       selectedStat: 0,
       Expenses: [12, 12, 12, 12, 12, 12],
       summaryStats: [],
@@ -145,6 +153,14 @@ export default {
           min10k: true
         })
     });
+
+    this.sendNotificationPage = {
+      link: "/notification/send",
+      props: {
+        businessId: this.business._id,
+        businessName: this.business.name
+      }
+    };
   },
   props: ["business"],
   methods: {

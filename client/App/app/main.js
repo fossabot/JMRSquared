@@ -43,7 +43,17 @@ Vue.registerElement(
 
 Vue.registerElement(
   "DropDown",
-  () => require("nativescript-drop-down//drop-down").DropDown
+  () => require("nativescript-drop-down/drop-down").DropDown
+);
+
+Vue.registerElement(
+  "CheckBox",
+  () => require("nativescript-checkbox").CheckBox, {
+    model: {
+      prop: 'checked',
+      event: 'checkedChange'
+    }
+  }
 );
 
 Vue.filter("fonticon", fonticon);

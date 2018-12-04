@@ -11,6 +11,9 @@ import AddPartner from '../components/pages/business/AddPartner.vue'
 import BusinessHome from '../components/pages/business/BusinessHome.vue'
 import PartnersList from '../components/pages/business/PartnersList.vue'
 
+// Notifications
+import SendNotification from '../components/pages/notification/SendNotification.vue'
+
 const http = require("http");
 import store from '../store';
 
@@ -109,6 +112,20 @@ router.routes = {
     component: PartnersList,
     meta: {
       title: 'Partners list',
+      authLevel: 3,
+      source: null
+    },
+    props: true
+  },
+  /**
+   * Notification
+   */
+  '/notification/send': {
+    name: 'SendNotification',
+    path: '/notification/send/:businessID',
+    component: SendNotification,
+    meta: {
+      title: 'Send Notification',
       authLevel: 3,
       source: null
     },
