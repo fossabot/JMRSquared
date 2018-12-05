@@ -37,8 +37,8 @@
                   <Ripple class="m-x-15 p-15" v-for="a in 10" :key="a">
                     <GridLayout rows="auto,auto" columns="auto,*,auto">
                       <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
-                      <label row="0" col="1" verticalAlignment="center" class="h3 text-mute" fontSize="20%" text="optional.title"></label>
-                      <label row="1" col="1" verticalAlignment="center" class="" text="optional.answer"></label>
+                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" :text="`Notification ${a}`"></label>
+                      <label row="1" col="1" class="h4" text="Recieved a notification"></label>
                       <Label row="1" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" text="a days ago"></Label>
                     </GridLayout>
                   </Ripple>
