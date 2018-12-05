@@ -16,7 +16,7 @@ const NotificationSchema = new mongoose.Schema({
     },
     topic: {
         type: String,
-        default: false
+        default: null
     },
     title: String,
     body: String,
@@ -39,7 +39,7 @@ const NotificationSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    scheduleInterval: String, // cron format e.g. * * * * *
+    scheduleInterval: String, // cron format e.g. * * * * * (seconds{optional} minute hour day month year )
     expiryDate: {
         type: Date,
         default: null
@@ -50,7 +50,7 @@ const NotificationSchema = new mongoose.Schema({
     }
 });
 
-NotificationSchema.methods.findSimilarTypes = function (cb) {
+NotificationSchema.methods.findSimilarTypes = function(cb) {
     return this.model('Animal').find({
         type: this.type
     }, cb);

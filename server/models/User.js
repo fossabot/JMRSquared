@@ -6,6 +6,10 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
     email: String,
+    adminID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Admin'
+    },
     hash: String,
     salt: String,
     createdDate: Date,

@@ -13,7 +13,9 @@ import businessController from "./routes/BusinessController";
 import studentController from "./routes/StudentController";
 import notificationController from "./routes/NotificationController";
 import settingController from "./routes/SettingController";
-import authController from "./routes/AuthController"
+import authController from "./routes/AuthController";
+
+import CronJob from './services/CronManager';
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -62,6 +64,8 @@ mongoose
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
+        const cronJob = new CronJob();
+        cronJob.fireJobs();
     });
 
 app.use("/b", businessController);

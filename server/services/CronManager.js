@@ -1,20 +1,73 @@
 const cron = require("node-cron");
-import FCM from "./FirebaseManager";
-var tasks = [];
+const helper = require("./Helper");
 
-var CronJob = {
-    schedule: (interval, registrationToken, payload) => {
+import FCM from "./FirebaseManager";
+import mongoose from "mongoose";
+
+import Notification from '../models/Notification'
+
+export default class CronJob {
+    constructor() {
+        this.tasks = [];
+    }
+
+    schedule(interval, registrationToken, payload, toTopic = false) {
         let task = cron.schedule(interval, () => {
             console.log('cron', 'Performing the cron job....');
-            FCM.sendToDevice(registrationToken, payload).then(v => {
-                console.log('cron', 'Cron job done....');
-            }).catch(err => {
-                console.log('cron', 'Error occured during job....');
+            if (toTopic) {
+                FCM.sendToTopic(registrationToken, payload).then(v => {
+                    console.log('cron', 'Cron job done....');
+                }).catch(err => {
+                    console.log('cron', err);
+                })
+            } else {
+                FCM.sendToDevice(registrationToken, payload).then(v => {
+                    console.log('cron', 'Cron job done....');
+                }).catch(err => {
+                    console.log('cron', err);
+                })
+            }
+        });
+        this.tasks.push(task);
+    }
+
+    getTasks() {
+        return this.tasks.map(t => t.status)
+    }
+
+    // This is called on app.js (everytime the server starts)
+    fireJobs() {
+        this.resendNotifications();
+    }
+
+
+
+    // A list of jobs that can be fired.
+    resendNotifications() {
+        Notification.find({
+            status: 'PENDING',
+            scheduled: true,
+            removed: false,
+            expiryDate: {
+                $gte: Date.now()
+            }
+        }).populate('toId').then(notifications => {
+            if (notifications == null) return console.log(`Error while reading notifications to re-shedule.`);
+            console.log(`Re-scheduling ${ notifications.length } notifications ....`);
+            notifications.map(notification => {
+                var payload = helper.makePayload(notification.title, notification.body, notification.data);
+                if (notification.topic != null) {
+                    this.schedule(notification.scheduleInterval, notification.topic, payload, true);
+                } else if (notification.toId) {
+                    if (notification.toId.deviceTokens && notification.toId.deviceTokens.filter(d => !d.removed && t.token).map(t => t.token).length > 0) {
+                        notification.toId.deviceTokens.forEach(device_token => {
+                            this.schedule(notification.scheduleInterval, device_token, payload);
+                        });
+                    } else {
+                        console.log(`${ notification.toId.userName } was suppose to be sent a notification , but there is no device linked to them ....`);
+                    }
+                }
             })
         });
-        tasks.push(task);
-    },
-    getTasks: () => tasks.map(t => t.status)
+    }
 }
-
-export default CronJob;

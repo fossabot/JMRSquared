@@ -8,6 +8,7 @@ import Admin from "../models/Admin";
 import Student from "../models/Student";
 import FCM from "../services/FirebaseManager";
 import CronJob from "../services/CronManager";
+const cronJob = new CronJob();
 
 /*
   TODO : Add notification (done)
@@ -19,7 +20,7 @@ import CronJob from "../services/CronManager";
          Get all from user (done)
 */
 
-router.post("/test/push/notification", function (req, res) {
+router.post("/test/push/notification", function(req, res) {
     var deviceToken = req.body.token;
     var payload = {
         notification: {
@@ -42,7 +43,7 @@ router.post("/test/push/notification", function (req, res) {
         });
 });
 
-router.post("/push/notification/to/admin", function (req, res) {
+router.post("/push/notification/to/admin", function(req, res) {
     var adminID = req.body.adminID;
     var notification = req.body.notification;
     var data = req.body.data;
@@ -86,7 +87,7 @@ router.post("/push/notification/to/admin", function (req, res) {
     });
 });
 
-router.post("/test/push/notification/schedule", function (req, res) {
+router.post("/test/push/notification/schedule", function(req, res) {
     var deviceToken = req.body.token;
     var payload = {
         notification: {
@@ -100,14 +101,14 @@ router.post("/test/push/notification/schedule", function (req, res) {
             })
         }
     };
-    CronJob.schedule("30 5 * * *", deviceToken, payload);
+    cronJob.schedule("30 5 * * *", deviceToken, payload);
 });
 
-router.get("/cron/get/tasks", function (req, res) {
-    res.send(CronJob.getTasks());
+router.get("/cron/get/tasks", function(req, res) {
+    res.send(cronJob.getTasks());
 });
 
-router.get("/all/for/:userId/:scheduled", function (req, res) {
+router.get("/all/for/:userId/:scheduled", function(req, res) {
     var receiver = req.params.userId;
     let scheduled = req.params.scheduled ? true : false;
     Notification.find({
@@ -126,7 +127,7 @@ router.get("/all/for/:userId/:scheduled", function (req, res) {
     });
 });
 
-router.get("/all/:userId/:scheduled", function (req, res) {
+router.get("/all/:userId/:scheduled", function(req, res) {
     let sender = req.params.userId;
     let scheduled = req.params.scheduled ? true : false;
     Notification.find({
@@ -153,7 +154,7 @@ router.get("/all/:userId/:scheduled", function (req, res) {
     });
 });
 
-router.get("/tasks/all", function (req, res) {
+router.get("/tasks/all", function(req, res) {
     Notification.find({
         dueDate: {
             $ne: null
@@ -167,7 +168,7 @@ router.get("/tasks/all", function (req, res) {
     });
 });
 
-router.get("/tasks/all/:userId", function (req, res) {
+router.get("/tasks/all/:userId", function(req, res) {
     var sender = req.params.userId;
     Notification.find({
         dueDate: {
@@ -187,7 +188,7 @@ router.get("/tasks/all/:userId", function (req, res) {
     });
 });
 
-router.post("/add", function (req, res) {
+router.post("/add", function(req, res) {
     var notification = new Notification({
         _id: mongoose.Types.ObjectId(),
         fromId: req.body.fromId,
@@ -203,29 +204,29 @@ router.post("/add", function (req, res) {
         expiryDate: req.body.expiryDate
     });
 
-    notification.save(function (err) {
+    notification.save(function(err) {
         if (err) return res.status(512).send(err);
 
-        Admin.findById(req.body.fromId, function (err, admin) {
+        Admin.findById(req.body.fromId, function(err, admin) {
             if (err || admin == null) {
                 console.log(err);
                 return;
             }
 
             admin.notifications.push(notification._id);
-            admin.save(function (err) {
+            admin.save(function(err) {
                 if (err) {
                     console.log(err);
                     return;
                 }
-                Student.findById(req.body.toId, function (err, student) {
+                Student.findById(req.body.toId, function(err, student) {
                     if (err || student == null) {
                         console.log(err);
                         return;
                     }
 
                     student.notifications.push(notification._id);
-                    student.save(function (err) {
+                    student.save(function(err) {
                         if (err) {
                             console.log(err);
                             return;

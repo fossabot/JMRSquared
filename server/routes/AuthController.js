@@ -31,6 +31,7 @@ router.post('/register', auth.optional, (req, res, next) => {
     const finalUser = new User(user);
     finalUser.createdDate = Date.now;
     finalUser.setPassword(user.password);
+    finalUser.adminID = user.adminID;
 
     return finalUser.save()
         .then(() => res.json({ user: finalUser.toAuthJSON() }));
