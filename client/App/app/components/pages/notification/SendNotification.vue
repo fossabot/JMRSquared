@@ -22,29 +22,35 @@
             <CardView margin="10" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
               <ScrollView>
                 <StackLayout>
-                  <Ripple @tap="changeNotificationTo">
-                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + notification.to.icon | fonticon"></label>
-                      <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Send Notification to:"></label>
-                      <label row="1" col="1" class="h4" :text="notification.to.text"></label>
-                    </GridLayout>
-                  </Ripple>
-  
-                  <GridLayout v-if="notification.to.index == 1" class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-worker' | fonticon"></label>
-                    <Label row="0" col="1" text="Pick the partner to send the notification to" class="h3 font-weight-bold text-mute"></Label>
-                    <DropDown row="1" col="1" :items="notificationPartners.map(v => v.text)" v-model="notification.partners"></DropDown>
+                  <GridLayout class="m-10" rows="auto" columns="*">
+                    <CheckBox @checkedChange="v => console.log(v)" fillColor="#0093a4" row="0" col="0" :text="`All ${businessName} partners`"></CheckBox>
                   </GridLayout>
-                  
-                  <ScrollView v-if="notification.to.index == 2" orientation="horizontal">
-                    <StackLayout orientation="horizontal">
-                      <GridLayout class="m-10" rows="auto,auto" columns="*,*,*">
-                        <CheckBox v-for="(sendToPartner,i) in notificationPartners" :key="i" :row="sendToPartner.row" :col="sendToPartner.col" v-model="notification.partners" fillColor="#0093a4" :text="sendToPartner.text"></CheckBox>
-                      </GridLayout>
-                    </StackLayout>
-                  </ScrollView>
-                  <StackLayout width="100%" class="hr-light"></StackLayout>
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-group' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="The notification will be sent to all partners"></label>
+                    <label row="1" col="1" class="h4" text="You can proceed"></label>
+                  </GridLayout>
   
+                  <GridLayout class="m-10" rows="auto" columns="*">
+                    <CheckBox fillColor="#0093a4" row="0" col="0" text="A single partner"></CheckBox>
+                  </GridLayout>
+                  <GridLayout class="m-10" rows="auto" columns="auto,*">
+                    <label row="0" col="0" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-worker' | fonticon"></label>
+                    <DropDown row="0" col="1" @selectedIndexChanged="args => addPartnerToNotification(args,true)" :items="notificationPartners.map(v => v.text)"></DropDown>
+                  </GridLayout>
+  
+                  <GridLayout class="m-10" rows="auto" columns="*">
+                    <CheckBox fillColor="#0093a4" row="0" col="0" text="Multiple partners"></CheckBox>
+                  </GridLayout>
+                  <GridLayout class="m-10" rows="auto" columns="auto,*">
+                    <label row="0" col="0" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-switch' | fonticon"></label>
+                    <ScrollView row="0" col="1" orientation="horizontal">
+                      <WrapLayout>
+                        <Label v-for="(partner,i) in notificationPartners" @tap="addPartnerToNotification(partner,false)" :class="{'chip-selected':notification.partners.indexOf(partner) >= 0}" :text="partner.text" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey"
+                          borderRadius="99%"></Label>
+                      </WrapLayout>
+                    </ScrollView>
+                  </GridLayout>
   
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + business.type.icon | fonticon"></label>
@@ -250,7 +256,7 @@ export default {
       savedBusiness: false,
       txtError: "",
       currentPage: 0,
-      currentPageTitle: "General Information",
+      currentPageTitle: "Who to notify?",
       tenantName: "",
       tenantUserName: "",
       tenantNumbers: "",
@@ -276,7 +282,7 @@ export default {
     currentPage(newVal, oldVal) {
       switch (newVal) {
         case 0:
-          this.currentPageTitle = "General Information";
+          this.currentPageTitle = "Who to notify?";
           break;
         case 1:
           this.currentPageTitle = this.business.name + "`s logo";
@@ -353,9 +359,36 @@ export default {
           });
       }
     },
+    addPartnerToNotification(partner, override) {
+      if (partner.newIndex != null) {
+        partner = this.notificationPartners[partner.newIndex];
+      }
+      console.log("partner", partner);
+      if (
+        !this.notification.partners ||
+        this.notification.partners.length == 0 ||
+        override
+      ) {
+        this.notification.partners = [];
+      }
+      let index = this.notification.partners.indexOf(partner);
+      if (index >= 0) {
+        this.notification.partners.splice(index, 1);
+      } else {
+        this.notification.partners.push(partner);
+      }
+    },
     changeNotificationTo() {
       var index = this.notification.to.index;
       index++;
+      if (index == 1) {
+        if (
+          this.notification.partners &&
+          this.notification.partners.length > 1
+        ) {
+          this.notification.partners.splice(1);
+        }
+      }
       if (index == this.notificationTo.length) {
         index = 0;
       }
