@@ -1,11 +1,11 @@
 <template>
   <GridLayout class="p-x-15" columns="*" rows="auto,*">
     <Ripple class="m-y-15" row="0">
-    <StackLayout>
-      <Image v-if="business.logo" height="100" :src="business.logo" alignSelf="center" stretch="aspectFit" />
-      <label v-if="!business.logo" textAlignment="center" verticalAlignment="center" fontSize="25%" class="h3 font-weight-bold text-dark-blue" :text="business.name"></label>
-      <Label class="m-10" textWrap="true" verticalAlignment="center" textAlignment="center" :text="business.description"></Label>
-    </StackLayout>
+      <StackLayout>
+        <Image v-if="business.logo" height="100" :src="business.logo" alignSelf="center" stretch="aspectFit" />
+        <label v-if="!business.logo" textAlignment="center" verticalAlignment="center" fontSize="25%" class="h3 font-weight-bold text-dark-blue" :text="business.name"></label>
+        <Label class="m-10" textWrap="true" verticalAlignment="center" textAlignment="center" :text="business.description"></Label>
+      </StackLayout>
     </Ripple>
     <StackLayout row="1">
       <GridLayout rows="auto,auto,*" columns="*,auto">
@@ -35,16 +35,18 @@
   
               <Ripple @tap="GoTo(sendNotificationPage)" row="2" col="0" colSpan="3">
                 <label class="p-15" textAlignment="center" text="Send a notification to a partner/s"></label>
-            </Ripple>
+              </Ripple>
+              
+              <ActivityIndicator v-if="!Notifications" row="3" col="0" colSpan="3" textAlignment="center" verticalAlignment="center" :busy="!Notifications"></ActivityIndicator>
   
-              <ScrollView row="3" col="0" colSpan="3">
+              <ScrollView v-if="Notifications" row="3" col="0" colSpan="3">
                 <StackLayout>
-                  <Ripple class="m-x-15 p-15" v-for="a in 10" :key="a">
+                  <Ripple class="m-x-15 p-15" v-for="(notification,i) in Notifications" :key="i">
                     <GridLayout rows="auto,auto" columns="auto,*,auto">
                       <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
-                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" :text="`Notification ${a}`"></label>
-                      <label row="1" col="1" class="h4" text="Recieved a notification"></label>
-                      <Label row="1" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" text="a days ago"></Label>
+                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" :text="notification.title"></label>
+                      <label row="1" col="1" class="h4" :text="notification.message"></label>
+                      <Label row="1" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" :text="getMoment(notification.date).fromNow()"></Label>
                     </GridLayout>
                   </Ripple>
                 </StackLayout>
@@ -104,6 +106,7 @@ export default {
     return {
       tabs: ["Summary", "Expenses", "Activities"],
       sendNotificationPage: {},
+      Notifications: null,
       selectedStat: 0,
       Expenses: [12, 12, 12, 12, 12, 12],
       summaryStats: [],
@@ -170,6 +173,7 @@ export default {
         businessName: this.business.name
       }
     };
+    this.getNotifications();
   },
   props: ["business"],
   methods: {
@@ -179,6 +183,21 @@ export default {
       } else {
         this.$emit("changeTab", option.link);
       }
+    },
+    getNotifications() {
+      this.$api
+        .getNotifications(this.$store.state.cache.cachedAdmin._id)
+        .then(notifications => {
+          this.Notifications = notifications;
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Unable to load new notifications.",
+            duration: 4000,
+            message: "Please try again later"
+          });
+          this.Notifications = [];
+        });
     },
     GoTo(option) {
       if (option.link) {
