@@ -161,10 +161,10 @@ export default class API {
         return connectivity.getConnectionType();
     }
 
-    getNotifications(adminID) {
+    getNotifications(adminID,businessID) {
         return new Promise((resolve, reject) => {
             http
-                .getJSON(this.makeGet(`/n/get/new/for/${adminID}`)).then(result => {
+                .getJSON(this.makeGet(`/n/get/new/for/${adminID}/business/${businessID}`)).then(result => {
                     return resolve(result);
                 }).catch(err => {
                     return reject(err);

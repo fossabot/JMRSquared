@@ -41,13 +41,6 @@
                       <label :text="notification.type.text" row="1" col="1" class="h4"></label>
                     </GridLayout>
                   </Ripple>
-                  <StackLayout width="80%" textAlignment="center" class="hr-light"></StackLayout>
-  
-                  <StackLayout width="100%" textAlignment="center" class="hr-light faded-blue"></StackLayout>
-                  <Checkbox :checked="notification.sendImmediately" class="m-20" text="Send immediately" fillColor="#0093a4"></Checkbox>
-                  <StackLayout width="100%" textAlignment="center" class="hr-light faded-blue"></StackLayout>
-  
-                  <StackLayout width="100%" class="hr-light"></StackLayout>
                 </StackLayout>
               </ScrollView>
             </CardView>
@@ -60,7 +53,7 @@
                     <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                       <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-calendar-range' | fonticon"></label>
                       <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Date (tap to change)"></label>
-                      <label row="1" col="1" :text="getMoment(notification.sendDateTime).format('Do MMMM YYYY')" class="h4"></label>
+                      <label row="1" col="1" :text="getMoment(notification.sendDateTime).format('DD MMMM YYYY')" class="h4"></label>
                     </GridLayout>
                   </Ripple>
                   <Ripple @tap="changeNotificationTime()">
@@ -74,11 +67,11 @@
               </ScrollView>
             </CardView>
           </StackLayout>
-
+  
           <StackLayout v-show="currentPage == 2">
             <CardView margin="10" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
               <ScrollView>
-                <StackLayout>  
+                <StackLayout>
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-text-outline' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Title"></label>
@@ -88,7 +81,7 @@
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-text' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Message"></label>
-                    <TextView row="1" col="1" v-model="notification.message"  hint="The message to be sent as a notification"  returnKeyType="next" class="h4"></TextView>
+                    <TextView row="1" col="1" v-model="notification.message" hint="The message to be sent as a notification" returnKeyType="next" class="h4"></TextView>
                   </GridLayout>
                 </StackLayout>
               </ScrollView>
@@ -111,54 +104,40 @@
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Title"></label>
                     <label :text="notification.title" row="1" col="1" class="h4"></label>
                   </GridLayout>
-
+  
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-text' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Message"></label>
                     <label :text="notification.message" row="1" col="1" class="h4"></label>
                   </GridLayout>
-  
-                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="top" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-switch' | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Partners"></label>
-                    <ScrollView row="1" col="1" orientation="horizontal">
-                      <WrapLayout>
-                        <Label v-for="(partner,i) in notification.partners" class="m-10 chip-selected" :text="partner.text" v-bind:key="i" backgroundColor="grey"borderRadius="99%"></Label>
-                      </WrapLayout>
-                    </ScrollView>
+
+                  <GridLayout class="m-10" rows="auto" columns="*,auto">
+                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Partners that will receive the notification"></label>
                   </GridLayout>
-  
-                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + business.type.icon | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business Category"></label>
-                    <label :text="business.type.category" row="1" col="1" class="h4"></label>
+
+                  <GridLayout v-for="(partner,i) in notification.partners" :key="i" class="m-10" rows="auto,auto" columns="auto,*">
+                    <Image row="0" rowSpan="2" col="0" verticalAlignment="center" width="40" height="40" class="m-5 circle" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%"/>
+                   <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="partner.text"></label>
+                    <label row="1" col="1" class="h4" text="Sirwali Joseph"></label>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
                   <GridLayout class="m-10" rows="auto" columns="*,auto">
-                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Optional information"></label>
+                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Date time to send the notification"></label>
                   </GridLayout>
   
-                  <GridLayout v-show="business.description.length != 0" class="m-10" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-bulleted' | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Business slogan"></label>
-                    <label :text="business.description" row="1" col="1" class="h4"></label>
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-calendar-range' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Date"></label>
+                    <label row="1" col="1" :text="getMoment(notification.sendDateTime).format('Do MMMM YYYY')" class="h4"></label>
                   </GridLayout>
   
-                  <GridLayout class="m-10" v-if="business.type.optionals && optional.answer && optional.answer.length != 0" v-for="(optional,o) in business.type.optionals" :key="o" rows="auto,auto" columns="auto,*">
-                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
-                    <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
-                    <label :text="optional.answer" row="1" col="1" class="h4"></label>
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-calendar-clock' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Time"></label>
+                    <label row="1" col="1" :text="getMoment(notification.sendDateTime).format('hh:mm A')" class="h4"></label>
                   </GridLayout>
   
-                  <StackLayout width="100%" class="hr-light"></StackLayout>
-                  <GridLayout v-show="business.logo" class="m-10" rows="auto" columns="*,auto">
-                    <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" :text="`${business.name}'s logo`"></label>
-                  </GridLayout>
-  
-                  <GridLayout v-show="business.logo" class="m-10 waves-effect" rows="*" columns="*">
-                    <Image row="0" col="0" :src="business.logo" stretch="aspectFill" width="100%" />
-                  </GridLayout>
                 </StackLayout>
               </ScrollView>
             </CardView>
@@ -368,14 +347,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                  <Page>
-                      <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                          <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
-                          <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
-                          <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                      </GridLayout>
-                  </Page>
-                  `,
+                    <Page>
+                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                            <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
+                            <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
+                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                        </GridLayout>
+                    </Page>
+                    `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -385,13 +364,14 @@ export default {
           changeDueRent(modal, value) {
             var date = self.notification.sendDateTime;
             var now = new Date(
-              value.getFullYear(),
-              value.getMonth(),
-              value.getDay(),
-              date.getHours(),
-              date.getMinutes(),
-              0
-            );
+              Date.UTC(
+                value.getFullYear(),
+                value.getMonth(),
+                value.getDate(),
+                date.getHours(),
+                date.getMinutes(),
+                0
+            ));
             self.notification.sendDateTime = now;
             this.$modal.close();
           }
@@ -402,14 +382,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                  <Page>
-                      <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                          <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="What time must the notification be sent?"></Label>
-                          <TimePicker v-model="selectedTime" verticalAlignment="center" row="1" />
-                          <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                      </GridLayout>
-                  </Page>
-                  `,
+                    <Page>
+                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                            <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="What time must the notification be sent?"></Label>
+                            <TimePicker v-model="selectedTime" verticalAlignment="center" row="1" />
+                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                        </GridLayout>
+                    </Page>
+                    `,
         data: function() {
           return {
             selectedTime: new Date()
@@ -529,80 +509,6 @@ export default {
         });
         this.isLoading = false;
       } else {
-        if (this.business.logo) {
-          new imageSource.ImageSource()
-            .fromAsset(this.business.logo)
-            .then(img => {
-              this.business.logo =
-                "data:image/png;base64," + img.toBase64String("png");
-              http
-                .request({
-                  url: this.$store.state.settings.baseLink + "/b/add/business",
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  content: JSON.stringify({
-                    adminID: this.$store.state.cache.cachedAdmin._id,
-                    adminAuthority: "ADMIN",
-                    business: this.business
-                  })
-                })
-                .then(
-                  response => {
-                    var statusCode = response.statusCode;
-                    var result = response.content.toString();
-
-                    if (statusCode == 200) {
-                      this.savedBusiness = response.content.toString();
-
-                      this.$feedback
-                        .success({
-                          title: this.business.name + " successfully added",
-                          duration: 30000,
-                          onTap: () => {
-                            this.GoToBusiness(this.savedBusiness);
-                          }
-                        })
-                        .then(() => {});
-                    } else {
-                      this.$feedback.error({
-                        title: "Error (" + statusCode + ")",
-                        duration: 4000,
-                        message: result
-                      });
-                    }
-                    this.isLoading = false;
-                  },
-                  e => {
-                    dialogs.alert(e).then(() => {
-                      console.log("Error occurred " + e);
-                    });
-
-                    this.isLoading = false;
-                  }
-                )
-                .catch(err => {
-                  this.$feedback.error({
-                    title: "Server error",
-                    duration: 4000,
-                    message: err,
-                    onTap: () => {
-                      dialogs.alert("TODO : Handle the error");
-                    }
-                  });
-                  this.isLoading = false;
-                });
-            })
-            .catch(err => {
-              this.$feedback.error({
-                title: "Unable to upload your logo",
-                message:
-                  "Please choose another image, or go back and remove it.",
-                duration: 4000
-              });
-            });
-        } else {
           http
             .request({
               url: this.$store.state.settings.baseLink + "/b/add/business",
@@ -661,7 +567,6 @@ export default {
               });
               this.isLoading = false;
             });
-        }
       }
     },
     canGoForward() {

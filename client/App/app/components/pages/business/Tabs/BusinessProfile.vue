@@ -33,20 +33,17 @@
                 </GridLayout>
               </Ripple>
   
-              <Ripple @tap="GoTo(sendNotificationPage)" row="2" col="0" colSpan="3">
-                <label class="p-15" textAlignment="center" text="Send a notification to a partner/s"></label>
-              </Ripple>
-              
               <ActivityIndicator v-if="!Notifications" row="3" col="0" colSpan="3" textAlignment="center" verticalAlignment="center" :busy="!Notifications"></ActivityIndicator>
   
+              <Fab @tap="GoTo(sendNotificationPage)" row="3" col="0" colSpan="3" icon="res://ic_bell_plus_white_24dp" class="fab-button fixedBtn"></Fab>
               <ScrollView v-if="Notifications" row="3" col="0" colSpan="3">
                 <StackLayout>
-                  <Ripple class="m-x-15 p-15" v-for="(notification,i) in Notifications" :key="i">
-                    <GridLayout rows="auto,auto" columns="auto,*,auto">
-                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
-                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" :text="notification.title"></label>
-                      <label row="1" col="1" class="h4" :text="notification.message"></label>
-                      <Label row="1" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" :text="getMoment(notification.date).fromNow()"></Label>
+                  <Ripple class="m-r-15 p-15" v-for="(notification,i) in Notifications" :key="i">
+                    <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
+                      <label row="0" rowSpan="3" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
+                      <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="notification.title"></label>
+                      <label row="1" col="1" class="h4" :text="notification.body"></label>
+                      <Label row="2" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" :text="getMoment(notification.date).fromNow()"></Label>
                     </GridLayout>
                   </Ripple>
                 </StackLayout>
@@ -186,7 +183,7 @@ export default {
     },
     getNotifications() {
       this.$api
-        .getNotifications(this.$store.state.cache.cachedAdmin._id)
+        .getNotifications(this.$store.state.cache.cachedAdmin._id,this.business._id)
         .then(notifications => {
           this.Notifications = notifications;
         })
