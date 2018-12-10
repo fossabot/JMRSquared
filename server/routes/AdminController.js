@@ -102,6 +102,8 @@ router.post("/add", function (req, res) {
 router.post("/device/token/add", function (req, res) {
   var adminID = req.body.adminID;
   var deviceToken = req.body.deviceToken;
+  var deviceInfo = req.body.deviceInfo;
+
   Admin.findById(adminID)
     .then(admin => {
       if (admin == null) {
@@ -115,7 +117,13 @@ router.post("/device/token/add", function (req, res) {
       if (exist == 0) {
         admin.deviceTokens.push({
           date: Date.now(),
-          token: deviceToken
+          token: deviceToken,
+          deviceType: deviceInfo.deviceType,
+          screen: deviceInfo.screen,
+          isEmulator: deviceInfo.isEmulator,
+          model: deviceInfo.model,
+          name: deviceInfo.name,
+          manufacturer: deviceInfo.manufacturer,
         });
         admin.save(function (err) {
           if (err) return res.status(512).send(err);

@@ -41,8 +41,6 @@ export default class CronJob {
         this.resendNotifications();
     }
 
-
-
     // A list of jobs that can be fired.
     resendNotifications() {
         Notification.find({

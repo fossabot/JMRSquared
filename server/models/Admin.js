@@ -42,8 +42,39 @@ const AdminSchema = new mongoose.Schema({
         date: {
             type: Date
         },
+        lastActiveDate: {
+            type: Date,
+            default: new Date()
+        },
         token: {
             type: String
+        },
+        deviceType: {
+            type: String,
+            default: null
+        },
+        screen: {
+            width: String,
+            height: String,
+            scale: String,
+            widthPixels: String,
+            heightPixels: String
+        },
+        isEmulator: {
+            type: Boolean,
+            default: null
+        },
+        model: {
+            type: String,
+            default: null
+        },
+        name: {
+            type: String,
+            default: null
+        },
+        manufacturer: {
+            type: String,
+            default: null
         },
         removed: {
             type: Boolean,
