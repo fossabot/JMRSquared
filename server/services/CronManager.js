@@ -12,6 +12,7 @@ export default class CronJob {
     }
 
     schedule(interval, registrationToken, payload, toTopic = false) {
+        console.log('cron', `Scheduled a job (${interval}) to ${registrationToken}`);
         let task = cron.schedule(interval, () => {
             console.log('cron', 'Performing the cron job....');
             if (toTopic) {
@@ -59,8 +60,8 @@ export default class CronJob {
                 if (notification.topic != null) {
                     this.schedule(notification.scheduleInterval, notification.topic, payload, true);
                 } else if (notification.toId) {
-                    if (notification.toId.deviceTokens && notification.toId.deviceTokens.filter(d => !d.removed && t.token).map(t => t.token).length > 0) {
-                        notification.toId.deviceTokens.forEach(device_token => {
+                    if (notification.toId.deviceTokens && notification.toId.deviceTokens.filter(d => !d.removed && d.token).length > 0) {
+                        notification.toId.deviceTokens.map(t => t.token).forEach(device_token => {
                             this.schedule(notification.scheduleInterval, device_token, payload);
                         });
                     } else {

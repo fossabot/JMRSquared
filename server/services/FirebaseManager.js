@@ -18,14 +18,14 @@ var FCM = {
             admin
                 .messaging()
                 .sendToDevice(registrationToken, payload, options)
-                .then(function (response) {
+                .then(function(response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
-                        throw new Error(response.results);
+                        throw response.results;
                     }
                 })
-                .catch(function (error) {
+                .catch(function(error) {
                     return reject(error);
                 });
         });
@@ -35,14 +35,14 @@ var FCM = {
             admin
                 .messaging()
                 .sendToTopic(topic, payload)
-                .then(function (response) {
+                .then(function(response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
-                        throw new Error(response.results);
+                        throw response.results;
                     }
                 })
-                .catch(function (error) {
+                .catch(function(error) {
                     return reject(error);
                 });
         });
@@ -52,14 +52,14 @@ var FCM = {
             admin
                 .messaging()
                 .subscribeToTopic(registrationToken, topic)
-                .then(function (response) {
+                .then(function(response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
-                        throw new Error(response.results);
+                        throw response.results;
                     }
                 })
-                .catch(function (error) {
+                .catch(function(error) {
                     return reject(error);
                 });
         });
@@ -69,14 +69,14 @@ var FCM = {
             admin
                 .messaging()
                 .subscribeToTopic(registrationToken, topic)
-                .then(function (response) {
+                .then(function(response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
-                        throw new Error(response.results);
+                        throw response.results;
                     }
                 })
-                .catch(function (error) {
+                .catch(function(error) {
                     return reject(error);
                 });
         });
