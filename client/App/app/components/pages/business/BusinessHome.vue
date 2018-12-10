@@ -77,35 +77,21 @@ export default {
   props: ["businessID"],
   methods: {
     pageLoaded() {
-      var connectionType = connectivity.getConnectionType();
-      if (connectionType == connectivity.connectionType.none) {
-        this.$feedback.warning({
-          title: "NO INTERNET CONNECTION",
-          duration: 4000,
-          message: "Data loaded is not recent."
-        });
-      } else {
-        http
-          .getJSON(
-            this.$store.state.settings.baseLink +
-              "/b/get/" +
-              this.businessID +
-              "/for/" +
-              this.$store.state.cache.cachedAdmin._id
-          )
-          .then(results => {
-            this.business = results;
-            this.tabs[0].icon = "mdi-" + this.business.type.icon;
-            this.$forceUpdate();
-          })
-          .catch(err => {
-            this.$feedback.error({
-              title: "Unable to load your business",
-              duration: 4000,
-              message: "Please try again later"
-            });
+      this.$api
+        .getBusiness(this.businessID, this.$store.state.cache.cachedAdmin._id)
+        .then(results => {
+          this.business = results;
+          this.tabs[0].icon = "mdi-" + this.business.type.icon;
+          this.$forceUpdate();
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Unable to load your business",
+            duration: 4000,
+            message: err.message
           });
-      }
+          this.navigate(null);
+        });
     },
     changeTabByChild(link) {
       var tab = this.tabs.filter(t => t.text == link);

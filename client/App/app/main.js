@@ -114,10 +114,6 @@ Vue.mixin({
     } else {
       console.log('LoggedIn device Token', 'No cached user');
     }
-    console.log(this.$route);
-    console.log('API', this.$api);
-    console.log("Auth level", this.$router.current.userAuthLevel());
-
   },
   mounted() {
 

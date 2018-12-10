@@ -57,63 +57,63 @@
 </template>
 
 <script>
-  const dialogs = require("ui/dialogs");
-  const http = require("http");
-  
-  import * as Toast from "nativescript-toast";
-  var appSettings = require("application-settings");
-  
-  import * as connectivity from "tns-core-modules/connectivity";
-  
-  export default {
-    name: "login",
-    data() {
-      return {
-        isEnterEmail: false,
-        user: {
-          numbers: "",
-          password: "",
-          email: ""
+const dialogs = require("ui/dialogs");
+const http = require("http");
+
+import * as Toast from "nativescript-toast";
+var appSettings = require("application-settings");
+
+import * as connectivity from "tns-core-modules/connectivity";
+
+export default {
+  name: "login",
+  data() {
+    return {
+      isEnterEmail: false,
+      user: {
+        numbers: "",
+        password: "",
+        email: ""
+      }
+    };
+  },
+  mounted() {
+    this.pageLoaded();
+  },
+  created() {
+    this.pageLoaded();
+  },
+  beforeDestroy() {
+    this.isLoading = false;
+  },
+  Destroy() {
+    this.isLoading = false;
+  },
+  methods: {
+    pageLoaded() {
+      this.$store.commit("refreshCache", {
+        db: this.$db,
+        appSettings: appSettings,
+        doc: "admin"
+      });
+    },
+    submit() {
+      var self = this;
+      this.isLoading = true;
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        if (this.$navigator.route.meta.userAuthLevel == -1) {
+          this.loadAdminData();
+        } else if (this.$navigator.route.meta.userAuthLevel == -2) {
+          this.loadTenantData();
+        } else {
+          this.$feedback.error({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "Please switch on your data/wifi."
+          });
         }
-      };
-    },
-    mounted() {
-      this.pageLoaded();
-    },
-    created() {
-      this.pageLoaded();
-    },
-    beforeDestroy() {
-      this.isLoading = false;
-    },
-    Destroy() {
-      this.isLoading = false;
-    },
-    methods: {
-      pageLoaded() {
-        this.$store.commit("refreshCache", {
-          db: this.$db,
-          appSettings: appSettings
-        });
-      },
-      submit() {
-        var self = this;
-        this.isLoading = true;
-        var connectionType = connectivity.getConnectionType();
-        if (connectionType == connectivity.connectionType.none) {
-          if (this.$navigator.route.meta.userAuthLevel == -1) {
-            this.loadAdminData();
-          } else if (this.$navigator.route.meta.userAuthLevel == -2) {
-            this.loadTenantData();
-          } else {
-            this.$feedback.error({
-              title: "NO INTERNET CONNECTION",
-              duration: 4000,
-              message: "Please switch on your data/wifi.",
-            });
-          }
-        }else{
-  
+      } else {
         dialogs
           .action("What type of user are you?", "cancel", ["Tenant", "Admin"])
           .then(userType => {
@@ -146,11 +146,12 @@
                     });
                     this.isLoading = false;
                   }
-                }).catch(err => {
+                })
+                .catch(err => {
                   this.$feedback.error({
                     message: err
                   });
-  
+
                   this.isLoading = false;
                 });
             } else if (userType == "Admin") {
@@ -167,7 +168,8 @@
                     email: this.user.email,
                     pass: this.user.password
                   })
-                }).then(response => {
+                })
+                .then(response => {
                   var statusCode = response.statusCode;
                   this.$feedback.info({
                     message: statusCode
@@ -177,7 +179,6 @@
                     this.loginAdmin(self, result);
                     this.isLoading = false;
                     this.navigate("/admin/dashboard");
-  
                   } else {
                     var error = response.content.toString();
                     this.$feedback.error({
@@ -185,24 +186,24 @@
                     });
                     this.isLoading = false;
                   }
-                }).catch(err => {
+                })
+                .catch(err => {
                   this.$feedback.error({
                     message: err
                   });
-  
+
                   this.isLoading = false;
                 });
-  
             } else {
               //WHen they press cancel
               this.isLoading = false;
             }
           });
-      }}
+      }
     }
-  };
+  }
+};
 </script>
 
 <style>
-  
 </style>

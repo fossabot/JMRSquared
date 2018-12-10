@@ -1,10 +1,12 @@
 <template>
   <GridLayout class="p-x-15" columns="*" rows="auto,*">
-    <StackLayout class="m-y-15" row="0">
+    <Ripple class="m-y-15" row="0">
+    <StackLayout>
       <Image v-if="business.logo" height="100" :src="business.logo" alignSelf="center" stretch="aspectFit" />
       <label v-if="!business.logo" textAlignment="center" verticalAlignment="center" fontSize="25%" class="h3 font-weight-bold text-dark-blue" :text="business.name"></label>
       <Label class="m-10" textWrap="true" verticalAlignment="center" textAlignment="center" :text="business.description"></Label>
     </StackLayout>
+    </Ripple>
     <StackLayout row="1">
       <GridLayout rows="auto,auto,*" columns="*,auto">
         <SegmentedBar row="0" colSpan="2" #tabs borderColor="$blueDarkColor" class="businessIcon snapTop" backgroundColor="transparent" selectedBackgroundColor="#0093a4" v-model="selectedStat">
@@ -12,28 +14,31 @@
         </SegmentedBar>
         <StackLayout v-if="selectedStat == 0" row="2" colSpan="2">
           <CardView margin="5" elevation="10">
-            <GridLayout rows="auto,auto,*" columns="*,*,*">
+            <GridLayout rows="auto,auto,auto,*" columns="*,*,*">
               <StackLayout row="0" :col="i" v-for="(summary,i) in summaryStats" :key="i">
                 <Ripple @tap="showStats(summary,summary.isToParent)">
                   <StackLayout class="p-15">
-                    <label class="h3 font-weight-bold text-dark-blue summaryStats" :text="summary.value" :class="{'visible':true}" fontSize="30%" vertialAlignment="center" textAlignment="center"></label>
+                    <label class="h3 font-weight-bold text-dark-blue summaryStats" :text="summary.value" :class="{'visible':true}" fontSize="25%" vertialAlignment="center" textAlignment="center"></label>
                     <label vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
                   </StackLayout>
                 </Ripple>
-              </StackLayout>
-              <StackLayout row="1" col="0" colSpan="3">
                 <StackLayout width="100%" class="hr-light"></StackLayout>
-                <label class="h3 font-weight-bold text-mute text-dark-blue m-15" text="Notifications"></label>
               </StackLayout>
-              <ScrollView row="2" col="0" colSpan="3">
+  
+              <Ripple @tap="showNewNotifications = !showNewNotifications" row="1" col="0" colSpan="3">
+                <GridLayout class="m-15" rows="auto" columns="*,auto,auto">
+                  <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" text="Notifications"></label>
+                  <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" :text="showNewNotifications ? `New` : `All`"></label>
+                  <switch row="0" col="2" v-model="showNewNotifications"></switch>
+                </GridLayout>
+              </Ripple>
+  
+              <Ripple @tap="GoTo(sendNotificationPage)" row="2" col="0" colSpan="3">
+                <label class="p-15" textAlignment="center" text="Send a notification to a partner/s"></label>
+            </Ripple>
+  
+              <ScrollView row="3" col="0" colSpan="3">
                 <StackLayout>
-                   <Ripple class="p-15" @tap="GoTo(sendNotificationPage)">
-                    <GridLayout rows="auto,auto" columns="auto,*">
-                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell-plus' | fonticon"></label>
-                      <label row="0" col="1" class="h2 font-weight-bold text-mute" fontSize="20%" text="Send new"></label>
-                      <label row="1" col="1" class="h4" text="Send a notification to a partner/s"></label>
-                    </GridLayout>
-                  </Ripple>
                   <Ripple class="m-x-15 p-15" v-for="a in 10" :key="a">
                     <GridLayout rows="auto,auto" columns="auto,*,auto">
                       <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
@@ -102,6 +107,7 @@ export default {
       selectedStat: 0,
       Expenses: [12, 12, 12, 12, 12, 12],
       summaryStats: [],
+      showNewNotifications: true,
       isMainScreen: false,
       selectedScreen: "",
       cards: [
@@ -119,6 +125,9 @@ export default {
         }
       ]
     };
+  },
+  watch: {
+    showNewNotifications(newVal, oldVal) {}
   },
   mounted() {
     this.summaryStats.push({

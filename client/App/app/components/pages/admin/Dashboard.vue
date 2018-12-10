@@ -70,6 +70,11 @@ export default {
         return this.$store.state.cache.cachedAdmin;
       }
     },
+    cachedBusinesses: {
+      get() {
+        return this.$store.state.cache.cachedBusinesses;
+      }
+    },
     Reminders: {
       get() {
         return this.$store.state.collections.tasks.all;
@@ -101,80 +106,63 @@ export default {
         }
       }
 
-      var connectionType = connectivity.getConnectionType();
-      if (connectionType == connectivity.connectionType.none) {
-        this.$feedback.error({
-          title: "Error (NO INTERNET CONNECTION)",
-          duration: 4000,
-          message: "Please switch on your data/wifi."
-        });
-      } else {
-        http
-          .getJSON(
-            this.$store.state.settings.baseLink +
-              "/b/all/for/" +
-              this.$store.state.cache.cachedAdmin._id
-          )
-          .then(results => {
-            var count = results.length;
-            if (count > this.layouts.length) {
-              count = this.layouts.length;
-            }
-            var i = 0;
-            var tank = [];
-            var timer = setInterval(() => {
-              if (tank.filter(t => t == i).length == 0) {
-                if (i < count) {
-                  this.layouts[i].icon = results[i].type.icon;
-                  this.layouts[i].title = results[i].name;
-                  this.layouts[i].link = "/business/home";
-                  this.layouts[i].props = {
-                    businessID: results[i]._id
-                  };
-                } else {
-                  if (
-                    this.layouts.filter(l => !l.title && !l.icon).length > 0
-                  ) {
-                    var first = this.layouts.filter(
-                      l => !l.title && !l.icon
-                    )[0];
-                    first.icon = "briefcase-plus";
-                    first.title = "Add Business";
-                    first.link = "/business/add/business";
-                  }
-                  this.layouts
-                    .filter(l => !l.title && !l.icon)
-                    .map(layout => {
-                      layout.icon = " ";
-                      layout.title = " ";
-                    });
-                  clearInterval(timer);
-                  if (args) {
-                    args.object.refreshing = false;
-                  }
+      this.$api
+        .getAllBusinessesForUser(this.$store.state.cache.cachedAdmin._id)
+        .then(results => {
+          var count = results.length;
+          if (count > this.layouts.length) {
+            count = this.layouts.length;
+          }
+          var i = 0;
+          var tank = [];
+          var timer = setInterval(() => {
+            if (tank.filter(t => t == i).length == 0) {
+              if (i < count) {
+                this.layouts[i].icon = results[i].type.icon;
+                this.layouts[i].title = results[i].name;
+                this.layouts[i].link = "/business/home";
+                this.layouts[i].props = {
+                  businessID: results[i]._id
+                };
+              } else {
+                if (this.layouts.filter(l => !l.title && !l.icon).length > 0) {
+                  var first = this.layouts.filter(l => !l.title && !l.icon)[0];
+                  first.icon = "briefcase-plus";
+                  first.title = "Add Business";
+                  first.link = "/business/add/business";
                 }
-                tank.push(i);
-                i++;
-                this.$forceUpdate();
+                this.layouts
+                  .filter(l => !l.title && !l.icon)
+                  .map(layout => {
+                    layout.icon = " ";
+                    layout.title = " ";
+                  });
+                clearInterval(timer);
+                if (args) {
+                  args.object.refreshing = false;
+                }
               }
-            }, 300);
-          })
-          .catch(err => {
-            this.$feedback.error({
-              title: "Unable to load your businesses",
-              duration: 4000,
-              message: "Please try again later"
-            });
-            this.layouts.forEach(layout => {
-              layout.icon = "bug-report";
-              layout.title = "Invalid";
-            });
-            if (args) {
-              args.object.refreshing = false;
+              tank.push(i);
+              i++;
+              this.$forceUpdate();
             }
-            this.$forceUpdate();
+          }, 300);
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Unable to load your businesses",
+            duration: 4000,
+            message: "Please try again later"
           });
-      }
+          this.layouts.forEach(layout => {
+            layout.icon = "bug-report";
+            layout.title = "Invalid";
+          });
+          if (args) {
+            args.object.refreshing = false;
+          }
+          this.$forceUpdate();
+        });
 
       var firstTime = appSettings.getBoolean("shownChangeLog");
       if (!firstTime) {

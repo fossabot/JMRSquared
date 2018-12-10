@@ -21,6 +21,10 @@ CardView {
   vertical-align: bottom;
 }
 
+.faded-blue {
+  background: linear-gradient(to bottom right, #eeeeee, #0093a4, #0093a4, #eeeeee);
+}
+
 .bgBlueDark {
   background-color: $blueDarkColor;
 }

@@ -18,8 +18,9 @@ master.approximateNumber = require('../lib/approximate-number');
 master.appSettings = require("application-settings");
 master.firebase = firebase;
 master.device_token = null;
+master.store = store;
 
-master.http = new API(store.state.settings.baseLink);
+master.http = new API(store.state.settings.baseLink, master);
 
 master.ChangeLog = {
     GetLogs: (version) => {
