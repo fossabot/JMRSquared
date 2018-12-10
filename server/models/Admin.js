@@ -49,32 +49,46 @@ const AdminSchema = new mongoose.Schema({
         token: {
             type: String
         },
-        deviceType: {
-            type: String,
-            default: null
-        },
-        screen: {
-            width: String,
-            height: String,
-            scale: String,
-            widthPixels: String,
-            heightPixels: String
-        },
-        isEmulator: {
-            type: Boolean,
-            default: null
-        },
-        model: {
-            type: String,
-            default: null
-        },
-        name: {
-            type: String,
-            default: null
-        },
-        manufacturer: {
-            type: String,
-            default: null
+        deviceInfo: {
+            deviceType: {
+                type: String,
+                default: null
+            },
+            screen: {
+                width: String,
+                height: String,
+                scale: String,
+                widthPixels: String,
+                heightPixels: String
+            },
+            model: {
+                type: String,
+                default: null
+            },
+            manufacturer: {
+                type: String,
+                default: null
+            },
+            manufacturer: {
+                type: String,
+                default: null
+            },
+            os: {
+                type: String,
+                default: null
+            },
+            osVersion: {
+                type: String,
+                default: null
+            },
+            sdkVersion: {
+                type: String,
+                default: null
+            },
+            language: {
+                type: String,
+                default: null
+            },
         },
         removed: {
             type: Boolean,

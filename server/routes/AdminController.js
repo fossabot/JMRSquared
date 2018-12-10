@@ -118,12 +118,7 @@ router.post("/device/token/add", function (req, res) {
         admin.deviceTokens.push({
           date: Date.now(),
           token: deviceToken,
-          deviceType: deviceInfo.deviceType,
-          screen: deviceInfo.screen,
-          isEmulator: deviceInfo.isEmulator,
-          model: deviceInfo.model,
-          name: deviceInfo.name,
-          manufacturer: deviceInfo.manufacturer,
+          deviceInfo: deviceInfo
         });
         admin.save(function (err) {
           if (err) return res.status(512).send(err);
