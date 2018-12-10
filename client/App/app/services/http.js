@@ -70,9 +70,11 @@ export default class API {
     addUserDeviceToken(adminID, deviceToken) {
         return new Promise((resolve, reject) => {
             console.log('Update device token', deviceToken);
+            
             http.request(this.makePost("/a/device/token/add", {
                 adminID: adminID,
-                deviceToken: deviceToken
+                deviceToken: deviceToken,
+                deviceInfo:this.master.deviceInfo
             })).then((result) => {
                 console.log("ADDTOKEN-success", result)
                 resolve(result)

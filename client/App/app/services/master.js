@@ -10,6 +10,8 @@ import {
 from "nativescript-feedback";
 import API from "./http";
 import store from '../store';
+import { device, screen, isAndroid, isIOS } from "tns-core-modules/platform";
+
 var firebase = require("nativescript-plugin-firebase");
 
 master.couchDB = new Couchbase("jmrdb");
@@ -19,6 +21,23 @@ master.appSettings = require("application-settings");
 master.firebase = firebase;
 master.device_token = null;
 master.store = store;
+master.deviceInfo = {
+   deviceType:device.deviceType,
+    screen: {
+        width: screen.mainScreen.widthDIPs,
+        height: screen.mainScreen.heightDIPs,
+        scale: screen.mainScreen.scale,
+        widthPixels: screen.mainScreen.widthPixels,
+        heightPixels: screen.mainScreen.heightPixels
+    },
+    model:device.model,
+    manufacturer: device.manufacturer,
+   /* uuid:device.uuid,
+   */ os:device.os,
+    osVersion:device.osVersion,
+    sdkVersion:device.sdkVersion,
+    language:device.language,
+};
 
 master.http = new API(store.state.settings.baseLink, master);
 
