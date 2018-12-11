@@ -20,7 +20,7 @@ const cronJob = new CronJob();
          Get all from user (done)
 */
 
-router.post("/test/push/notification", function (req, res) {
+router.post("/test/push/notification", function(req, res) {
   var deviceToken = req.body.token;
   var payload = {
     notification: {
@@ -43,7 +43,7 @@ router.post("/test/push/notification", function (req, res) {
     });
 });
 
-router.post("/push/notification/to/admin", function (req, res) {
+router.post("/push/notification/to/admin", function(req, res) {
   var adminID = req.body.adminID;
   var notification = req.body.notification;
   var data = req.body.data;
@@ -91,7 +91,7 @@ router.post("/push/notification/to/admin", function (req, res) {
 
 router.post(
   "/test/push/notification/schedule/hour/:hour/minute/:minute",
-  function (req, res) {
+  function(req, res) {
     var deviceToken = req.body.token;
     var minute = req.params.minute;
     var hour = req.params.hour;
@@ -112,32 +112,35 @@ router.post(
   }
 );
 
-router.get("/cron/get/tasks", function (req, res) {
+router.get("/cron/get/tasks", function(req, res) {
   res.send(cronJob.getTasks());
 });
 
-router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
+router.get("/get/new/for/:userId/business/:businessID", function(req, res) {
   var receiver = req.params.userId;
   var businessID = req.params.businessID;
   Notification.find({
-      businessID: businessID,
-      $or: [{
-          expiryDate: null
-        },
-        {
-          expiryDate: {
-            $lt: new Date()
-          }
+    businessID: businessID,
+    $or: [
+      {
+        expiryDate: null
+      },
+      {
+        expiryDate: {
+          $lt: new Date()
         }
-      ],
-      $or: [{
+      }
+    ],
+    $or: [
+      {
         status: {
           $ne: "SEEN"
         }
-      }],
-      removed: false,
-      toId: receiver
-    })
+      }
+    ],
+    removed: false,
+    toId: receiver
+  })
     .sort("-date")
     .then(notifications => {
       if (notifications == null) res.send("Error : 9032egrrtu834g9erbo");
@@ -145,12 +148,13 @@ router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
     });
 });
 
-router.get("/all/for/:userId/:scheduled", function (req, res) {
+router.get("/all/for/:userId/:scheduled", function(req, res) {
   var receiver = req.params.userId;
   let scheduled = req.params.scheduled ? true : false;
   Notification.find({
     scheduled: scheduled,
-    $or: [{
+    $or: [
+      {
         expiryDate: null
       },
       {
@@ -166,12 +170,13 @@ router.get("/all/for/:userId/:scheduled", function (req, res) {
   });
 });
 
-router.get("/all/:userId/:scheduled", function (req, res) {
+router.get("/all/:userId/:scheduled", function(req, res) {
   let sender = req.params.userId;
   let scheduled = req.params.scheduled ? true : false;
   Notification.find({
     scheduled: scheduled,
-    $or: [{
+    $or: [
+      {
         expiryDate: null
       },
       {
@@ -180,7 +185,8 @@ router.get("/all/:userId/:scheduled", function (req, res) {
         }
       }
     ],
-    $or: [{
+    $or: [
+      {
         fromId: sender
       },
       {
@@ -197,7 +203,7 @@ router.get("/all/:userId/:scheduled", function (req, res) {
   });
 });
 
-router.get("/tasks/all", function (req, res) {
+router.get("/tasks/all", function(req, res) {
   Notification.find({
     dueDate: {
       $ne: null
@@ -211,13 +217,14 @@ router.get("/tasks/all", function (req, res) {
   });
 });
 
-router.get("/tasks/all/:userId", function (req, res) {
+router.get("/tasks/all/:userId", function(req, res) {
   var sender = req.params.userId;
   Notification.find({
     dueDate: {
       $ne: null
     },
-    $or: [{
+    $or: [
+      {
         fromId: sender
       },
       {
@@ -233,36 +240,37 @@ router.get("/tasks/all/:userId", function (req, res) {
   });
 });
 
-router.post("/add", function (req, res) {
+router.post("/add", function(req, res) {
   var notification = new Notification({
     _id: mongoose.Types.ObjectId(),
-    fromId: req.body.fromId,
-    toId: req.body.toId,
-    title: req.body.title,
-    body: req.body.body,
-    data: req.body.data,
-    type: req.body.type,
-    status: req.body.status,
-    scheduled: req.body.scheduled,
-    topic: req.body.topic,
-    businessID: req.body.businessID,
-    scheduleInterval: req.body.scheduleInterval,
-    expiryDate: req.body.expiryDate
+    fromId: req.body.notification.fromId,
+    toId: req.body.notification.toId,
+    title: req.body.notification.title,
+    body: req.body.notification.body,
+    data: req.body.notification.data,
+    type: req.body.notification.type.text.toUpperCase(),
+    status: req.body.notification.status,
+    scheduled: req.body.notification.scheduled,
+    topic: req.body.notification.topic,
+    businessID: req.body.notification.businessID,
+    scheduleInterval: req.body.notification.scheduleInterval,
+    expiryDate: req.body.notification.expiryDate
   });
 
   if (notification.scheduled) {
-
     notification.status = "PENDING";
   } else {
     notification.status = "SENT";
   }
-  notification.save(function (err) {
+  notification.save(function(err) {
     if (err) return res.status(512).send(err);
     Admin.findById(notification.toId)
       .then(user => {
         if (user == null)
           return res.status(514).send("User of id " + adminID + " not found");
-        var tokens = user.deviceTokens.filter(v => !v.removed).map(v => v.token);
+        var tokens = user.deviceTokens
+          .filter(v => !v.removed)
+          .map(v => v.token);
         if (tokens) {
           var payload = {
             notification: {
@@ -272,7 +280,12 @@ router.post("/add", function (req, res) {
           };
           tokens.forEach(deviceToken => {
             if (notification.scheduled) {
-              cronJob.schedule(notification.scheduleInterval, deviceToken, payload, notification._id);
+              cronJob.schedule(
+                notification.scheduleInterval,
+                deviceToken,
+                payload,
+                notification._id
+              );
             } else {
               FCM.sendToDevice(deviceToken, payload)
                 .then(response => {})
@@ -291,57 +304,6 @@ router.post("/add", function (req, res) {
       .catch(err => {
         return res.status(514).send(err);
       });
-  });
-
-  notification.save(function (err) {
-    if (err) return res.status(512).send(err);
-
-    Admin.findById(req.body.fromId, function (err, admin) {
-      if (err || admin == null) {
-        console.log(err);
-        return;
-      }
-
-      admin.notifications.push(notification._id);
-      admin.save(function (err) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        Student.findById(req.body.toId, function (err, student) {
-          if (err || student == null) {
-            console.log(err);
-            return;
-          }
-
-          student.notifications.push(notification._id);
-          student.save(function (err) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-
-            var answer = Admin.findById(admin._id)
-              .populate(["documents"])
-              .populate(["notifications"])
-              .populate(["transactions"])
-              .then(_admin => {
-                if (_admin == null) {
-                  res.status(500);
-                  res.send("User not found");
-                } else {
-                  console.log("Returning admin " + _admin._id);
-                  res.json(_admin);
-                }
-              });
-
-            //Done ...
-          });
-        });
-      });
-    });
-
-    res.json("Notification sent to " + req.body.to);
   });
 });
 
