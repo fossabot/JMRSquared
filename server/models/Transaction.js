@@ -12,7 +12,8 @@ const TransactionSchema = new mongoose.Schema({
     }, //ForeignKey
     businessID: {
         type: Schema.Types.ObjectId,
-        ref: 'Business'
+        ref: 'Business',
+        default: mongoose.Types.ObjectId('5be20bfc65aaf50f2b0a839b')
     },
     amount: String,
     itemCount: {
@@ -44,6 +45,10 @@ const TransactionSchema = new mongoose.Schema({
     proof: {
         type: Object,
         default: null
+    },
+    insertedDate: {
+        type: Date,
+        default: Date.now()
     },
     date: {
         type: Date,
