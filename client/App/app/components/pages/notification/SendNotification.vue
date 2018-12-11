@@ -27,7 +27,7 @@
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Select a partner or partners"></label>
                     <ScrollView row="1" col="1" orientation="horizontal">
                       <WrapLayout>
-                        <Label v-for="(partner,i) in notificationPartners" @tap="addPartnerToNotification(partner,false)" :class="{'chip-selected':notification.partners.indexOf(partner) >= 0}" :text="partner.text" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey"
+                        <Label v-for="(partner,i) in notificationPartners" @tap="addPartnerToNotification(partner,false)" :class="{'chip-selected':notification.partners.indexOf(partner) >= 0}" :text="partner.userName" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey"
                           borderRadius="99%"></Label>
                       </WrapLayout>
                     </ScrollView>
@@ -110,15 +110,15 @@
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Message"></label>
                     <label :text="notification.message" row="1" col="1" class="h4"></label>
                   </GridLayout>
-
+  
                   <GridLayout class="m-10" rows="auto" columns="*,auto">
                     <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Partners that will receive the notification"></label>
                   </GridLayout>
-
+  
                   <GridLayout v-for="(partner,i) in notification.partners" :key="i" class="m-10" rows="auto,auto" columns="auto,*">
-                    <Image row="0" rowSpan="2" col="0" verticalAlignment="center" width="40" height="40" class="m-5 circle" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%"/>
-                   <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="partner.text"></label>
-                    <label row="1" col="1" class="h4" text="Sirwali Joseph"></label>
+                    <Image row="0" rowSpan="2" col="0" verticalAlignment="center" width="40" height="40" class="m-5 circle" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="partner.userName"></label>
+                    <label row="1" col="1" class="h4" :text="partner.fullName"></label>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
@@ -148,15 +148,15 @@
         <CardView class="bg-white m-t-10 p-t-10" elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
           <StackLayout>
             <FlexboxLayout v-show="!isLoading" flexDirection="column" alignContent="flex-end" justifyContent="flex-end" width="100%">
-              <GridLayout v-show="!savedBusiness" rows="auto,auto" columns="*,*">
+              <GridLayout v-show="!saveNotification" rows="auto,auto" columns="*,*">
                 <Label row="0" colSpan="2" :text="txtError.length < 2 ? '' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
-                <Button row="1" col="1" @tap="submitBusiness()" v-show="currentPage == 3" class="btn-primary bg-light-green" text="Send"></Button>
+                <Button row="1" col="1" @tap="submitNotification()" v-show="currentPage == 3" class="btn-primary bg-light-green" text="Send"></Button>
                 <Button row="1" col="0" @tap="currentPage--" v-show="currentPage > 0" :isEnabled="currentPage > 0" class="btn-primary bg-light-red" text="back"></Button>
                 <Button row="1" col="1" @tap="moveForward()" v-show="currentPage != 3" class="btn-primary bg-light-blue" text="proceed"></Button>
               </GridLayout>
-              <GridLayout v-show="savedBusiness" rows="auto,auto" columns="*">
-                <Label row="0" text="Your business is ready!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
-                <Button row="1" @tap="GoToBusiness(savedBusiness)" class="btn-primary bg-light-blue" :text="`Open ${business.name}`"></Button>
+              <GridLayout v-show="saveNotification" rows="auto,auto" columns="*">
+                <Label row="0" text="Your notification was sent!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
+                <Button row="1" @tap="GoToBusiness(businessId)" class="btn-primary bg-light-blue" text="Go Home"></Button>
               </GridLayout>
             </FlexboxLayout>
             <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
@@ -209,39 +209,7 @@ export default {
           icon: "check"
         }
       ],
-      notificationPartners: [
-        {
-          row: 0,
-          col: 0,
-          value: false,
-          text: "Joe Sirwali"
-        },
-        {
-          row: 0,
-          col: 1,
-          value: false,
-          text: "Joe"
-        },
-        {
-          row: 0,
-          col: 2,
-          value: false,
-          text: "Joe Lavhe"
-        },
-        {
-          row: 1,
-          col: 0,
-          value: false,
-          text: "Joe Mulavhe"
-        },
-        {
-          row: 1,
-          col: 1,
-          value: false,
-          text: "Joe"
-        }
-      ],
-      notificationTo: [],
+      notificationPartners: [],
       notification: {
         sendImmediately: false,
         sendDateTime: new Date(),
@@ -273,7 +241,7 @@ export default {
           types: []
         }
       },
-      savedBusiness: false,
+      saveNotification: false,
       txtError: "",
       currentPage: 0,
       currentPageTitle: "Who to notify?",
@@ -309,6 +277,9 @@ export default {
           break;
         case 2:
           this.currentPageTitle = "What is the notification?";
+          break;
+        case 3:
+          this.currentPageTitle = "Confirm the notification";
           break;
         default:
           this.currentPageTitle = "";
@@ -347,14 +318,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                    <Page>
-                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                            <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
-                            <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
-                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                        </GridLayout>
-                    </Page>
-                    `,
+                          <Page>
+                              <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                  <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
+                                  <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
+                                  <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                              </GridLayout>
+                          </Page>
+                          `,
         data: function() {
           return {
             selectedDueDate: new Date()
@@ -371,7 +342,8 @@ export default {
                 date.getHours(),
                 date.getMinutes(),
                 0
-            ));
+              )
+            );
             self.notification.sendDateTime = now;
             this.$modal.close();
           }
@@ -382,14 +354,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                    <Page>
-                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                            <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="What time must the notification be sent?"></Label>
-                            <TimePicker v-model="selectedTime" verticalAlignment="center" row="1" />
-                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                        </GridLayout>
-                    </Page>
-                    `,
+                          <Page>
+                              <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                  <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="What time must the notification be sent?"></Label>
+                                  <TimePicker v-model="selectedTime" verticalAlignment="center" row="1" />
+                                  <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                              </GridLayout>
+                          </Page>
+                          `,
         data: function() {
           return {
             selectedTime: new Date()
@@ -415,59 +387,8 @@ export default {
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
-      this.business.options.types = [];
 
-      this.notificationTo = [
-        {
-          index: 0,
-          text: "All " + this.businessName + " partners",
-          icon: "account-group",
-          value: true
-        },
-        {
-          index: 1,
-          text: "One or many partners",
-          icon: "account-switch",
-          value: false
-        }
-      ];
-      this.changeNotificationTo();
-
-      var connectionType = connectivity.getConnectionType();
-      if (connectionType == connectivity.connectionType.none) {
-        this.$feedback.error({
-          title: "NO INTERNET CONNECTION",
-          duration: 4000,
-          message: "Please switch on your data/wifi."
-        });
-      } else {
-        http
-          .getJSON(
-            this.$store.state.settings.baseLink +
-              "/settings/options/business/types"
-          )
-          .then(
-            response => {
-              this.business.options.types = response;
-              this.changeSelectedBusinessCategory(0);
-            },
-            err => {
-              dialogs.alert(e).then(() => {
-                console.log("Error occurred " + e);
-              });
-            }
-          )
-          .catch(err => {
-            this.$feedback.error({
-              title: "Server error",
-              duration: 4000,
-              message: err,
-              onTap: () => {
-                dialogs.alert("TODO : Handle the error");
-              }
-            });
-          });
-      }
+      this.loadPartners();
     },
     addPartnerToNotification(partner) {
       if (partner.newIndex != null) {
@@ -481,93 +402,44 @@ export default {
         this.notification.partners.push(partner);
       }
     },
-    changeNotificationTo() {
-      var index = this.notification.to.index;
-      index++;
-      if (index == 1) {
-        if (
-          this.notification.partners &&
-          this.notification.partners.length > 1
-        ) {
-          this.notification.partners.splice(1);
-        }
-      }
-      if (index == this.notificationTo.length) {
-        index = 0;
-      }
-      this.notification.to = this.notificationTo[index];
-    },
-    submitBusiness() {
-      this.isLoading = true;
-
-      var connectionType = connectivity.getConnectionType();
-      if (connectionType == connectivity.connectionType.none) {
-        this.$feedback.error({
-          title: "NO INTERNET CONNECTION",
-          duration: 4000,
-          message: "Please switch on your data/wifi."
+    loadPartners() {
+      this.$api
+        .getPartners(this.businessId)
+        .then(partners => {
+          this.notificationPartners = partners;
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Unable to load partners",
+            duration: 4000,
+            message: err.message
+          });
         });
-        this.isLoading = false;
-      } else {
-          http
-            .request({
-              url: this.$store.state.settings.baseLink + "/b/add/business",
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              content: JSON.stringify({
-                adminID: this.$store.state.cache.cachedAdmin._id,
-                adminAuthority: "ADMIN",
-                business: this.business
-              })
-            })
-            .then(
-              response => {
-                var statusCode = response.statusCode;
-                var result = response.content.toString();
+    },
+    submitNotification() {
+      this.isLoading = true;
+      this.$api
+        .submitNotification(notification)
+        .then(response => {
+          this.saveNotification = response.content.toString();
 
-                if (statusCode == 200) {
-                  this.savedBusiness = response.content.toString();
-
-                  this.$feedback
-                    .success({
-                      title: this.business.name + " successfully added",
-                      duration: 30000,
-                      onTap: () => {
-                        this.GoToBusiness(this.savedBusiness);
-                      }
-                    })
-                    .then(() => {});
-                } else {
-                  this.$feedback.error({
-                    title: "Error (" + statusCode + ")",
-                    duration: 4000,
-                    message: result
-                  });
-                }
-                this.isLoading = false;
-              },
-              e => {
-                dialogs.alert(e).then(() => {
-                  console.log("Error occurred " + e);
-                });
-
-                this.isLoading = false;
-              }
-            )
-            .catch(err => {
-              this.$feedback.error({
-                title: "Server error",
-                duration: 4000,
-                message: err,
-                onTap: () => {
-                  dialogs.alert("TODO : Handle the error");
-                }
-              });
-              this.isLoading = false;
-            });
-      }
+          this.$feedback.success({
+            title: "Notification successfully sent!",
+            duration: 30000,
+            onTap: () => {
+              this.GoToBusiness(this.saveNotification);
+            }
+          });
+          this.isLoading = false;
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "Please switch on your data/wifi."
+          });
+          this.isLoading = false;
+        });
     },
     canGoForward() {
       this.txtError = "";

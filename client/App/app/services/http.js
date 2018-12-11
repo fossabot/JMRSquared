@@ -70,11 +70,11 @@ export default class API {
     addUserDeviceToken(adminID, deviceToken) {
         return new Promise((resolve, reject) => {
             console.log('Update device token', deviceToken);
-            
+
             http.request(this.makePost("/a/device/token/add", {
                 adminID: adminID,
                 deviceToken: deviceToken,
-                deviceInfo:this.master.deviceInfo
+                deviceInfo: this.master.deviceInfo
             })).then((result) => {
                 console.log("ADDTOKEN-success", result)
                 resolve(result)
@@ -163,7 +163,7 @@ export default class API {
         return connectivity.getConnectionType();
     }
 
-    getNotifications(adminID,businessID) {
+    getNotifications(adminID, businessID) {
         return new Promise((resolve, reject) => {
             http
                 .getJSON(this.makeGet(`/n/get/new/for/${adminID}/business/${businessID}`)).then(result => {
@@ -171,6 +171,29 @@ export default class API {
                 }).catch(err => {
                     return reject(err);
                 });
+        });
+    }
+
+    getPartners(businessID) {
+        return new Promise((resolve, reject) => {
+            http
+                .getJSON(this.makeGet(`/b/get/all/partners/for/${businessID}`)).then(result => {
+                    return resolve(result);
+                }).catch(err => {
+                    return reject(err);
+                });
+        });
+    }
+
+    submitNotification(notification) {
+        return new Promise((resolve, reject) => {
+            http.request(this.makePost("/n/add", {
+                notification
+            })).then((result) => {
+                resolve(result)
+            }).catch(err => {
+                reject(err);
+            });
         });
     }
 }
