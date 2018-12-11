@@ -11,19 +11,38 @@ export default class CronJob {
         this.tasks = [];
     }
 
-    schedule(interval, registrationToken, payload, toTopic = false) {
+    schedule(interval, registrationToken, payload, toTopic = false, notificationID = null) {
         console.log('cron', `Scheduled a job (${interval}) to ${registrationToken}`);
         let task = cron.schedule(interval, () => {
             console.log('cron', 'Performing the cron job....');
             if (toTopic) {
                 FCM.sendToTopic(registrationToken, payload).then(v => {
+                    if (notificationID) {
+                        Notification.findById(notificationID).then(notification => {
+                            notification.status = "SENT";
+                            notification.save(function (err) {
+                                if (err) throw "Unable to save notification status change , " + err.message
+                            })
+                        }).catch(err => {
+                            console.log('Notification status change', err)
+                        });
+                    }
                     console.log('cron', 'Cron job done....');
                 }).catch(err => {
                     console.log('cron', err);
                 })
             } else {
                 FCM.sendToDevice(registrationToken, payload).then(v => {
-                    console.log('cron', 'Cron job done....');
+                    if (notificationID) {
+                        Notification.findById(notificationID).then(notification => {
+                            notification.status = "SENT";
+                            notification.save(function (err) {
+                                if (err) throw "Unable to save notification status change , " + err.message
+                            })
+                        }).catch(err => {
+                            console.log('Notification status change', err)
+                        });
+                    }
                 }).catch(err => {
                     console.log('cron', err);
                 })
