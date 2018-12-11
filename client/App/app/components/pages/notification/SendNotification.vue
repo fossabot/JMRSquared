@@ -81,7 +81,7 @@
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-text' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Message"></label>
-                    <TextView row="1" col="1" v-model="notification.message" hint="The message to be sent as a notification" returnKeyType="next" class="h4"></TextView>
+                    <TextView row="1" col="1" v-model="notification.body" hint="The message to be sent as a notification" returnKeyType="next" class="h4"></TextView>
                   </GridLayout>
                 </StackLayout>
               </ScrollView>
@@ -108,7 +108,7 @@
                   <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-text' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Message"></label>
-                    <label :text="notification.message" row="1" col="1" class="h4"></label>
+                    <label :text="notification.body" row="1" col="1" class="h4"></label>
                   </GridLayout>
   
                   <GridLayout class="m-10" rows="auto" columns="*,auto">
@@ -211,20 +211,17 @@ export default {
       ],
       notificationPartners: [],
       notification: {
-        sendImmediately: false,
         sendDateTime: new Date(),
-        to: {
-          index: -1,
-          text: ""
-        },
         type: {
           index: 0,
           text: "Reminder",
           icon: "alarm"
         },
+        fromId: null,
+        toId: null,
         partners: [],
         title: "",
-        message: ""
+        body: ""
       },
       business: {
         name: "",
@@ -297,12 +294,6 @@ export default {
         this.notification.type = this.notificationTypes[0];
       } else {
         this.notification.type = this.notificationTypes[index];
-      }
-
-      if (this.notification.type.index == 0) {
-        this.notification.sendImmediately = false;
-      } else {
-        this.notification.sendImmediately = true;
       }
     },
     ChangeCheck(event, index) {
@@ -418,28 +409,50 @@ export default {
     },
     submitNotification() {
       this.isLoading = true;
-      this.$api
-        .submitNotification(notification)
-        .then(response => {
-          this.saveNotification = response.content.toString();
-
-          this.$feedback.success({
-            title: "Notification successfully sent!",
-            duration: 30000,
-            onTap: () => {
-              this.GoToBusiness(this.saveNotification);
+      this.notification.fromId = this.$store.state.cache.cachedAdmin._id;
+      this.notification.type = this.notification.type.toUpperCase();
+      var hoursDiff = this.getMoment().diff(
+        this.notification.sendDateTime,
+        "hours"
+      );
+      if (hoursDiff > 2) {
+        this.notification.scheduled = true;
+        var dateTime = this.notification.sendDateTime;
+        this.notification.scheduleInterval = `${dateTime.getMinutes()} ${dateTime.getHours()} ${dateTime.getDate()} ${dateTime.getMonth() +
+          1} * `;
+      } else {
+        this.notification.scheduled = false;
+      }
+      var sentCount = 0;
+      this.notification.partners.forEach(partner => {
+        this.notification.toId = partner._id;
+        this.$api
+          .submitNotification(this.notification)
+          .then(response => {
+            this.$feedback.success({
+              title:
+                "Notification successfully sent to " + partner.userName + "!",
+              duration: 5000
+            });
+            sentCount++;
+            if (sentCount == this.notification.partners.length) {
+              this.saveNotification = response.content.toString();
+              this.isLoading = false;
+            }
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "NO INTERNET CONNECTION",
+              duration: 4000,
+              message: "Please switch on your data/wifi."
+            });
+            sentCount++;
+            if (sentCount == this.notification.partners.length) {
+              this.saveNotification = response.content.toString();
+              this.isLoading = false;
             }
           });
-          this.isLoading = false;
-        })
-        .catch(err => {
-          this.$feedback.error({
-            title: "NO INTERNET CONNECTION",
-            duration: 4000,
-            message: "Please switch on your data/wifi."
-          });
-          this.isLoading = false;
-        });
+      });
     },
     canGoForward() {
       this.txtError = "";
@@ -455,7 +468,7 @@ export default {
         if (this.notification.title.length < 2) {
           this.txtError = "Please provide a title for your notification.";
           return false;
-        } else if (this.notification.message.length < 2) {
+        } else if (this.notification.body.length < 2) {
           this.txtError = "A notification requires a longer message.";
           return false;
         }
@@ -466,11 +479,7 @@ export default {
     },
     moveForward() {
       if (this.canGoForward()) {
-        if (this.currentPage == 0 && this.notification.sendImmediately) {
-          this.currentPage = 2;
-        } else {
-          this.currentPage++;
-        }
+        this.currentPage++;
       }
     },
     changeSelectedBusinessCategory(index) {
