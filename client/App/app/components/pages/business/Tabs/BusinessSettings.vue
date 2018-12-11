@@ -48,10 +48,17 @@ export default {
       icon: "worker"
     });
     this.options.push({
-      title: "Expences",
-      text: `Expences of the business`,
+      title: "Expenses",
+      text: `Expenses of the business`,
       link: "",
       icon: "trending-down"
+    });
+
+    this.options.push({
+      title: "Income",
+      text: `Income streams of the business`,
+      link: "",
+      icon: "trending-up"
     });
   },
   props: ["business"],

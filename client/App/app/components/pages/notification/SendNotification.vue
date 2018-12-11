@@ -148,15 +148,15 @@
         <CardView class="bg-white m-t-10 p-t-10" elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
           <StackLayout>
             <FlexboxLayout v-show="!isLoading" flexDirection="column" alignContent="flex-end" justifyContent="flex-end" width="100%">
-              <GridLayout v-show="!saveNotification" rows="auto,auto" columns="*,*">
+              <GridLayout v-show="!savedNotification" rows="auto,auto" columns="*,*">
                 <Label row="0" colSpan="2" :text="txtError.length < 2 ? '' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
                 <Button row="1" col="1" @tap="submitNotification()" v-show="currentPage == 3" class="btn-primary bg-light-green" text="Send"></Button>
                 <Button row="1" col="0" @tap="currentPage--" v-show="currentPage > 0" :isEnabled="currentPage > 0" class="btn-primary bg-light-red" text="back"></Button>
                 <Button row="1" col="1" @tap="moveForward()" v-show="currentPage != 3" class="btn-primary bg-light-blue" text="proceed"></Button>
               </GridLayout>
-              <GridLayout v-show="saveNotification" rows="auto,auto" columns="*">
+              <GridLayout v-show="savedNotification" rows="auto,auto" columns="*">
                 <Label row="0" text="Your notification was sent!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
-                <Button row="1" @tap="GoToBusiness(businessId)" class="btn-primary bg-light-blue" text="Go Home"></Button>
+                <Button row="1" @tap="navigate('/admin/dashboard')" class="btn-primary bg-light-blue" text="Go Home"></Button>
               </GridLayout>
             </FlexboxLayout>
             <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
@@ -238,7 +238,7 @@ export default {
           types: []
         }
       },
-      saveNotification: false,
+      savedNotification: false,
       txtError: "",
       currentPage: 0,
       currentPageTitle: "Who to notify?",
@@ -411,6 +411,7 @@ export default {
       this.isLoading = true;
       this.notification.fromId = this.$store.state.cache.cachedAdmin._id;
       this.notification.type = this.notification.type;
+      this.notification.businessID = this.businessId;
       var hoursDiff = this.getMoment().diff(
         this.notification.sendDateTime,
         "hours"
@@ -436,7 +437,7 @@ export default {
             });
             sentCount++;
             if (sentCount == this.notification.partners.length) {
-              this.saveNotification = response.content.toString();
+              this.savedNotification = true;
               this.isLoading = false;
             }
           })
@@ -448,7 +449,7 @@ export default {
             });
             sentCount++;
             if (sentCount == this.notification.partners.length) {
-              this.saveNotification = response.content.toString();
+              this.savedNotification = true;
               this.isLoading = false;
             }
           });

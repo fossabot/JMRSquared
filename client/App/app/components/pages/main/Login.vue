@@ -114,90 +114,44 @@ export default {
           });
         }
       } else {
-        dialogs
-          .action("What type of user are you?", "cancel", ["Tenant", "Admin"])
-          .then(userType => {
-            if (userType == "Tenant") {
-              http
-                .request({
-                  url: this.$store.state.settings.baseLink + "/s/login",
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  content: JSON.stringify({
-                    useEmail: this.isEnterEmail,
-                    numbers: this.user.numbers,
-                    email: this.user.email,
-                    pass: this.user.password
-                  })
-                })
-                .then(response => {
-                  var statusCode = response.statusCode;
-                  if (statusCode == 200) {
-                    var result = response.content.toJSON();
-                    this.loginTenant(this, result);
-                    this.isLoading = false;
-                    this.navigate("/tenant/dashboard");
-                  } else {
-                    var error = response.content.toString();
-                    this.$feedback.error({
-                      message: error
-                    });
-                    this.isLoading = false;
-                  }
-                })
-                .catch(err => {
-                  this.$feedback.error({
-                    message: err
-                  });
-
-                  this.isLoading = false;
-                });
-            } else if (userType == "Admin") {
-              http
-                .request({
-                  url: this.$store.state.settings.baseLink + "/a/login",
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  content: JSON.stringify({
-                    useEmail: this.isEnterEmail,
-                    numbers: this.user.numbers,
-                    email: this.user.email,
-                    pass: this.user.password
-                  })
-                })
-                .then(response => {
-                  var statusCode = response.statusCode;
-                  this.$feedback.info({
-                    message: statusCode
-                  });
-                  if (statusCode == 200) {
-                    var result = response.content.toJSON();
-                    this.loginAdmin(self, result);
-                    this.isLoading = false;
-                    this.navigate("/admin/dashboard");
-                  } else {
-                    var error = response.content.toString();
-                    this.$feedback.error({
-                      message: error
-                    });
-                    this.isLoading = false;
-                  }
-                })
-                .catch(err => {
-                  this.$feedback.error({
-                    message: err
-                  });
-
-                  this.isLoading = false;
-                });
+        http
+          .request({
+            url: this.$store.state.settings.baseLink + "/a/login",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            content: JSON.stringify({
+              useEmail: this.isEnterEmail,
+              numbers: this.user.numbers,
+              email: this.user.email,
+              pass: this.user.password
+            })
+          })
+          .then(response => {
+            var statusCode = response.statusCode;
+            this.$feedback.info({
+              message: statusCode
+            });
+            if (statusCode == 200) {
+              var result = response.content.toJSON();
+              this.loginAdmin(self, result);
+              this.isLoading = false;
+              this.navigate("/admin/dashboard");
             } else {
-              //WHen they press cancel
+              var error = response.content.toString();
+              this.$feedback.error({
+                message: error
+              });
               this.isLoading = false;
             }
+          })
+          .catch(err => {
+            this.$feedback.error({
+              message: err
+            });
+
+            this.isLoading = false;
           });
       }
     }
