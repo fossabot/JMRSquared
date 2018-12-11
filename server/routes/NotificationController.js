@@ -109,6 +109,7 @@ router.post(
       }
     };
     cronJob.schedule(`${minute} ${hour} * * *`, deviceToken, payload);
+    return res.send(`Message scheduled to be sent at ${hour}:${minute} to ${deviceToken}`)
   }
 );
 
