@@ -410,7 +410,7 @@ export default {
     submitNotification() {
       this.isLoading = true;
       this.notification.fromId = this.$store.state.cache.cachedAdmin._id;
-      this.notification.type = this.notification.type.toUpperCase();
+      this.notification.type = this.notification.type;
       var hoursDiff = this.getMoment().diff(
         this.notification.sendDateTime,
         "hours"
