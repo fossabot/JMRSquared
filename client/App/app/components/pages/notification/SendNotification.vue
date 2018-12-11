@@ -481,52 +481,6 @@ export default {
       if (this.canGoForward()) {
         this.currentPage++;
       }
-    },
-    changeSelectedBusinessCategory(index) {
-      if (
-        this.business.options.types.length > 0 &&
-        this.business.options.types.length > this.business.type.index
-      ) {
-        this.business.type.category = this.business.options.types[
-          this.business.type.index
-        ].category;
-
-        this.business.type.type = this.business.options.types[
-          this.business.type.index
-        ].type;
-
-        this.business.type.icon = this.business.options.types[
-          this.business.type.index
-        ].icon;
-
-        this.business.type.optionals = this.business.options.types[
-          this.business.type.index
-        ].optional;
-
-        this.business.type.optionals.forEach(optional => {
-          optional.answer = null;
-        });
-      }
-    },
-    uploadLogo() {
-      var context = imagepicker.create({
-        mode: "single" // use "multiple" for multiple selection
-      });
-
-      context
-        .authorize()
-        .then(function() {
-          return context.present();
-        })
-        .then(selection => {
-          selection.forEach(selected => {
-            // process the selected image
-            this.business.logo = selected;
-          });
-        })
-        .catch(err => {
-          // process error
-        });
     }
   }
 };
