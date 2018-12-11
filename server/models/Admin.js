@@ -90,6 +90,10 @@ const AdminSchema = new mongoose.Schema({
                 default: null
             },
         },
+        dateRemoved: {
+            type: Date,
+            default: null
+        },
         removed: {
             type: Boolean,
             default: false
