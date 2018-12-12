@@ -26,6 +26,10 @@ const NotificationSchema = new mongoose.Schema({
   title: String,
   body: String,
   data: Object,
+  icon: {
+    type: String,
+    default: 'bell'
+  },
   type: {
     type: String,
     enum: ["REMINDER", "INFO", "WARNING", "ERROR", "SUCCESS"],
@@ -36,6 +40,10 @@ const NotificationSchema = new mongoose.Schema({
     enum: ["PENDING", "SENT", "SEEN"],
     default: "PENDING"
   },
+  viewedDates: [{
+    type: Date,
+    default: []
+  }],
   date: {
     type: Date,
     default: Date.now()
@@ -55,9 +63,8 @@ const NotificationSchema = new mongoose.Schema({
   }
 });
 
-NotificationSchema.methods.findSimilarTypes = function(cb) {
-  return this.model("Animal").find(
-    {
+NotificationSchema.methods.findSimilarTypes = function (cb) {
+  return this.model("Animal").find({
       type: this.type
     },
     cb

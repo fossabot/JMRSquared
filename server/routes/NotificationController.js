@@ -131,17 +131,22 @@ router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
           }
         }
       ],
-      $or: [{
-        status: {
-          $ne: "SEEN"
-        }
-      }],
+      status: "SENT",
       removed: false,
       toId: receiver
     })
     .sort("-date")
     .then(notifications => {
       if (notifications == null) res.send("Error : 9032egrrtu834g9erbo");
+      notifications.forEach(notification => {
+        if (!notification.viewedDates) {
+          notification.viewedDates = [];
+        }
+        notification.viewedDates.push(Date.now());
+      });
+      notifications.save(function (err) {
+        if (err) console.log("An error occured while updating the viewedDates of notifications");
+      });
       res.json(notifications);
     });
 });
@@ -256,6 +261,7 @@ router.post("/add", function (req, res) {
     title: req.body.notification.title,
     body: req.body.notification.body,
     data: req.body.notification.data,
+    icon: req.body.notification.type.icon,
     type: req.body.notification.type.text.toUpperCase(),
     status: req.body.notification.status,
     scheduled: req.body.notification.scheduled,

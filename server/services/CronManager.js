@@ -19,6 +19,7 @@ export default class CronJob {
                 FCM.sendToTopic(registrationToken, payload).then(v => {
                     if (notificationID) {
                         Notification.findById(notificationID).then(notification => {
+                            if (notification == null) throw "Scheduled notification does not exist (anymore) , " + notificationID
                             notification.status = "SENT";
                             notification.save(function (err) {
                                 if (err) throw "Unable to save notification status change , " + err.message
@@ -35,6 +36,7 @@ export default class CronJob {
                 FCM.sendToDevice(registrationToken, payload).then(v => {
                     if (notificationID) {
                         Notification.findById(notificationID).then(notification => {
+                            if (notification == null) throw "Scheduled notification does not exist (anymore) , " + notificationID
                             notification.status = "SENT";
                             notification.save(function (err) {
                                 if (err) throw "Unable to save notification status change , " + err.message
