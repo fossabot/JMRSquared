@@ -143,9 +143,9 @@ router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
           notification.viewedDates = [];
         }
         notification.viewedDates.push(Date.now());
-      });
-      notifications.save(function (err) {
-        if (err) console.log("An error occured while updating the viewedDates of notifications");
+        notification.save(function (err) {
+          if (err) console.log("An error occured while updating the viewedDates of notifications");
+        });
       });
       res.json(notifications);
     }).catch(err=>{
