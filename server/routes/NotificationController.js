@@ -149,7 +149,7 @@ router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
       });
       res.json(notifications);
     }).catch(err=>{
-     return res.status(512).json(err);
+     return res.status(514).json(err.message);
     });
 });
 
