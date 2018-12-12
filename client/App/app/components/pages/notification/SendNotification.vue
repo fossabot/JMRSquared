@@ -138,6 +138,12 @@
                     <label row="1" col="1" :text="getMoment(notification.sendDateTime).format('hh:mm A')" class="h4"></label>
                   </GridLayout>
   
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-calendar-clock' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="When will the notification be sent?"></label>
+                    <label row="1" col="1" :text="(getMoment().diff(notification.sendDateTime,'hours') >= -1) ? 'Immediatly' : getMoment(notification.sendDateTime).fromNow()" class="h4"></label>
+                  </GridLayout>
+  
                 </StackLayout>
               </ScrollView>
             </CardView>
@@ -211,7 +217,7 @@ export default {
       ],
       notificationPartners: [],
       notification: {
-        sendDateTime: new Date(),
+        sendDateTime: new Date().setMinutes(new Date().getMinutes() + 10),
         type: {
           index: 0,
           text: "Reminder",
@@ -309,31 +315,28 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                          <Page>
-                              <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                  <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
-                                  <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
-                                  <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal,selectedDueDate)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                              </GridLayout>
-                          </Page>
-                          `,
+                              <Page>
+                                  <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                      <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
+                                      <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
+                                      <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                                  </GridLayout>
+                              </Page>
+                              `,
         data: function() {
           return {
             selectedDueDate: new Date()
           };
         },
         methods: {
-          changeDueRent(modal, value) {
+          changeDueRent(modal) {
             var date = self.notification.sendDateTime;
             var now = new Date(
-              Date.UTC(
-                value.getFullYear(),
-                value.getMonth(),
-                value.getDate(),
-                date.getHours(),
-                date.getMinutes(),
-                0
-              )
+              this.selectedDueDate.getFullYear(),
+              this.selectedDueDate.getMonth(),
+              this.selectedDueDate.getDate(),
+              date.getHours(),
+              date.getMinutes()
             );
             self.notification.sendDateTime = now;
             this.$modal.close();
@@ -345,29 +348,28 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                          <Page>
-                              <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                  <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="What time must the notification be sent?"></Label>
-                                  <TimePicker v-model="selectedTime" verticalAlignment="center" row="1" />
-                                  <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                              </GridLayout>
-                          </Page>
-                          `,
+                              <Page>
+                                  <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                      <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="What time must the notification be sent?"></Label>
+                                      <TimePicker v-model="selectedTime" verticalAlignment="center" row="1" />
+                                      <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                                  </GridLayout>
+                              </Page>
+                              `,
         data: function() {
           return {
             selectedTime: new Date()
           };
         },
         methods: {
-          changeDueRent(modal, hours, minutes) {
+          changeDueRent(modal) {
             var date = self.notification.sendDateTime;
             var now = new Date(
               date.getFullYear(),
               date.getMonth(),
-              date.getDay(),
+              date.getDate(),
               this.selectedTime.getHours(),
-              this.selectedTime.getMinutes(),
-              0
+              this.selectedTime.getMinutes()
             );
             self.notification.sendDateTime = now;
             this.$modal.close();
@@ -416,7 +418,7 @@ export default {
         this.notification.sendDateTime,
         "hours"
       );
-      if (hoursDiff > 2) {
+      if (hoursDiff < -1) {
         this.notification.scheduled = true;
         var dateTime = this.notification.sendDateTime;
         this.notification.scheduleInterval = `${dateTime.getMinutes()} ${dateTime.getHours()} ${dateTime.getDate()} ${dateTime.getMonth() +
@@ -432,7 +434,9 @@ export default {
           .then(response => {
             this.$feedback.success({
               title:
-                "Notification successfully sent to " + partner.userName + "!",
+                "Notification successfully " +
+                (this.notification.scheduled ? "scheduled for " : "sent to ") +
+                partner.userName,
               duration: 5000
             });
             sentCount++;
@@ -464,6 +468,10 @@ export default {
         }
         return true;
       } else if (this.currentPage == 1) {
+        if (this.notification.sendDateTime < Date.now()) {
+          this.txtError = "Please provide a date that is in the future.";
+          return false;
+        }
         return true;
       } else if (this.currentPage == 2) {
         if (this.notification.title.length < 2) {
