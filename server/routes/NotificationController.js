@@ -148,6 +148,8 @@ router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
         if (err) console.log("An error occured while updating the viewedDates of notifications");
       });
       res.json(notifications);
+    }).catch(err=>{
+     return res.status(512).send(err);
     });
 });
 
