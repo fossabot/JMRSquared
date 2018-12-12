@@ -58,7 +58,7 @@ export default {
         },
         {
           text: "Settings",
-          icon: "mdi-settings",
+          icon: "mdi-briefcase-edit",
           view: "BusinessSettings"
         }
       ]

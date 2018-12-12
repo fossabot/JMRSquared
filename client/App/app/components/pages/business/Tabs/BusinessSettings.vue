@@ -50,14 +50,22 @@ export default {
     this.options.push({
       title: "Expenses",
       text: `Expenses of the business`,
-      link: "",
+      link: `/business/expenses/list`,
+      props: {
+        businessId: this.business._id,
+        businessName: this.business.name
+      },
       icon: "trending-down"
     });
 
     this.options.push({
       title: "Income",
       text: `Income streams of the business`,
-      link: "",
+      link: `/business/income/list`,
+      props: {
+        businessId: this.business._id,
+        businessName: this.business.name
+      },
       icon: "trending-up"
     });
   },

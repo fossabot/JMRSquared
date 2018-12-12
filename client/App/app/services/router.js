@@ -9,7 +9,11 @@ import EditDetails from '../components/pages/admin/EditDetails.vue'
 import AddBusiness from '../components/pages/business/AddBusiness.vue'
 import AddPartner from '../components/pages/business/AddPartner.vue'
 import BusinessHome from '../components/pages/business/BusinessHome.vue'
-import PartnersList from '../components/pages/business/PartnersList.vue'
+
+// Business Components
+import PartnersList from '../components/pages/business/Components/PartnersList.vue'
+import ExpensesList from '../components/pages/business/Components/ExpensesList.vue'
+import IncomeList from '../components/pages/business/Components/IncomeList.vue'
 
 // Notifications
 import SendNotification from '../components/pages/notification/SendNotification.vue'
@@ -112,6 +116,28 @@ router.routes = {
     component: PartnersList,
     meta: {
       title: 'Partners list',
+      authLevel: 3,
+      source: null
+    },
+    props: true
+  },
+  '/business/expenses/list': {
+    name: 'ExpensesList',
+    path: '/business/expenses/list/:businessID/:businessName',
+    component: ExpensesList,
+    meta: {
+      title: 'Expenses list',
+      authLevel: 3,
+      source: null
+    },
+    props: true
+  },
+  '/business/income/list': {
+    name: 'IncomeList',
+    path: '/business/income/list/:businessID/:businessName',
+    component: IncomeList,
+    meta: {
+      title: 'Income list',
       authLevel: 3,
       source: null
     },
