@@ -10,11 +10,9 @@
     <StackLayout row="1">
       <CardView margin="5" elevation="10">
         <GridLayout rows="auto,*,auto" columns="*,*,*">
-          <Ripple @tap="showNewNotifications = !showNewNotifications" row="0" col="0" colSpan="3">
-            <GridLayout class="m-15" rows="auto" columns="*,auto,auto">
+          <Ripple row="0" col="0" colSpan="3">
+            <GridLayout class="m-15" rows="auto" columns="*">
               <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" text="Notifications"></label>
-              <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" :text="showNewNotifications ? `New` : `All`"></label>
-              <switch row="0" col="2" v-model="showNewNotifications"></switch>
             </GridLayout>
           </Ripple>
   
@@ -68,7 +66,6 @@ export default {
       Notifications: null,
       Expenses: [12, 12, 12, 12, 12, 12],
       summaryStats: [],
-      showNewNotifications: true,
       isMainScreen: false,
       selectedScreen: "",
       selectedNotification: null,
@@ -87,9 +84,6 @@ export default {
         }
       ]
     };
-  },
-  watch: {
-    showNewNotifications(newVal, oldVal) {}
   },
   mounted() {
     this.summaryStats.push({
