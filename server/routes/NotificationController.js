@@ -234,6 +234,20 @@ router.get("/tasks/all/:userId", function (req, res) {
   });
 });
 
+router.post("/mark/as/seen", function (req, res) {
+  var notificationID = req.body.notificationID;
+  Notification.findById(notificationID).then(notification => {
+    if (notification == null) return res.status(512).send("Notification of id " + notificationID + " not found");
+    notification.status = "SEEN";
+    notification.save(function (err) {
+      if (err) return res.status(512).send(err);
+      return res.send("Notification removed");
+    });
+  }).catch(err => {
+    return res.status(512).send(err);
+  })
+});
+
 router.post("/add", function (req, res) {
   var notification = new Notification({
     _id: mongoose.Types.ObjectId(),
