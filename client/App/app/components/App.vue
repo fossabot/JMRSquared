@@ -14,6 +14,7 @@ export default {
   beforeCreate() {
     this.$store.commit("refreshCache", {
       db: this.$db,
+      api: this.$api,
       appSettings: this.appSettings,
       doc: "admin"
     });

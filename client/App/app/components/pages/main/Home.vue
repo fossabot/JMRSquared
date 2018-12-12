@@ -57,6 +57,7 @@ export default {
     pageLoaded() {
       this.$store.commit("refreshCache", {
         db: this.$db,
+        api: this.$api,
         appSettings: appSettings,
         doc: "admin"
       });

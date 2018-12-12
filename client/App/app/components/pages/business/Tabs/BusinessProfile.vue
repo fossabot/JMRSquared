@@ -38,14 +38,21 @@
               <Fab @tap="GoTo(sendNotificationPage)" row="3" col="0" colSpan="3" icon="res://ic_bell_plus_white_24dp" class="fab-button fixedBtn"></Fab>
               <ScrollView v-if="Notifications" row="3" col="0" colSpan="3">
                 <StackLayout>
-                  <Ripple class="m-r-15 p-15" v-for="(notification,i) in Notifications" :key="i">
-                    <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
-                      <label row="0" rowSpan="3" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
-                      <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="notification.title"></label>
-                      <label row="1" col="1" class="h4" :text="notification.body"></label>
-                      <Label row="2" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" :text="getMoment(notification.date).fromNow()"></Label>
-                    </GridLayout>
-                  </Ripple>
+                  <GridLayout rows="auto" columns="*,auto" v-for="(notification,i) in Notifications" :key="i">
+                    <Ripple @tap="selectedNotification == i ? selectedNotification = null: selectedNotification = i" col="0" :colSpan="selectedNotification == i ? '1' : '2'" class="m-r-15 p-15">
+                      <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
+                        <label row="0" rowSpan="3" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
+                        <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="notification.title"></label>
+                        <label row="1" col="1" :textWrap="true" class="h4" :text="notification.body"></label>
+                        <Label row="2" col="2" verticalAlignment="center" class="h4 text-mute p-x-5" textAlignment="right" :text="getMoment(notification.date).fromNow()"></Label>
+                      </GridLayout>
+                    </Ripple>
+                    <StackLayout verticalAlignment="center" textAlignment="center" row="0" col="1" v-if="selectedNotification == i">
+                      <Ripple @tap="markNotificationAsSeen(notification)">
+                        <label verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-thumb-up-outline' | fonticon"></label>
+                      </Ripple>
+                    </StackLayout>
+                  </GridLayout>
                 </StackLayout>
               </ScrollView>
             </GridLayout>
@@ -110,6 +117,7 @@ export default {
       showNewNotifications: true,
       isMainScreen: false,
       selectedScreen: "",
+      selectedNotification: null,
       cards: [
         {
           text: "new new 86",
@@ -174,6 +182,35 @@ export default {
   },
   props: ["business"],
   methods: {
+    markNotificationAsSeen(notification) {
+      dialogs
+        .confirm({
+          title: "Mark as seen",
+          message: "Are you sure you want to remove this notification?",
+          okButtonText: "Yes",
+          cancelButtonText: "No"
+        })
+        .then(result => {
+          if (result) {
+            this.$api
+              .markNotificationAsSeen(notification._id)
+              .then(response => {
+                this.selectedNotification = null;
+                this.$feedback.success({
+                  title: "Notification removed"
+                });
+                var index = this.Notifications.indexOf(notification);
+                this.Notifications.splice(index, 1);
+              })
+              .catch(err => {
+                this.$feedback.error({
+                  title: "Notification not removed",
+                  message: err.message
+                });
+              });
+          }
+        });
+    },
     showStats(option, toParent) {
       if (!toParent) {
         this.GoTo(option);
@@ -183,7 +220,10 @@ export default {
     },
     getNotifications() {
       this.$api
-        .getNotifications(this.$store.state.cache.cachedAdmin._id,this.business._id)
+        .getNotifications(
+          this.$store.state.cache.cachedAdmin._id,
+          this.business._id
+        )
         .then(notifications => {
           this.Notifications = notifications;
         })

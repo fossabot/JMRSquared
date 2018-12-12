@@ -20,6 +20,21 @@ const mutations = {
         let user = obj.db.getDocument(documentID);
         state.cachedAdmin = user.result;
         state.lastUpdated = user.date;
+
+        if (state.cachedAdmin.device_token != obj.appSettings.getString("device_token")) {
+          state.cachedAdmin.device_token = obj.appSettings.getString("device_token");
+          obj.api.addUserDeviceToken(state.cachedAdmin._id, state.cachedAdmin.device_token).then(response => {
+            var statusCode = response.statusCode;
+            if (statusCode == 200) {
+              console.log("ADDTOKEN-success", response)
+            } else {
+              var error = response.content;
+              throw new Error(error);
+            }
+          }).catch(err => {
+            console.log("ADDTOKEN-error", err)
+          });
+        }
       }
     } else if (obj.doc == 'tenant') {
       // Cached tenant (TO BE REMOVED)
