@@ -1,17 +1,89 @@
 <template>
-    <GridLayout rows="*" columns="*">
-        <Label verticalAlignment="center" textAlignment="center" text="Transactions"></Label>
-    </GridLayout>
+  <GridLayout rows="auto,*,auto,auto" columns="*">
+    <StackLayout>
+      <GridLayout class="m-15" rows="auto" columns="*">
+        <label row="0" col="0" verticalAlignment="center" textAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" text="Transactions"></label>
+      </GridLayout>
+      <ScrollView v-if="business.type && business.type.optionals" orientation="horizontal">
+        <StackLayout orientation="horizontal">
+          <GridLayout v-for="(optional,i) in business.type.optionals" :key="i" class="m-10" rows="auto,auto" columns="auto,*">
+            <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
+            <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
+            <label :text="optional.answer" row="1" col="1" class="h4"></label>
+          </GridLayout>
+        </StackLayout>
+      </ScrollView>
+      <StackLayout width="100%" class="hr-light"></StackLayout>
+    </StackLayout>
+    <Fab v-if="!isBottomSheetOpen" @tap="goToAddTransaction" rowSpan="3" row="1" icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
+    <ScrollView rowSpan="2" row="1">
+      <StackLayout>
+        <CardView v-for="a in 30" :key="a" radius="5" margin="1" elevation="5">
+          <Ripple class="m-x-5">
+            <GridLayout class="m-15" rows="auto,auto,auto" columns="*,auto,auto">
+              <label row="0" col="0" class="font-weight-bold text-mute" text="Electricity"></label>
+              <label row="1" col="0" class="h3 text-mute" :text="getMoment().format('DD MMM YY')"></label>
+              <label row="0" rowSpan="2" col="1" verticalAlignment="center" textAlignment="right" class="mdi m-15" fontSize="25%" :text="'mdi-bank-transfer-in' | fonticon"></label>
+              <Label row="0" rowSpan="2" col="2" verticalAlignment="center" class="font-weight-bold  text-mute p-x-5 text-light-red" textAlignment="right" text="- R3000"></Label>
+            </GridLayout>
+          </Ripple>
+        </CardView>
+      </StackLayout>
+    </ScrollView>
+  
+    <StackLayout row="2" ref="bottomSheet" backgroundColor="white" :visibility="isBottomSheetOpen ? 'visible' : 'collapse'" verticalAlignment="bottom">
+      <CardView elevation="15">
+        <StackLayout class="m-x-15 m-y-5">
+            <GridLayout textAlignment="right" columns="auto">
+            <Ripple textAlignment="right" @tap="closeSheet">
+              <label col="1" class="text-light-red mdi m-15" verticalAlignment="center" textAlignment="right" fontSize="25%" :text="'mdi-close' | fonticon"></label>
+            </Ripple>
+          </GridLayout>
+            <GridLayout v-for="a in 5" :key="a" rows="auto,auto" columns="*,*">
+            <StackLayout row="1" :col="i" v-for="(summary,i) in summaryStats" :key="i">
+              <label class="font-weight-bold" vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
+              <label class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.value}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
+            </StackLayout>
+          </GridLayout>
+        <GridLayout textAlignment="center" columns="*">
+            <Ripple @tap="goToStats">
+              <label class="m-15" verticalAlignment="center" textAlignment="center" text="Detailed information"></label>
+            </Ripple>
+          </GridLayout>
+        </StackLayout>
+      </CardView>
+    </StackLayout>
+    <CardView row="3" elevation="5" class="m-x-15 m-y-5">
+      <Ripple @tap="isBottomSheetOpen ? closeSheet() : openSheet()" class="p-5">
+        <GridLayout class="m-x-15 m-y-5" rows="auto" columns="*,*">
+          <StackLayout :col="i" v-for="(summary,i) in summaryStats" :key="i">
+            <label class="font-weight-bold" vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
+            <label class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.value}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
+          </StackLayout>
+        </GridLayout>
+      </Ripple>
+    </CardView>
+  </GridLayout>
 </template>
 
 <script>
 const dialogs = require("ui/dialogs");
-import application from "application";
 
 export default {
   data() {
     return {
+      summaryStats: [
+        {
+          title: "Revenue",
+          value: 9212
+        },
+        {
+          title: "Profit",
+          value: 502
+        }
+      ],
       isMainScreen: false,
+      isBottomSheetOpen: false,
       selectedScreen: "",
       cards: [
         {
@@ -30,15 +102,49 @@ export default {
     };
   },
   mounted() {
-    console.log(application);
+
   },
+  props: ["business"],
   methods: {
-    switchPage(card) {
-      dialogs.alert("Going to " + card.redirect).then(() => {
-        console.log(card.redirect);
-      });
-      this.$router.push({
-        path: card.redirect
+    openSheet() {
+      this.isBottomSheetOpen = true;
+      const bottomSheet = this.$refs.bottomSheet;
+      console.log("sheet", bottomSheet);
+      if (bottomSheet) {
+        bottomSheet.translateY = 100;
+        bottomSheet.nativeView.animate({
+          translate: {
+            x: 0,
+            y: 0
+          },
+          duration: 200
+        });
+      }
+    },
+    closeSheet() {
+      const bottomSheet = this.$refs.bottomSheet;
+      if (bottomSheet) {
+        bottomSheet.nativeView.animate({
+            translate: {
+              x: 0,
+              y: 100
+            },
+            duration: 200
+          })
+          .then(_ => {
+            this.isBottomSheetOpen = false;
+          });
+      } else {
+        this.isBottomSheetOpen = false;
+      }
+    },
+    goToStats(){
+      this.$emit("changeTab", "Stats");
+    },
+    goToAddTransaction(){
+      this.navigate('/business/add/transaction', {
+        businessId: this.business._id,
+        businessName: this.business.name
       });
     }
   }

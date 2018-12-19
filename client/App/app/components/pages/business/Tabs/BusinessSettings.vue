@@ -1,14 +1,24 @@
 <template>
   <StackLayout>
-    <ScrollView>
-      <GridLayout rows="auto,*" columns="*">
-        <Image height="200" row="0" :src="business.logo ? business.logo : 'https://content.linkedin.com/content/dam/brand/site/img/visual-guidelines.png'" alignSelf="center" stretch="aspectFit" />
-        <StackLayout row="1">
-          <Label class="font-weight-bold m-10 h3" fontSize="25%" verticalAlignment="center" textAlignment="center" :text="business.name"></Label>
-          <Label class="m-10" textWrap="true" verticalAlignment="center" textAlignment="center" :text="business.description"></Label>
-          <Fab icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
-          <CardView margin="10" elevation="5">
-            <StackLayout>
+     <GridLayout rows="auto,*" columns="*">
+         <CardView row="0" class="p-y-15 m-b-5" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+               <Ripple>
+        <GridLayout rows="auto,auto" columns="auto,*,auto">
+          <Ripple row="0" rowSpan="2" col="2" class="p-10" @tap="logOut()" textAlignmemt="left" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-dots-vertical' | fonticon"></Label>
+          </Ripple>
+          <Image v-if="business.logo" row="0" rowSpan="2" col="0" verticalAlignment="center" width="70" height="70" class="circle p-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="business.logo" borderRadius="50%"/>
+          <Ripple v-if="!business.logo" row="0" rowSpan="2" col="0" borderWidth="5px" width="70" height="70" borderColor="white" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
+          </Ripple>
+          <label row="0" col="0" colSpan="3" fontSize="20" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-mute text-dark-blue" :text="business.name"></label>
+          <Label row="1" col="0" colSpan="3" fontSize="15" verticalAlignment="center" textAlignment="center" :textWrap="true" :text="business.description"></Label>
+        </GridLayout>
+        </Ripple>
+      </CardView>
+         <CardView row="1" margin="10" elevation="5">
+            <ScrollView>
+             <StackLayout>
               <Ripple v-for="(option,i) in options" :key="i" @tap="GoTo(option)">
                 <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
                   <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + option.icon | fonticon"></Label>
@@ -16,11 +26,21 @@
                   <label row="1" col="1" class="p-x-15 h4" :text="option.text"></label>
                 </GridLayout>
               </Ripple>
+              <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+              <GridLayout class="m-10" rows="auto" columns="*,auto">
+                <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Settings"></label>
+              </GridLayout>
+              <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto">
+                  <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-file-document' | fonticon"></Label>
+                  <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" text="Transaction evidence"></label>
+                  <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" text="Client will be required to upload proof"></label>
+                  <switch row="0" rowSpan="2" col="2" v-model="businessSettings.evidenceRequired"></switch>
+                </GridLayout>
             </StackLayout>
-          </CardView>
-        </StackLayout>
-      </GridLayout>
     </ScrollView>
+           </CardView>
+     </GridLayout>
   </StackLayout>
 </template>
 
@@ -33,7 +53,10 @@ export default {
     return {
       isMainScreen: false,
       selectedScreen: "",
-      options: []
+      options: [],
+      businessSettings:{
+        evidenceRequired:false
+      }
     };
   },
   mounted() {
@@ -68,6 +91,7 @@ export default {
       },
       icon: "trending-up"
     });
+    this.SetSettings();
   },
   props: ["business"],
   methods: {
@@ -75,6 +99,9 @@ export default {
       if (option.link) {
         this.navigate(option.link, option.props);
       }
+    },
+    SetSettings(){
+      //this.business.settings.evidenceRequired = this.business.settings.evidenceRequired;
     },
     switchPage(card) {
       dialogs.alert("Going to " + card.redirect).then(() => {

@@ -8,6 +8,7 @@ import EditDetails from '../components/pages/admin/EditDetails.vue'
 // Business
 import AddBusiness from '../components/pages/business/AddBusiness.vue'
 import AddPartner from '../components/pages/business/AddPartner.vue'
+import AddTransaction from '../components/pages/business/AddTransaction.vue'
 import BusinessHome from '../components/pages/business/BusinessHome.vue'
 
 // Business Components
@@ -84,6 +85,16 @@ router.routes = {
     component: AddBusiness,
     meta: {
       title: 'Add Business',
+      authLevel: 3,
+      source: null
+    },
+  },
+   '/business/add/transaction': {
+    name: 'AddTransaction',
+    path: '/business/add/transaction/:businessId/:businessName',
+    component: AddTransaction,
+    meta: {
+      title: 'Add Transaction',
       authLevel: 3,
       source: null
     },

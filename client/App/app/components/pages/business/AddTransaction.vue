@@ -1,0 +1,641 @@
+<template>
+  <page class="page" actionBarHidden="true" width="100%" height="100%">
+    <GridLayout rows="auto,*,auto">
+      <StackLayout row="0">
+        <CardView elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+          <StackLayout>
+            <GridLayout class="m-10" rows="auto" columns="*,auto">
+              <StackLayout row="0" col="0">
+                <label class="h3" text="Adding a transaction for : "></label>
+                <label class="h4 m-l-20" :text="businessName"></label>
+              </StackLayout>
+              <Button row="0" col="1" @tap="$router.back()" selfAlign="right" text="Cancel"></Button>
+            </GridLayout>
+            <label class="h3 font-weight-bold text-mute text-dark-blue" verticalAlignment="center" textAlignment="center" :text="currentPageTitle"></label>
+          </StackLayout>
+        </CardView>
+        <Progress :value="(currentPage) * 25"></Progress>
+      </StackLayout>
+      <ScrollView row="1">
+        <FlexboxLayout flexDirection="column" justifyContent="center" width="100%">
+          <!-- PAGE 0 -->
+          <StackLayout v-show="currentPage == 0">
+            <CardView margin="10" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+              <ScrollView>
+                <StackLayout class="form">
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-edit' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Transacter"></label>
+                    <label row="1" col="1" :text="$store.state.cache.cachedAdmin.userName" class="h4"></label>
+                  </GridLayout>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+                  <Ripple @tap="changeTransactionDate()">
+                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-calendar-range' | fonticon"></label>
+                      <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Date (tap to change)"></label>
+                      <label row="1" col="1" :text="getMoment(transaction.date).format('DD MMMM YYYY')" class="h4"></label>
+                    </GridLayout>
+                  </Ripple>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" :class="transaction.isMoneyIn ? 'text-light-blue' : 'text-light-red'" class="mdi m-15" fontSize="25%" :text="'mdi-bank-transfer-' + (transaction.isMoneyIn ? 'in' : 'out') | fonticon"></label>
+                    <label row="0" col="1" colSpan="2" class="h3 font-weight-bold text-mute" text="Transaction type"></label>
+                    <Checkbox @tap="changeTransactionType(transaction.isMoneyIn)" :checked="transaction.isMoneyIn" boxType="circle" name="transactionType" row="1" col="1" text="Money in" class="h4"></Checkbox>
+                    <Checkbox @tap="changeTransactionType(transaction.isMoneyOut)" :checked="transaction.isMoneyOut" boxType="circle" name="transactionType" row="1" col="2" text="Money out" class="h4"></Checkbox>
+                  </GridLayout>
+  
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-cash-multiple' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="'Amount ' + (!transaction.isMoneyIn ? 'used' : 'deposited')  "></label>
+                    <TextField row="1" col="1" v-model="transaction.amount" :hint="'How much did you ' + (!transaction.isMoneyIn ? 'use' : 'deposit')  + '?'" keyboardType="number" returnKeyType="next" class="h4"></TextField>
+                  </GridLayout>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+                </StackLayout>
+              </ScrollView>
+            </CardView>
+          </StackLayout>
+          <StackLayout v-show="currentPage == 1">
+            <CardView margin="10" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+              <ScrollView>
+                <StackLayout>
+                  <Ripple @tap="transaction.isMonthlyPayment = !transaction.isMonthlyPayment">
+                    <GridLayout class="m-10" rows="auto" columns="*,auto">
+                      <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="MONTHLY PAYMENT"></label>
+                      <switch row="0" col="1" v-model="transaction.isMonthlyPayment"></switch>
+                    </GridLayout>
+                  </Ripple>
+  
+                  <Ripple v-show="transaction.isMonthlyPayment" @tap="changeRentMonth()">
+                    <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-calendar-today' | fonticon"></label>
+                      <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Month for rent (tap to change)"></label>
+                      <label :text="rentMonths[rentMonthIndex]" row="1" col="1" class="h4"></label>
+                    </GridLayout>
+                  </Ripple>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+                  <Ripple @tap="transaction.isClientPayment = !transaction.isClientPayment">
+                    <GridLayout class="m-10" rows="auto" columns="*,auto">
+                      <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute" text="CLIENT PAYMENT"></label>
+                      <switch row="0" col="1" v-model="transaction.isClientPayment"></switch>
+                    </GridLayout>
+                  </Ripple>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+                  <GridLayout v-show="transaction.isClientPayment" class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle-outline' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Client's name"></label>
+                    <StackLayout v-show="users && users.length > 0" row="1" col="1">
+                      <ScrollView orientation="horizontal">
+                        <WrapLayout>
+                          <Label v-for="(user,i) in users" @tap="rentTenantName = user.text" :class="{'chip-selected':rentTenantName == user.text}" :text="user.text" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
+                        </WrapLayout>
+                      </ScrollView>
+                    </StackLayout>
+                  </GridLayout>
+                  <StackLayout v-show="transaction.isClientPayment" width="100%" class="hr-light"></StackLayout>
+  
+                  <Ripple @tap="uploadEvidence()">
+                    <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*">
+                      <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-file-document' | fonticon"></label>
+                      <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Evidence"></label>
+                      <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
+                      <Image row="2" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
+                    </GridLayout>
+                  </Ripple>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+  
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-message-text-outline' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Description"></label>
+                    <TextView row="1" col="1" hint="What exactly did you do?" v-model="transaction.description" class="h4"></TextView>
+                  </GridLayout>
+                  <StackLayout width="100%" class="hr-light"></StackLayout>
+                </StackLayout>
+              </ScrollView>
+            </CardView>
+          </StackLayout>
+          <StackLayout v-show="currentPage == 2">
+            <CardView margin="10" elevation="10" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+              <ScrollView>
+  
+              </ScrollView>
+            </CardView>
+          </StackLayout>
+        </FlexboxLayout>
+      </ScrollView>
+      <StackLayout row="2">
+        <CardView class="bg-white m-t-10 p-t-10" elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+          <StackLayout>
+            <FlexboxLayout v-show="!isLoading" flexDirection="column" alignContent="flex-end" justifyContent="flex-end" width="100%">
+              <GridLayout rows="auto,auto" columns="*,*">
+                <Label row="0" colSpan="2" :text="txtError.length < 2 ? '' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
+                <Button row="1" col="1" @tap="submitBusiness()" v-show="currentPage == 2" class="btn-primary bg-light-green" :text="`save ${businessName}`"></Button>
+                <Button row="1" col="0" @tap="currentPage--" v-show="currentPage > 0" :isEnabled="currentPage > 0" class="btn-primary bg-light-red" text="back"></Button>
+                <Button row="1" col="1" @tap="moveForward()" v-show="currentPage != 2" class="btn-primary bg-light-blue" text="proceed"></Button>
+              </GridLayout>
+              <GridLayout v-show="savedBusiness" rows="auto,auto" columns="*">
+                <Label row="0" text="Your business is ready!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
+                <Button row="1" @tap="GoToBusiness(savedBusiness)" class="btn-primary bg-light-blue" :text="`Open ${businessName}`"></Button>
+              </GridLayout>
+            </FlexboxLayout>
+            <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+          </StackLayout>
+        </CardView>
+      </StackLayout>
+    </GridLayout>
+  </page>
+</template>
+
+
+<script>
+const dialogs = require("ui/dialogs");
+const application = require("application");
+var AndroidApplication = application.android;
+var activity = AndroidApplication.foregroundActivity;
+import * as imageSource from "tns-core-modules/image-source";
+
+import * as imagepicker from "nativescript-imagepicker";
+
+import * as connectivity from "tns-core-modules/connectivity";
+const http = require("http");
+export default {
+  data() {
+    return {
+      total: {
+        filter: 0,
+        values: []
+      },
+      txtError: "",
+      txtSearch: "",
+      Amount: "",
+      users: [],
+      hasImage: false,
+      selectedImage: null,
+      selectedType: "All",
+      transactionTypes: ["All", "Deposit", "Rent", "Withdraw"],
+      rentMonthIndex: new Date().getMonth(),
+      rentMonths: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      rentTenantID: "",
+      rentTenantName: "",
+      isRent: false,
+      description: "",
+      transaction: {
+        Amount: null,
+        date: new Date(),
+        description: null,
+        isMoneyIn: true,
+        isMoneyOut: false,
+        isMonthlyPayment: false,
+        isClientPayment: false
+      },
+      transactions: [],
+      isWithdraw: false,
+      currentPage: false,
+      isMainScreen: false,
+      selectedScreen: "",
+      price: "",
+      donePayment: false,
+      toggleSearch: false
+    };
+  },
+  props: ["businessName", "businessId"],
+  computed: {
+    amount: {
+      get() {
+        return this.price;
+      },
+      set(value) {
+        if (value.length > 0 && value[0] != "R") {
+          return "R" + this.price;
+        }
+        this.price = value;
+      }
+    },
+    filteredTransactions: {
+      get() {
+        if (this.selectedType == this.transactionTypes[0]) {
+          if (this.txtSearch.length < 2) {
+            return this.transactions;
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
+        } else {
+          if (this.txtSearch.length < 2) {
+            return this.transactions.filter(
+              v => v.type == this.selectedType.toUpperCase()
+            );
+          } else {
+            return this.transactions.filter(t => {
+              return (
+                t.type == this.selectedType.toUpperCase() &&
+                JSON.stringify(t)
+                  .toLowerCase()
+                  .indexOf(this.txtSearch.toLowerCase()) >= 0
+              );
+            });
+          }
+        }
+      },
+      set(val) {
+        this.transactions = val;
+      }
+    }
+  },
+  created() {
+    this.pageLoaded();
+  },
+  mounted() {
+    this.pageLoaded();
+  },
+  methods: {
+    changeTransactionType(isTrue) {
+      if (!isTrue) {
+        this.transaction.isMoneyIn = !this.transaction.isMoneyIn;
+        this.transaction.isMoneyOut = !this.transaction.isMoneyOut;
+      }
+    },
+    changeTotalFilter() {
+      if (this.total.filter == this.total.values.length - 1) {
+        this.total.filter = 0;
+      } else {
+        this.total.filter++;
+      }
+    },
+    pageLoaded(args) {
+      var self = this;
+      this.ApplyNavigation(self);
+      http
+        .getJSON(this.$store.state.settings.baseLink + "/s/students/all/names")
+        .then(results => {
+          this.users = [];
+
+          results.map(v => {
+            this.users.push({
+              id: v._id,
+              text: v.username,
+              selected: false
+            });
+          });
+        });
+
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+      } else {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+          )
+          .then(results => {
+            this.filteredTransactions = results;
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err
+            });
+          });
+      }
+    },
+    canGoForward() {
+      this.txtError = "";
+      if (this.currentPage == 0) {
+        if (!this.transaction.amount || isNaN(this.transaction.amount)) {
+          this.txtError = "Provide a valid amount of money.";
+          return false;
+        }
+        return true;
+      } else if (this.currentPage == 1) {
+        if (
+          !this.transaction.isMonthlyPayment &&
+          !this.transaction.isClientPayment &&
+          (!this.transaction.description ||
+            this.transaction.description.length < 3)
+        ) {
+          this.txtError = "Provide a valid description.";
+          return false;
+        }
+
+        if (
+          this.transaction.isClientPayment &&
+          !this.transaction.ClientPayment
+        ) {
+          this.txtError = "Pick a client.";
+          return false;
+        }
+
+        return true;
+      } else {
+        return false;
+      }
+    },
+    moveForward() {
+      if (this.canGoForward()) {
+        this.currentPage++;
+      }
+    },
+    canSubmit() {
+      this.txtError = "";
+      if (!this.hasImage) {
+        this.txtError = "Please an image of your proof (slip)";
+      }
+      if (this.Amount.toString().length < 1 && !isNaN(this.Amount)) {
+        this.txtError = "Please provide a valid amount.";
+      }
+      if (this.isRent) {
+        if (this.rentTenantName.length < 2) {
+          this.txtError = "Please select a tenant.";
+        }
+      } else {
+        if (this.description.length < 2) {
+          this.txtError = "A description is required.";
+        }
+      }
+      return this.txtError.length < 2;
+    },
+    SubmitTransaction() {
+      this.isLoading = true;
+      if (!this.canSubmit()) {
+        this.ShowNewTransaction(1);
+        this.isLoading = false;
+        return;
+      }
+
+      let source = new imageSource.ImageSource();
+      source.fromAsset(this.selectedImage).then(img => {
+        this.selectedImage =
+          "data:image/png;base64," + img.toBase64String("png");
+
+        http
+          .request({
+            url: this.$store.state.settings.baseLink + "/a/transaction/add",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            content: JSON.stringify({
+              adminID: this.$store.state.cache.cachedAdmin._id, //ForeignKey
+              amount: this.Amount,
+              type: this.isRent
+                ? "RENT"
+                : this.isWithdraw
+                ? "WITHDRAW"
+                : "DEPOSIT",
+              rentTenantID: this.isRent
+                ? this.users.filter(u => u.text == this.rentTenantName)[0].id
+                : false,
+              rentTenantName: this.rentTenantName,
+              rentMonth: this.rentMonths[this.rentMonthIndex],
+              description: this.description,
+              proof: this.selectedImage,
+              date: this.transaction.date,
+              source: "PROPERTY"
+            })
+          })
+          .then(response => {
+            var statusCode = response.statusCode;
+            if (statusCode == 200) {
+              this.$feedback.success({
+                title: response.content.toString(),
+                duration: 4000,
+                onTap: () => {
+                  this.ShowNewTransaction(0);
+                }
+              });
+              this.donePayment = true;
+              this.isLoading = false;
+            } else if (statusCode == 413) {
+              this.$feedback.error({
+                title: "Unable to add transaction",
+                message: "The image file is too large",
+                duration: 4000
+              });
+              this.isLoading = false;
+            }
+          })
+          .catch(err => {
+            this.$feedback.error({
+              message: err,
+              duration: 4000
+            });
+            this.isLoading = false;
+          });
+      });
+    },
+    refreshList(args) {
+      var pullRefresh = args.object;
+
+      var connectionType = connectivity.getConnectionType();
+      if (connectionType == connectivity.connectionType.none) {
+        this.$feedback.error({
+          title: "Error (NO INTERNET CONNECTION)",
+          duration: 4000,
+          message: "Please switch on your data/wifi."
+        });
+
+        pullRefresh.refreshing = false;
+      } else {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+          )
+          .then(results => {
+            this.filteredTransactions = results;
+            pullRefresh.refreshing = false;
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err
+            });
+            pullRefresh.refreshing = false;
+          });
+      }
+    },
+    changeRentMonth() {
+      if (this.rentMonthIndex == 11) {
+        this.rentMonthIndex = 0;
+      } else {
+        this.rentMonthIndex++;
+      }
+    },
+    changeTransactionDate() {
+      var self = this;
+      this.$showModal({
+        template: ` 
+                                                    <Page>
+                                                        <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                            <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
+                                                            <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
+                                                            <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                                                        </GridLayout>
+                                                    </Page>
+                                                    `,
+        data: function() {
+          return {
+            selectedDueDate: new Date()
+          };
+        },
+        methods: {
+          changeDueRent(modal) {
+            var date = self.transaction.date;
+            var now = new Date(
+              this.selectedDueDate.getFullYear(),
+              this.selectedDueDate.getMonth(),
+              this.selectedDueDate.getDate(),
+              date.getHours(),
+              date.getMinutes()
+            );
+            self.transaction.date = now;
+            this.$modal.close();
+          }
+        }
+      });
+    },
+    onTransactionTap(event) {
+      var self = this;
+      this.$showModal({
+        template: ` 
+                                                                <Page>
+                                                                    <GridLayout rows="auto,*" columns="auto,*" width="100%" height="100%">
+                                                                      <Label row="0" col="1" @tap="$modal.close()" verticalAlignment="center" textAlignment="right" alignSelf="right" class="mdi h1 m-10" :text="'mdi-close' | fonticon" color="$redColor"></Label>
+                                                                      <ActivityIndicator row="1" colSpan="2" :busy="!imgSrc"></ActivityIndicator>
+                                                                      <ScrollView row="1" colSpan="2">
+                                                                        <Image alignSelf="center" width="100%" class="m-5" stretch="aspectFit" :src="imgSrc" />
+                                                                      </ScrollView>
+                                                                    </GridLayout>
+                                                                </Page>
+                                                                `,
+        data() {
+          return {
+            imgSrc: null
+          };
+        },
+        mounted() {
+          this.imgSrc = null;
+          this.loadImage();
+        },
+        methods: {
+          loadImage() {
+            http
+              .getJSON(
+                this.$store.state.settings.baseLink +
+                  "/a/transaction/get/" +
+                  event.item._id
+              )
+              .then(results => {
+                this.imgSrc = results.proof;
+              })
+              .catch(err => {
+                this.$feedback.error({
+                  title: "Error",
+                  duration: 4000,
+                  message: err
+                });
+                this.imgSrc = true;
+              });
+          }
+        }
+      });
+    },
+    onBackPressed(event) {
+      dialogs.alert("Going Back").then(() => {
+        console.log("card.redirect");
+      });
+    },
+    switchPage(card) {
+      dialogs.alert("Going to " + card.redirect).then(() => {
+        console.log(card.redirect);
+      });
+      this.$router.push({
+        path: card.redirect
+      });
+    },
+    ShowNewTransaction(value) {
+      if (value == 2) {
+        if (!this.canSubmit()) {
+          return;
+        } else {
+          this.donePayment = false;
+        }
+      } else if (value == 0) {
+        http
+          .getJSON(
+            this.$store.state.settings.baseLink + "/a/transaction/PROPERTY/all"
+          )
+          .then(results => {
+            this.filteredTransactions = results;
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Error",
+              duration: 4000,
+              message: err
+            });
+          });
+      }
+      this.currentPage = value;
+    },
+    uploadEvidence() {
+      let context = imagepicker.create({
+        mode: "single" // use "multiple" for multiple selection
+      });
+
+      context
+        .authorize()
+        .then(function() {
+          return context.present();
+        })
+        .then(selection => {
+          selection.forEach(selected => {
+            // process the selected image
+            this.selectedImage = selected;
+            this.hasImage = true;
+          });
+        })
+        .catch(err => {
+          // process error
+          this.$feedback.error({
+            title: "No file selected",
+            message: "Please select a valid image file",
+            duration: 4000,
+            position: 1,
+            onTap: () => {}
+          });
+        });
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+</style>
