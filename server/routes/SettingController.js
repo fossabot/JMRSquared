@@ -10,7 +10,7 @@ router.get("/options/business/types", function (req, res) {
   Setting.findOne()
     .then(settings => {
       if (!settings) return res.status(512).send("No settings are avaliable.");
-      res.json(settings.businessTypes);
+      res.json(settings.options.businessTypes);
     })
     .catch(err => {
       return res.status(512).send("No settings are avaliable.");
