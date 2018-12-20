@@ -53,7 +53,7 @@ mongoose.connect("mongodb://localhost:27017/JMRdb", {
 //    Server
 
 mongoose
-    .connect("mongodb://68.66.193.181:27017/JMRDevDB?authSource=admin", {
+    .connect("mongodb://localhost:27017/JMRDevDB?authSource=admin", {
         auth: {
             user: "admin",
             password: "Mulavhelesi@1"
