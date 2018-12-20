@@ -20,13 +20,14 @@ const BusinessSchema = new mongoose.Schema({
             type: Schema.Types.ObjectId,
             default: null,
             ref: 'Admin'
-        }
+        },
+        settings: Array
     }],
     name: String,
     icon: String,
     logo: String,
     type: Object,
-    // e.g Taxify , Cosmetics , Property
+    settings: Array,
     description: String,
     transactions: [{
         type: Schema.Types.ObjectId,
@@ -35,7 +36,15 @@ const BusinessSchema = new mongoose.Schema({
     notifications: [{
         type: Schema.Types.ObjectId,
         ref: 'Notification'
-    }]
+    }],
+    date: {
+        type: Date,
+        default: Date.now()
+    },
+    removed: {
+        type: Boolean,
+        default: false
+    }
 });
 
 BusinessSchema.methods.findSimilarTypes = function (cb) {

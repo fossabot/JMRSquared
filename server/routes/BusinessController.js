@@ -51,6 +51,26 @@ router.get("/get/:business/for/:userid", function (req, res) {
     });
 });
 
+router.post("/set/business/settings", function (req, res) {
+  var businessID = req.body.businessID;
+  var settingID = req.body.settingID;
+  var value = req.body.value;
+
+  Business.findById(businessID).then(business => {
+    if (!business) return res.status(512).send("The requested business is not avaliable");
+
+    business.settings.find(s => s._id == settingID).value = value
+
+    business.markModified('settings');
+    business.save(function (err) {
+      if (err) return res.status(512).send(err);
+      res.send("Business setting successfully saved");
+    });
+  }).catch(err => {
+    return res.status(512).send(err);
+  })
+});
+
 router.get("/get/all/partners/for/:business", function (req, res) {
   var businessID = req.params.business;
   Business.findById(businessID)

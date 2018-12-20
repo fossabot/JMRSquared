@@ -5,6 +5,8 @@ import FCM from "./FirebaseManager";
 import mongoose from "mongoose";
 
 import Notification from '../models/Notification'
+import Setting from '../models/Setting'
+import Business from '../models/Business'
 
 export default class CronJob {
     constructor() {
@@ -60,6 +62,8 @@ export default class CronJob {
     // This is called on app.js (everytime the server starts)
     fireJobs() {
         this.resendNotifications();
+        this.createIDForStaticFields();
+        this.populateBusinessSettings();
     }
 
     // A list of jobs that can be fired.
@@ -88,6 +92,87 @@ export default class CronJob {
                     }
                 }
             })
+        });
+    }
+
+    createIDForStaticFields() {
+        Setting.findOne().then(settings => {
+            var count = 0;
+            settings.settings.business.filter(bs => !bs._id).forEach(victim => {
+                victim._id = mongoose.Types.ObjectId();
+                count++;
+            });
+
+            settings.settings.user.filter(bs => !bs._id).forEach(victim => {
+                victim._id = mongoose.Types.ObjectId();
+                count++;
+            });
+
+            settings.options.businessTypes.filter(bs => !bs._id).forEach(victim => {
+                victim._id = mongoose.Types.ObjectId();
+                count++;
+            });
+
+            settings.save(function (err) {
+                if (err) throw err;
+                console.log(`${count} settings got new ids`);
+            })
+        }).catch(err => {
+            throw err;
+        });
+    }
+
+    populateBusinessSettings() {
+        Setting.findOne().then(settings => {
+            const businessSettings = settings.settings.business;
+            Business.find({
+                $or: [{
+                        removed: false
+                    },
+                    {
+                        removed: null
+                    }
+                ],
+                'type.type': {
+                    $in: businessSettings.map(v => v.type)
+                }
+            }).then(businesses => {
+                if (!businesses) throw "Unable to find any business that matches";
+                businessSettings.forEach(businessSetting => {
+                    if (!businessSetting.businessIDs) businessSetting.businessIDs = [];
+                    businesses.filter(b => !b.settings || businessSetting.businessIDs.filter(s => s == b._id.toString()).length == 0).forEach(business => {
+                        if (!business.settings) {
+                            business.settings = [];
+                        }
+                        let {
+                            businessIDs,
+                            ...businessSettingClone
+                        } = businessSetting.toObject();
+
+                        business.settings.push(businessSettingClone);
+                        business.save(function (err) {
+                            if (err) throw err;
+                            Setting.findOne().then(settingsInner => {
+                                var count = 0;
+                                settingsInner.settings.business.filter(bs => bs.type == business.type.type && (!bs.businessIDs || bs.businessIDs.filter(bsID => bsID == business._id).length == 0)).forEach(victim => {
+                                    if (!victim.businessIDs) {
+                                        victim.businessIDs = []
+                                    }
+                                    victim.businessIDs.push(business._id);
+                                    count++;
+                                });
+                                settingsInner.save(function (errr) {
+                                    if (errr) throw errr;
+                                    console.log(`A businesses (${business.type.type}) was linked to ${count} settings.`);
+                                })
+                            });
+                        })
+                    });
+                });
+            }).catch(err => {
+                console.log('businessGettingError', err)
+            });
+
         });
     }
 }
