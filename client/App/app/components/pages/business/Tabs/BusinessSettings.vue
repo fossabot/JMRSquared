@@ -31,11 +31,11 @@
               <GridLayout class="m-10" rows="auto" columns="*,auto">
                 <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Settings"></label>
               </GridLayout>
-              <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto">
-                  <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-file-document' | fonticon"></Label>
-                  <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" text="Transaction evidence"></label>
-                  <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" text="Client will be required to upload proof"></label>
-                  <switch row="0" rowSpan="2" col="2" v-model="businessSettings.evidenceRequired"></switch>
+              <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto" v-for="(setting,i) in business.settings" :key="i">
+                  <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + setting.icon | fonticon"></Label>
+                  <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" :text="setting.title"></label>
+                  <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="setting.description"></label>
+                  <switch row="0" rowSpan="2" col="2" @checkedChange="changeSetting($event,setting.value,setting._id)" :checked="setting.value"></switch>
                 </GridLayout>
             </StackLayout>
     </ScrollView>
@@ -95,6 +95,30 @@ export default {
   },
   props: ["business"],
   methods: {
+    changeSetting(event,value,settingsID){
+      console.log('event',event.value);
+      console.log('value',value);
+      if(event.value != value){
+         this.$api
+        .changeBusinessSettings(
+          this.business._id,
+          settingsID,
+          event.value
+        )
+        .then(changedBusinessSettings => {
+          this.$feedback.success({
+            title: "Your changes are saved.",
+          });  
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Unable to save your change.",
+            duration: 4000,
+            message: "You have to be connected to the internet"
+          });
+        });
+      }
+    },
     GoTo(option) {
       if (option.link) {
         this.navigate(option.link, option.props);
