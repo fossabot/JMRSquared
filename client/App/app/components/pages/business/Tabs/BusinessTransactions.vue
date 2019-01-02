@@ -1,20 +1,20 @@
 <template>
   <GridLayout rows="auto,*,auto,auto" columns="*">
-    <StackLayout>
-      <GridLayout class="m-15" rows="auto" columns="*">
-        <label row="0" col="0" verticalAlignment="center" textAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" text="Transactions"></label>
-      </GridLayout>
-      <ScrollView v-if="business.type && business.type.optionals" orientation="horizontal">
-        <StackLayout orientation="horizontal">
-          <GridLayout v-for="(optional,i) in business.type.optionals" :key="i" class="m-10" rows="auto,auto" columns="auto,*">
-            <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
-            <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
-            <label :text="optional.answer" row="1" col="1" class="h4"></label>
-          </GridLayout>
-        </StackLayout>
-      </ScrollView>
-      <StackLayout width="100%" class="hr-light"></StackLayout>
-    </StackLayout>
+    <CardView row="0" class="p-y-15 m-b-5" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+      <Ripple>
+        <GridLayout rows="auto,auto" columns="auto,*,auto">
+          <Ripple row="0" rowSpan="2" col="2" class="p-10" @tap="logOut()" textAlignmemt="left" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-dots-vertical' | fonticon"></Label>
+          </Ripple>
+          <Image v-if="business.logo" row="0" rowSpan="2" col="0" verticalAlignment="center" width="70" height="70" class="circle p-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
+          <Ripple v-if="!business.logo" row="0" rowSpan="2" col="0" borderWidth="5px" width="70" height="70" borderColor="white" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
+          </Ripple>
+          <label row="0" col="0" colSpan="3" fontSize="20" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-mute text-dark-blue" :text="business.name"></label>
+          <Label row="1" col="0" colSpan="3" fontSize="15" verticalAlignment="center" textAlignment="center" :textWrap="true" text="Transactions"></Label>
+        </GridLayout>
+      </Ripple>
+    </CardView>
     <Fab v-if="!isBottomSheetOpen" @tap="goToAddTransaction" rowSpan="3" row="1" icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
     <ScrollView rowSpan="2" row="1">
       <StackLayout>
@@ -34,18 +34,18 @@
     <StackLayout row="2" ref="bottomSheet" backgroundColor="white" :visibility="isBottomSheetOpen ? 'visible' : 'collapse'" verticalAlignment="bottom">
       <CardView elevation="15">
         <StackLayout class="m-x-15 m-y-5">
-            <GridLayout textAlignment="right" columns="auto">
+          <GridLayout textAlignment="right" columns="auto">
             <Ripple textAlignment="right" @tap="closeSheet">
               <label col="1" class="text-light-red mdi m-15" verticalAlignment="center" textAlignment="right" fontSize="25%" :text="'mdi-close' | fonticon"></label>
             </Ripple>
           </GridLayout>
-            <GridLayout v-for="a in 5" :key="a" rows="auto,auto" columns="*,*">
+          <GridLayout v-for="a in 5" :key="a" rows="auto,auto" columns="*,*">
             <StackLayout row="1" :col="i" v-for="(summary,i) in summaryStats" :key="i">
               <label class="font-weight-bold" vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
               <label class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.value}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
             </StackLayout>
           </GridLayout>
-        <GridLayout textAlignment="center" columns="*">
+          <GridLayout textAlignment="center" columns="*">
             <Ripple @tap="goToStats">
               <label class="m-15" verticalAlignment="center" textAlignment="center" text="Detailed information"></label>
             </Ripple>
@@ -101,9 +101,7 @@ export default {
       ]
     };
   },
-  mounted() {
-
-  },
+  mounted() {},
   props: ["business"],
   methods: {
     openSheet() {
@@ -124,7 +122,8 @@ export default {
     closeSheet() {
       const bottomSheet = this.$refs.bottomSheet;
       if (bottomSheet) {
-        bottomSheet.nativeView.animate({
+        bottomSheet.nativeView
+          .animate({
             translate: {
               x: 0,
               y: 100
@@ -138,13 +137,14 @@ export default {
         this.isBottomSheetOpen = false;
       }
     },
-    goToStats(){
+    goToStats() {
       this.$emit("changeTab", "Stats");
     },
-    goToAddTransaction(){
-      this.navigate('/business/add/transaction', {
+    goToAddTransaction() {
+      this.navigate("/business/add/transaction", {
         businessId: this.business._id,
-        businessName: this.business.name
+        businessName: this.business.name,
+        businessSettings: this.business.settings ? this.business.settings : []
       });
     }
   }

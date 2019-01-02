@@ -50,15 +50,18 @@ export default {
   props: ["businessName", "businessId"],
   methods: {
     GetPartnersForBusiness() {
-      this.$api.getPartners(this.businessId).then(partners =>{
-this.partners = partners;
-      }).catch(err =>{
+      this.$api
+        .getPartners(this.businessId)
+        .then(partners => {
+          this.partners = partners;
+        })
+        .catch(err => {
           this.$feedback.error({
             title: "Unable to load your partners",
             duration: 4000,
             message: "Please try again later"
           });
-      });
+        });
     },
     GoTo(option) {
       if (option.link) {

@@ -187,6 +187,18 @@ export default class API {
         });
     }
 
+    submitTransaction(transaction) {
+        return new Promise((resolve, reject) => {
+            http.request(this.makePost(`/b/transaction/add`, {
+                transaction
+            })).then((result) => {
+                resolve(result)
+            }).catch(err => {
+                reject(err);
+            });
+        });
+    }
+
     submitNotification(notification) {
         return new Promise((resolve, reject) => {
             http.request(this.makePost("/n/add", {
@@ -211,12 +223,12 @@ export default class API {
         });
     }
 
-    changeBusinessSettings(businessID,settingID,value){
+    changeBusinessSettings(businessID, settingID, value) {
         return new Promise((resolve, reject) => {
             http.request(this.makePost("/b/set/business/settings", {
-                 businessID,
-                 settingID,
-                 value
+                businessID,
+                settingID,
+                value
             })).then((result) => {
                 return resolve(result)
             }).catch(err => {

@@ -46,6 +46,21 @@
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full name"></label>
                     <TextView v-model="partner.fullName" returnKeyType="done" row="1" col="1" class="h4" hint="e.g Sirwali Joseph"></TextView>
                   </GridLayout>
+  
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-card-details' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full name"></label>
+                    <TextView v-model="partner.fullName" returnKeyType="done" row="1" col="1" class="h4" hint="e.g Sirwali Joseph"></TextView>
+                  </GridLayout>
+  
+  
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-google-circles-communities' | fonticon"></label>
+                    <label row="0" col="1" colSpan="2" class="h3 font-weight-bold text-mute" text="Partner's relationship to business"></label>
+                    <Checkbox @tap="changeTransactionType('worker')" :checked="partner.type == 'worker'" boxType="circle" name="transactionType" row="1" col="1" text="Worker" class="h4"></Checkbox>
+                    <Checkbox @tap="changeTransactionType('client')" :checked="partner.type == 'client'" boxType="circle" name="transactionType" row="1" col="2" text="Client" class="h4"></Checkbox>
+                  </GridLayout>
+  
                   <StackLayout width="100%" class="hr-light"></StackLayout>
                 </StackLayout>
               </ScrollView>
@@ -86,6 +101,12 @@
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Full name"></label>
                     <label :text="partner.fullName" row="1" col="1" class="h4"></label>
                   </GridLayout>
+  
+                  <GridLayout class="m-10" rows="auto,auto" columns="auto,*">
+                    <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-google-circles-communities' | fonticon"></label>
+                    <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Partner's relationship to business"></label>
+                    <label :text="partner.type" row="1" col="1" class="h4"></label>
+                  </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
                 </StackLayout>
               </ScrollView>
@@ -117,229 +138,234 @@
 </template>
 
 <script>
-const dialogs = require("ui/dialogs");
-
-import * as Toast from "nativescript-toast";
-import * as LocalNotifications from "nativescript-local-notifications";
-const http = require("http");
-import * as imageSource from "tns-core-modules/image-source";
-
-import * as imagepicker from "nativescript-imagepicker";
-
-import * as connectivity from "tns-core-modules/connectivity";
-// var keyboard = require("nativescript-keyboardshowing");
-
-export default {
-  data() {
-    return {
-      partner: {
-        username: "",
-        contactNumbers: "",
-        email: "",
-        fullName: ""
-      },
-      business: {
-        name: "",
-        logo: null,
-        description: "",
-        type: {
-          icon: "",
-          type: "",
-          index: 0,
-          category: "",
-          optionals: []
+  const dialogs = require("ui/dialogs");
+  
+  import * as Toast from "nativescript-toast";
+  import * as LocalNotifications from "nativescript-local-notifications";
+  const http = require("http");
+  import * as imageSource from "tns-core-modules/image-source";
+  
+  import * as imagepicker from "nativescript-imagepicker";
+  
+  import * as connectivity from "tns-core-modules/connectivity";
+  // var keyboard = require("nativescript-keyboardshowing");
+  
+  export default {
+    data() {
+      return {
+        partner: {
+          username: "",
+          contactNumbers: "",
+          email: "",
+          fullName: "",
+          type: "worker"
         },
-        options: {
-          types: []
+        business: {
+          name: "",
+          logo: null,
+          description: "",
+          type: {
+            icon: "",
+            type: "",
+            index: 0,
+            category: "",
+            optionals: []
+          },
+          options: {
+            types: []
+          }
+        },
+        savedPartner: false,
+        txtError: "",
+        currentPage: -1,
+        currentPageTitle: "......",
+        tenantName: "",
+        tenantUserName: "",
+        tenantNumbers: "",
+        tenantRoom: "",
+        leaseStartDate: new Date(),
+        leaseEndDate: new Date(),
+        leaseTotalMonths: 0,
+        rentAmount: "",
+        rentDueOn: "1st of each month",
+        hasDeposit: false,
+        depositAmount: "",
+        hasBusary: false,
+        busaryProvider: "",
+        nextOfKin: {
+          name: "",
+          contact: "",
+          relationship: ""
+        }
+      };
+    },
+    watch: {
+      currentPage(newVal, oldVal) {
+        switch (newVal) {
+          case 0:
+            this.currentPageTitle = "Adding a partner for ";
+            break;
+          case 1:
+            this.currentPageTitle = "Verify information";
+            break;
+          default:
+            this.currentPageTitle = "";
+        }
+      }
+    },
+    created() {
+      this.pageLoaded();
+    },
+    mounted() {
+      this.pageLoaded();
+    },
+    props: ["businessName", "businessId"],
+    methods: {
+      changeTransactionType(type) {
+        if (this.partner.type != type) {
+          this.partner.type = type;
         }
       },
-      savedPartner: false,
-      txtError: "",
-      currentPage: -1,
-      currentPageTitle: "......",
-      tenantName: "",
-      tenantUserName: "",
-      tenantNumbers: "",
-      tenantRoom: "",
-      leaseStartDate: new Date(),
-      leaseEndDate: new Date(),
-      leaseTotalMonths: 0,
-      rentAmount: "",
-      rentDueOn: "1st of each month",
-      hasDeposit: false,
-      depositAmount: "",
-      hasBusary: false,
-      busaryProvider: "",
-      nextOfKin: {
-        name: "",
-        contact: "",
-        relationship: ""
-      }
-    };
-  },
-  watch: {
-    currentPage(newVal, oldVal) {
-      switch (newVal) {
-        case 0:
-          this.currentPageTitle = "Adding a partner for ";
-          break;
-        case 1:
-          this.currentPageTitle = "Verify information";
-          break;
-        default:
-          this.currentPageTitle = "";
-      }
-    }
-  },
-  created() {
-    this.pageLoaded();
-  },
-  mounted() {
-    this.pageLoaded();
-  },
-  props: ["businessName", "businessId"],
-  methods: {
-    pageLoaded(args) {
-      this.currentPage = 0;
-      var self = this;
-      this.ApplyNavigation(self);
-    },
-    GeneratePassword() {
-      return Math.floor(100000 + Math.random() * 900000);
-    },
-    submitPartner() {
-      this.isLoading = true;
-
-      var connectionType = connectivity.getConnectionType();
-      if (connectionType == connectivity.connectionType.none) {
-        this.$feedback.error({
-          title: "NO INTERNET CONNECTION",
-          duration: 4000,
-          message: "Please switch on your data/wifi."
-        });
-        this.isLoading = false;
-      } else {
-        http
-          .request({
-            url: this.$store.state.settings.baseLink + "/a/add",
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            content: JSON.stringify({
-              email: this.partner.email,
-              pass: this.GeneratePassword(),
-              numbers: this.partner.contactNumbers,
-              role: "WORKER",
-              username: this.partner.username,
-              fullName: this.partner.fullName
-            })
-          })
-          .then(answer => {
-            var statusCode = answer.statusCode;
-            if (statusCode == 200) {
-              var userID = answer.content;
-              http
-                .request({
-                  url:
-                    this.$store.state.settings.baseLink +
-                    "/b/assign/to/business",
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  content: JSON.stringify({
-                    assignedBY: this.$store.state.cache.cachedAdmin._id,
-                    adminID: userID,
-                    adminAuthority: "WORKER",
-                    businessID: this.businessId
-                  })
-                })
-                .then(
-                  response => {
-                    statusCode = response.statusCode;
-                    var result = response.content.toString();
-
-                    if (statusCode == 200) {
-                      this.savedPartner = response.content.toString();
-
-                      this.$feedback
-                        .success({
-                          title: this.partner.username + " successfully added",
-                          message:
-                            this.partner.username +
-                            " is now linked to " +
-                            this.businessName,
-                          duration: 30000,
-                          onTap: () => {
-                            this.GoToPartner(this.savedPartner);
-                          }
-                        })
-                        .then(() => {});
-                    } else {
-                      this.$feedback.error({
-                        title: "Error (" + statusCode + ")",
-                        duration: 4000,
-                        message: result
-                      });
-                    }
-                    this.isLoading = false;
-                  },
-                  e => {
-                    dialogs.alert(e).then(() => {
-                      console.log("Error occurred " + e);
-                    });
-
-                    this.isLoading = false;
-                  }
-                )
-                .catch(err => {
-                  throw new Error(err);
-                  this.isLoading = false;
-                });
-            } else {
-              throw new Error(answer.content);
-            }
-          })
-          .catch(err => {
-            this.$feedback.error({
-              title: "Server error",
-              duration: 4000,
-              message: err
-            });
-            this.isLoading = false;
+      pageLoaded(args) {
+        this.currentPage = 0;
+        var self = this;
+        this.ApplyNavigation(self);
+      },
+      GeneratePassword() {
+        return Math.floor(100000 + Math.random() * 900000);
+      },
+      submitPartner() {
+        this.isLoading = true;
+  
+        var connectionType = connectivity.getConnectionType();
+        if (connectionType == connectivity.connectionType.none) {
+          this.$feedback.error({
+            title: "NO INTERNET CONNECTION",
+            duration: 4000,
+            message: "Please switch on your data/wifi."
           });
-      }
-    },
-    canGoForward() {
-      this.txtError = "";
-      if (this.currentPage == 0) {
-        if (this.partner.username.length < 2) {
-          this.txtError = "Provide a valid partner username.";
-          return false;
-        } else if (
-          isNaN(this.partner.contactNumbers) ||
-          this.partner.contactNumbers.toString().length < 10 ||
-          this.partner.contactNumbers.toString().length > 13
-        ) {
-          this.txtError = "Please provide valid partner contact numbers.";
+          this.isLoading = false;
+        } else {
+          http
+            .request({
+              url: this.$store.state.settings.baseLink + "/a/add",
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              content: JSON.stringify({
+                email: this.partner.email,
+                pass: this.GeneratePassword(),
+                numbers: this.partner.contactNumbers,
+                role: this.partner.type.toUpperCase(),
+                username: this.partner.username,
+                fullName: this.partner.fullName
+              })
+            })
+            .then(answer => {
+              var statusCode = answer.statusCode;
+              if (statusCode == 200) {
+                var userID = answer.content;
+                http
+                  .request({
+                    url: this.$store.state.settings.baseLink +
+                      "/b/assign/to/business",
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    content: JSON.stringify({
+                      assignedBY: this.$store.state.cache.cachedAdmin._id,
+                      adminID: userID,
+                      adminAuthority: "WORKER",
+                      businessID: this.businessId
+                    })
+                  })
+                  .then(
+                    response => {
+                      statusCode = response.statusCode;
+                      var result = response.content.toString();
+  
+                      if (statusCode == 200) {
+                        this.savedPartner = response.content.toString();
+  
+                        this.$feedback
+                          .success({
+                            title: this.partner.username + " successfully added",
+                            message: this.partner.username +
+                              " is now linked to " +
+                              this.businessName,
+                            duration: 30000,
+                            onTap: () => {
+                              this.GoToPartner(this.savedPartner);
+                            }
+                          })
+                          .then(() => {});
+                      } else {
+                        this.$feedback.error({
+                          title: "Error (" + statusCode + ")",
+                          duration: 4000,
+                          message: result
+                        });
+                      }
+                      this.isLoading = false;
+                    },
+                    e => {
+                      dialogs.alert(e).then(() => {
+                        console.log("Error occurred " + e);
+                      });
+  
+                      this.isLoading = false;
+                    }
+                  )
+                  .catch(err => {
+                    throw new Error(err);
+                    this.isLoading = false;
+                  });
+              } else {
+                throw new Error(answer.content);
+              }
+            })
+            .catch(err => {
+              this.$feedback.error({
+                title: "Server error",
+                duration: 4000,
+                message: err
+              });
+              this.isLoading = false;
+            });
+        }
+      },
+      canGoForward() {
+        this.txtError = "";
+        if (this.currentPage == 0) {
+          if (this.partner.username.length < 2) {
+            this.txtError = "Provide a valid partner username.";
+            return false;
+          } else if (
+            isNaN(this.partner.contactNumbers) ||
+            this.partner.contactNumbers.toString().length < 10 ||
+            this.partner.contactNumbers.toString().length > 13
+          ) {
+            this.txtError = "Please provide valid partner contact numbers.";
+            return false;
+          }
+          return true;
+        } else if (this.currentPage == 1) {
+          return true;
+        } else {
           return false;
         }
-        return true;
-      } else if (this.currentPage == 1) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    moveForward() {
-      if (this.canGoForward()) {
-        this.currentPage++;
+      },
+      moveForward() {
+        if (this.canGoForward()) {
+          this.currentPage++;
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <style lang="scss" scoped>
+  
 </style>

@@ -44,7 +44,7 @@ export default {
   data() {
     return {
       introTxt:
-        "JMRSquared is a company that deals with blah blah blah blah ......"
+        "JMRSquared allows you to manage your businesses and keep track of your earnings and loses on all your businesses in one place."
     };
   },
   created() {

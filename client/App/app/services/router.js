@@ -89,9 +89,9 @@ router.routes = {
       source: null
     },
   },
-   '/business/add/transaction': {
+  '/business/add/transaction': {
     name: 'AddTransaction',
-    path: '/business/add/transaction/:businessId/:businessName',
+    path: '/business/add/transaction/:businessId/:businessName/:businessSettings',
     component: AddTransaction,
     meta: {
       title: 'Add Transaction',
