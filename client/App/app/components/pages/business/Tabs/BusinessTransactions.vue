@@ -18,16 +18,17 @@
     <Fab v-if="!isBottomSheetOpen" @tap="goToAddTransaction" rowSpan="3" row="1" icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
     <ScrollView rowSpan="2" row="1">
       <StackLayout>
-        <CardView v-for="a in 30" :key="a" radius="5" margin="1" elevation="5">
+        <CardView v-if="!isLoading" v-for="(transaction,i) in transactions" :key="i" radius="5" margin="1" elevation="5">
           <Ripple class="m-x-5">
             <GridLayout class="m-15" rows="auto,auto,auto" columns="*,auto,auto">
-              <label row="0" col="0" class="font-weight-bold text-mute" text="Electricity"></label>
-              <label row="1" col="0" class="h3 text-mute" :text="getMoment().format('DD MMM YY')"></label>
+              <label row="0" col="0" class="font-weight-bold text-mute" :text="transaction.category"></label>
+              <label row="1" col="0" class="h3 text-mute" :text="getMoment(transaction.date).format('DD MMM YY')"></label>
               <label row="0" rowSpan="2" col="1" verticalAlignment="center" textAlignment="right" class="mdi m-15" fontSize="25%" :text="'mdi-bank-transfer-in' | fonticon"></label>
-              <Label row="0" rowSpan="2" col="2" verticalAlignment="center" class="font-weight-bold  text-mute p-x-5 text-light-red" textAlignment="right" text="- R3000"></Label>
+              <Label row="0" rowSpan="2" col="2" verticalAlignment="center" class="font-weight-bold  text-mute p-x-5" :class="{'text-dark-blue':transaction.type == 'MONEYIN','text-light-red':transaction.type == 'MONEYOUT'}" textAlignment="right" :text="(transaction.type == 'MONEYIN' ? '- R' : '+ R') + transaction.amount"></Label>
             </GridLayout>
           </Ripple>
         </CardView>
+       <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
       </StackLayout>
     </ScrollView>
   
@@ -82,6 +83,8 @@ export default {
           value: 502
         }
       ],
+      isLoading: false,
+      transactions: [],
       isMainScreen: false,
       isBottomSheetOpen: false,
       selectedScreen: "",
@@ -101,7 +104,18 @@ export default {
       ]
     };
   },
-  mounted() {},
+  mounted() {
+    this.isLoading = true;
+    this.$api
+      .getAllBusinessTransactions(this.business._id)
+      .then(transactions => {
+        this.isLoading = false;
+        this.transactions = transactions.transactions;
+      })
+      .catch(err => {
+        this.isLoading = false;
+      });
+  },
   props: ["business"],
   methods: {
     openSheet() {
@@ -144,7 +158,15 @@ export default {
       this.navigate("/business/add/transaction", {
         businessId: this.business._id,
         businessName: this.business.name,
-        businessSettings: this.business.settings ? this.business.settings : []
+        businessSettings: this.business.settings ? this.business.settings : [],
+        businessCategories: this.business.categories
+          ? this.business.categories
+          : [],
+        businessClients: this.business.admin
+          ? this.business.admin
+              .filter(v => v.authority != "ADMIN" && v.id)
+              .map(a => a.id)
+          : []
       });
     }
   }

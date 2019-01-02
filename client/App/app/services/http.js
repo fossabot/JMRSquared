@@ -190,12 +190,34 @@ export default class API {
     submitTransaction(transaction) {
         return new Promise((resolve, reject) => {
             http.request(this.makePost(`/b/transaction/add`, {
-                transaction
+                adminID: transaction.transacterId,
+                businessID: transaction.businessId,
+                type: transaction.isMoneyIn ? 'MONEYIN' : 'MONEYOUT',
+                amount: transaction.amount,
+                date: transaction.date,
+                category: transaction.category,
+                client: transaction.clientID,
+                monthOfPayment: transaction.month,
+                description: transaction.description,
+                proof: transaction.evidence
             })).then((result) => {
                 resolve(result)
             }).catch(err => {
                 reject(err);
             });
+        });
+    }
+
+    getAllBusinessTransactions(businessID, existing = []) {
+        return new Promise((resolve, reject) => {
+            http
+                .getJSON(this.makePost(`/b/transactions/for/business/${businessID}`, {
+                    existing
+                })).then(result => {
+                    resolve(result);
+                }).catch(err => {
+                    reject(err);
+                });
         });
     }
 

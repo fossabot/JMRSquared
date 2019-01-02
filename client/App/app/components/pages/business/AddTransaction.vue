@@ -89,25 +89,25 @@
                     <StackLayout v-show="clients && clients.length > 0" row="1" col="1">
                       <ScrollView orientation="horizontal">
                         <WrapLayout>
-                          <Label v-for="(client,i) in clients" @tap="transaction.client = client" :class="{'chip-selected':transaction.client._id == client._id}" :text="client.userName" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
+                          <Label v-for="(client,i) in clients" @tap="transaction.client = client" :class="{'chip-selected':transaction.client == client}" :text="client.userName" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
                         </WrapLayout>
                       </ScrollView>
                     </StackLayout>
                   </GridLayout>
                   <StackLayout v-show="transaction.isClientPayment" width="100%" class="hr-light"></StackLayout>
   
-                  <GridLayout class="m-10" :rows="categories.filter(v => v.text == transaction.category).length == 0 ? 'auto,auto,auto' : 'auto,auto'" columns="auto,*">
+                  <GridLayout class="m-10" :rows="categories.filter(v => v == transaction.category).length == 0 ? 'auto,auto,auto' : 'auto,auto'" columns="auto,*">
                     <label row="0" rowSpan="3" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-chart-bubble' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Category"></label>
                     <StackLayout v-show="categories && categories.length > 0" row="1" col="1">
                       <ScrollView orientation="horizontal">
                         <WrapLayout>
-                          <Label v-for="(category,i) in categories" @tap="changeTransactionCategory(category.text)" :class="{'chip-selected':transaction.category == category.text}" :text="category.text" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
-                          <Label @tap="changeTransactionCategory(null)" :class="{'chip-selected':categories.filter(v => v.text == transaction.category).length == 0}" text="+ new" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
+                          <Label v-for="(category,i) in categories" @tap="changeTransactionCategory(category)" :class="{'chip-selected':transaction.category == category}" :text="category" v-bind:key="i" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
+                          <Label @tap="changeTransactionCategory(null)" :class="{'chip-selected':categories.filter(v => v == transaction.category).length == 0}" text="+ new" class="m-10" padding="5" backgroundColor="grey" borderRadius="99%"></Label>
                         </WrapLayout>
                       </ScrollView>
                     </StackLayout>
-                    <TextField row="2" col="1" v-if="categories.filter(v => v.text == transaction.category).length == 0" v-model="transaction.category" hint="New Category" returnKeyType="next" class="h4"></TextField>
+                    <TextField row="2" col="1" v-if="categories.filter(v => v == transaction.category).length == 0" v-model="transaction.category" hint="New Category" returnKeyType="next" class="h4"></TextField>
                   </GridLayout>
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
@@ -198,13 +198,13 @@
         <CardView class="bg-white m-t-10 p-t-10" elevation="5" radius="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
           <StackLayout>
             <FlexboxLayout v-show="!isLoading" flexDirection="column" alignContent="flex-end" justifyContent="flex-end" width="100%">
-              <GridLayout rows="auto,auto" columns="*,*">
+              <GridLayout v-show="!savedTransaction" rows="auto,auto" columns="*,*">
                 <Label row="0" colSpan="2" :text="txtError.length < 2 ? '' :txtError" textWrap="true" :class="`text-mute text-light-${txtError.length < 2 ? 'blue' : 'red'}`" textAlignment="center"></Label>
                 <Button row="1" col="1" @tap="SubmitTransaction()" v-show="currentPage == 2" class="btn-primary bg-light-green" text="submit"></Button>
                 <Button row="1" col="0" @tap="currentPage--" v-show="currentPage > 0" :isEnabled="currentPage > 0" class="btn-primary bg-light-red" text="back"></Button>
                 <Button row="1" col="1" @tap="moveForward()" v-show="currentPage != 2" class="btn-primary bg-light-blue" text="proceed"></Button>
               </GridLayout>
-              <GridLayout v-show="savedBusiness" rows="auto,auto" columns="*">
+              <GridLayout v-show="savedTransaction" rows="auto,auto" columns="*">
                 <Label row="0" text="Your transaction was saved successfully!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
                 <Button row="1" @tap="GoTo('/business/home',{props:{businessID:businessId}})" class="btn-primary bg-light-blue" text="All Transactions"></Button>
               </GridLayout>
@@ -238,21 +238,12 @@ export default {
         filter: 0,
         values: []
       },
+      savedTransaction: false,
       txtError: "",
       txtSearch: "",
       Amount: "",
       clients: [],
-      categories: [
-        {
-          text: "Electricity"
-        },
-        {
-          text: "Rates"
-        },
-        {
-          text: "Cleaner"
-        }
-      ],
+      categories: [],
       hasImage: false,
       selectedImage: null,
       selectedType: "All",
@@ -285,7 +276,7 @@ export default {
         transacterId: null,
         month: null,
         client: null,
-        clientId: null,
+        clientID: null,
         isMoneyIn: true,
         isMoneyOut: false,
         isMonthlyPayment: false,
@@ -297,11 +288,16 @@ export default {
       isMainScreen: false,
       selectedScreen: "",
       price: "",
-      donePayment: false,
       toggleSearch: false
     };
   },
-  props: ["businessName", "businessId", "businessSettings"],
+  props: [
+    "businessName",
+    "businessId",
+    "businessSettings",
+    "businessClients",
+    "businessCategories"
+  ],
   computed: {
     amount: {
       get() {
@@ -379,22 +375,11 @@ export default {
     pageLoaded(args) {
       var self = this;
       this.ApplyNavigation(self);
-      this.$api
-        .getPartners(this.businessId)
-        .then(partners => {
-          this.clients = partners;
-          this.$feedback.error({
-            title: partners
-          });
-        })
-        .catch(err => {
-          this.$feedback.error({
-            title: "Unable to load clients",
-            duration: 4000,
-            message: "Please try again later"
-          });
-        });
-      this.transaction.category = this.categories[0]["text"];
+      this.clients = this.businessClients;
+      this.categories = this.businessCategories;
+      if (this.categories && this.categories.length > 0) {
+        this.transaction.category = this.categories[0];
+      }
     },
     canGoForward(all = false) {
       this.txtError = "";
@@ -451,9 +436,9 @@ export default {
       this.transaction.businessId = this.businessId;
       this.transaction.transacterId = this.$store.state.cache.cachedAdmin._id;
       if (this.transaction.isClientPayment) {
-        this.transaction.clientId = this.transaction.client._id;
+        this.transaction.clientID = this.transaction.client._id;
       } else {
-        this.transaction.clientId = null;
+        this.transaction.clientID = null;
       }
 
       if (this.transaction.isMonthlyPayment) {
@@ -474,7 +459,7 @@ export default {
                 this.ShowNewTransaction(0);
               }
             });
-            this.donePayment = true;
+            this.savedTransaction = true;
             this.isLoading = false;
           } else if (statusCode == 413) {
             this.$feedback.error({
@@ -504,14 +489,14 @@ export default {
       var self = this;
       this.$showModal({
         template: ` 
-                                                                                                          <Page>
-                                                                                                              <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
-                                                                                                                  <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
-                                                                                                                  <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
-                                                                                                                  <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
-                                                                                                              </GridLayout>
-                                                                                                          </Page>
-                                                                                                          `,
+                                                                                                            <Page>
+                                                                                                                <GridLayout rows="auto,*,auto" columns="*" width="100%" height="60%">
+                                                                                                                    <Label row="0" class="h3 m-5" :textWrap="true" textAlignment="center" text="When must the notification be sent?"></Label>
+                                                                                                                    <DatePicker verticalAlignment="center" row="1" v-model="selectedDueDate" />
+                                                                                                                    <Label row="2" class="mdi h1 m-5" @tap="changeDueRent($modal)" textAlignment="center" :text="'mdi-check' | fonticon"></Label>
+                                                                                                                </GridLayout>
+                                                                                                            </Page>
+                                                                                                            `,
         data: function() {
           return {
             selectedDueDate: new Date()
