@@ -4,6 +4,9 @@ var router = express.Router();
 import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Business from "../models/Business";
+import Transaction from "../models/Transaction";
+import FCM from "../services/FirebaseManager";
+const helper = require("../services/Helper");
 
 router.get("/all/for/:userid", function (req, res) {
   var adminID = req.params.userid;
@@ -33,13 +36,13 @@ router.get("/get/:business/for/:userid", function (req, res) {
   var businessID = req.params.business;
   var adminID = req.params.userid;
   Business.findById(businessID)
+    .populate("admin.id", '_id userName fullName')
     .then(business => {
       if (business == null)
         return res.status(512).send("The requested business is not avaliable");
       if (
         !business.admin ||
-        !business.admin ||
-        business.admin.filter(a => a.id == adminID).length == 0
+        !business.admin.find(a => a.id._id == adminID)
       )
         return res
           .status(512)
@@ -156,6 +159,105 @@ router.post("/assign/to/business", function (req, res) {
     .catch(err => {
       return res.status(512).send(err);
     });
+});
+
+// This is the newest function to be used
+router.post("/transactions/for/business/:businessId", function (req, res) {
+  var businessID = req.params.businessId;
+  var existing = req.body.existing;
+  if (!existing) existing = []
+  Transaction.find({
+        businessID: businessID,
+        '_id': {
+          "$nin": existing
+        }
+      },
+      "_id adminID amount type itemCount carName propertyName productName source rentTenantName rentMonth description date"
+    )
+    .populate("adminID", "userName")
+    .then(transactions => {
+      if (transactions == null) {
+        res.status(500);
+        res.send("Error : 9032rtu834g9erbo");
+      }
+      console.log("Got " + transactions.length + " transactions");
+      transactions.reverse();
+      const revenues = helper.GetTransactionProfitAndRevenue(transactions);
+      res.json({
+        transactions,
+        revenues
+      });
+    }).catch(err => {
+      res.send(err);
+    });
+});
+
+router.post("/transaction/add", async function (req, res) {
+  var transaction = new Transaction({
+    _id: mongoose.Types.ObjectId(),
+    adminID: req.body.adminID, //ForeignKey
+    businessID: req.body.businessID,
+    date: req.body.date,
+    type: req.body.type.toUpperCase(),
+    amount: req.body.amount,
+    monthOfPayment: req.body.monthOfPayment,
+    client: req.body.client,
+    category: req.body.category,
+    description: req.body.description,
+    proof: req.body.proof
+  });
+
+  var business = await Business.findById(transaction.businessID);
+  if (!business) {
+    return res.status(512).send("The provided business is not avaliable");
+  }
+  if (transaction.category && !business.categories.find(v => v == transaction.category.toLowerCase())) {
+    business.categories.push(transaction.category.toLowerCase());
+    business.save(function (err) {
+      if (err) {
+        return res.status(512).send("The selected category is invalid, please try again");
+      }
+    })
+  }
+
+  var admin = await Admin.findById(transaction.adminID);
+  if (!admin) {
+    return res.status(512).send("The provided user is not avaliable");
+  }
+
+  var _client = null
+  if (transaction.client) {
+    _client = await Admin.findById(transaction.client);
+    if (!_client) {
+      return res.status(512).send("The provided client is not avaliable");
+    }
+  }
+
+  transaction.save(function (err) {
+    if (err) return res.status(512).send(err);
+    // TODO : Notify the other admins about this transaction.
+    if (business && business.admin) {
+      business.admin.filter(b => b.authority == 'ADMIN').map(b => {
+        var title = `Money was ${transaction.type == 'MONEYIN' ? 'deposited into' : 'withdrawn from'} ${business.name}`;
+        var body = `R${transaction.amount} was ${transaction.type == 'MONEYIN' ? 'deposited' : 'withdrawn'} by ${admin.userName} ${transaction.client ? 'from ' + _client.userName : ''} for ${transaction.category}`;
+        var data = {
+          link: "/open/transaction",
+          props: JSON.stringify({
+            businessID: transaction.businessID,
+            transactionID: transaction._id
+          })
+        }
+        FCM.sendToUser(b.id, helper.makePayload(title, body, data)).then(v => {
+          console.log('Notifications success', v);
+        }).catch(err => {
+          console.log('Notifications error', err);
+        })
+        return b;
+      });
+    }
+
+    return res.send("Transaction successfully saved");
+  });
 });
 
 module.exports = router;

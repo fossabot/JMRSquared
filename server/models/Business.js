@@ -29,6 +29,7 @@ const BusinessSchema = new mongoose.Schema({
     type: Object,
     settings: Array,
     description: String,
+    categories: [String],
     transactions: [{
         type: Schema.Types.ObjectId,
         ref: 'Transaction'

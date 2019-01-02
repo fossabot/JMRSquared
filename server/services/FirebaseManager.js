@@ -1,4 +1,5 @@
 var admin = require("firebase-admin");
+var helper = require("./Helper");
 
 var serviceAccount = require("../firebase_service_account.json");
 
@@ -13,8 +14,30 @@ var options = {
 };
 import Admin from '../models/Admin';
 
-var FCM = {
-    sendToDevice: (registrationToken, payload) => {
+class FCM {
+    sendToUser(adminID, payload) {
+        return new Promise((resolve, reject) => {
+            Admin.findById(adminID)
+                .then(user => {
+                    if (user == null)
+                        return reject("User of id " + adminID + " not found");
+                    var tokens = user.deviceTokens.filter(v => !v.removed).map(v => v.token);
+                    if (tokens) {
+                        tokens.forEach(async deviceToken => {
+                            await this.sendToDevice(deviceToken, payload);
+                        });
+                        return resolve("Notification will be sent to " + tokens.length + " devices");
+                    } else {
+                        return reject("User has no device");
+                    }
+                })
+                .catch(err => {
+                    return reject(err);
+                });
+        });
+    }
+
+    sendToDevice(registrationToken, payload) {
         return new Promise((resolve, reject) => {
             admin
                 .messaging()
@@ -55,8 +78,9 @@ var FCM = {
                     }
                 });
         });
-    },
-    sendToTopic: (topic, payload) => {
+    }
+
+    sendToTopic(topic, payload) {
         return new Promise((resolve, reject) => {
             admin
                 .messaging()
@@ -72,8 +96,9 @@ var FCM = {
                     return reject(error);
                 });
         });
-    },
-    subscribeToTopic: (registrationToken, topic) => {
+    }
+
+    subscribeToTopic(registrationToken, topic) {
         return new Promise((resolve, reject) => {
             admin
                 .messaging()
@@ -89,8 +114,9 @@ var FCM = {
                     return reject(error);
                 });
         });
-    },
-    subscribeToTopic: (registrationToken, topic) => {
+    }
+
+    subscribeToTopic(registrationToken, topic) {
         return new Promise((resolve, reject) => {
             admin
                 .messaging()
@@ -109,4 +135,4 @@ var FCM = {
     }
 };
 
-export default FCM;
+export default new FCM();

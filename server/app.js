@@ -6,6 +6,7 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 
 var app = express();
+import 'babel-polyfill';
 
 import mongoose from "mongoose";
 import adminController from "./routes/AdminController";
