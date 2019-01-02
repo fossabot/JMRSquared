@@ -43,11 +43,27 @@ router.get("/get/:business/for/:userid", function (req, res) {
       if (
         !business.admin ||
         !business.admin.find(a => a.id._id == adminID)
-      )
+      ) {
         return res
           .status(512)
           .send("You are not part of the requested business");
-      res.json(business);
+      }
+      Transaction.find({
+          businessID: businessID
+        },
+        "-proof"
+      ).then(transactions => {
+        var returnedBusiness = business.toObject()
+        const revenues = helper.GetTransactionProfitAndRevenue(transactions);
+        returnedBusiness.revenues = {
+          date: new Date(),
+          values: revenues
+        };
+        return res.json(returnedBusiness);
+      }).catch(err => {
+        console.log('err', err);
+        return res.json(business);
+      });
     })
     .catch(err => {
       return res.status(512).send(err);
@@ -172,9 +188,10 @@ router.post("/transactions/for/business/:businessId", function (req, res) {
           "$nin": existing
         }
       },
-      "_id adminID amount type itemCount carName propertyName productName source rentTenantName rentMonth description date"
+      "-proof"
     )
     .populate("adminID", "userName")
+    .populate("client", "userName")
     .then(transactions => {
       if (transactions == null) {
         res.status(500);

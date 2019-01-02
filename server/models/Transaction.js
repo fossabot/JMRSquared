@@ -18,7 +18,7 @@ const TransactionSchema = new mongoose.Schema({
     type: {
         type: String,
         enum: ['MONEYIN', 'MONEYOUT'],
-        default: "DEPOSIT"
+        default: "MONEYIN"
     },
     category: String,
     client: {

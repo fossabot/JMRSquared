@@ -19,7 +19,7 @@ helper.makePayload = function (title = "Title", body = "This is the body", data 
 
 helper.GetTransactionProfitAndRevenue = function (transactions, maxMonths = 5, maxWeeks = 3, maxDays = 3) {
     var revenues = [];
-
+    if (!transactions) transactions = [];
     transactions.forEach(value => {
         // Calculate the overrall profit
         if (true) {
