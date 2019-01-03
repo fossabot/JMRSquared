@@ -217,20 +217,6 @@ router.post("/document/add", function (req, res) {
     });
 });
 
-router.get("/transaction/get/:transactionId", function (req, res) {
-    var transactionID = req.params.transactionId;
-    Transaction.findById(transactionID)
-        .populate("adminID", "userName")
-        .then(transaction => {
-            if (transaction == null) {
-                res.status(500);
-                res.send("Invalid request");
-            } else {
-                res.json(transaction);
-            }
-        });
-});
-
 // This function will soon be abolute (it returns for properties only)
 router.get("/transaction/all", function (req, res) {
     Transaction.find({

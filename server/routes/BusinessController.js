@@ -8,7 +8,7 @@ import Transaction from "../models/Transaction";
 import FCM from "../services/FirebaseManager";
 const helper = require("../services/Helper");
 
-router.get("/all/for/:userid", function(req, res) {
+router.get("/all/for/:userid", function (req, res) {
   var adminID = req.params.userid;
   Admin.findById(adminID)
     .then(admin => {
@@ -16,15 +16,12 @@ router.get("/all/for/:userid", function(req, res) {
         return res
           .status(512)
           .send("Admin of id " + adminID + " does not exist");
-      Business.find(
-        {
-          "admin.id": adminID
-        },
-        {
-          logo: 0,
-          transactions: 0
-        }
-      ).then(businesses => {
+      Business.find({
+        "admin.id": adminID
+      }, {
+        logo: 0,
+        transactions: 0
+      }).then(businesses => {
         if (businesses == null)
           return res.status(512).send("Error : 9032rtu834g9erbo");
         res.json(businesses);
@@ -35,7 +32,7 @@ router.get("/all/for/:userid", function(req, res) {
     });
 });
 
-router.get("/get/:business/for/:userid", function(req, res) {
+router.get("/get/:business/for/:userid", function (req, res) {
   var businessID = req.params.business;
   var adminID = req.params.userid;
   Business.findById(businessID)
@@ -48,12 +45,11 @@ router.get("/get/:business/for/:userid", function(req, res) {
           .status(512)
           .send("You are not part of the requested business");
       }
-      Transaction.find(
-        {
-          businessID: businessID
-        },
-        "-proof"
-      )
+      Transaction.find({
+            businessID: businessID
+          },
+          "-proof"
+        )
         .then(transactions => {
           var returnedBusiness = business.toObject();
           const revenues = helper.GetTransactionProfitAndRevenue(transactions);
@@ -73,7 +69,7 @@ router.get("/get/:business/for/:userid", function(req, res) {
     });
 });
 
-router.post("/set/business/:type", function(req, res) {
+router.post("/set/business/:type", function (req, res) {
   var businessID = req.body.businessID;
   var value = req.body.value;
   var type = req.params.type;
@@ -90,7 +86,7 @@ router.post("/set/business/:type", function(req, res) {
         business.settings.find(s => s._id == settingID).value = value;
 
         business.markModified("settings");
-        business.save(function(err) {
+        business.save(function (err) {
           if (err) return res.status(512).send(err);
           res.send("Business setting successfully saved");
         });
@@ -111,7 +107,7 @@ router.post("/set/business/:type", function(req, res) {
           business.categories.push(value);
         }
 
-        business.save(function(err) {
+        business.save(function (err) {
           if (err) return res.status(512).send(err);
           res.send(`Business ${type} successfully saved`);
         });
@@ -122,7 +118,7 @@ router.post("/set/business/:type", function(req, res) {
   }
 });
 
-router.get("/get/all/:type/for/:business", function(req, res) {
+router.get("/get/all/:type/for/:business", function (req, res) {
   var businessID = req.params.business;
   var type = req.params.type;
   if (type == "partners") {
@@ -141,12 +137,11 @@ router.get("/get/all/:type/for/:business", function(req, res) {
       });
   } else {
     type = type == "expenses" ? "MONEYOUT" : "MONEYIN";
-    Transaction.find(
-      {
-        businessID: businessID
-      },
-      "-proof"
-    )
+    Transaction.find({
+          businessID: businessID
+        },
+        "-proof"
+      )
       .then(transactions => {
         if (!transactions) transactions = [];
         var returnOBJs = [];
@@ -191,7 +186,7 @@ router.get("/get/all/:type/for/:business", function(req, res) {
   }
 });
 
-router.post("/add/business", function(req, res) {
+router.post("/add/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
@@ -208,19 +203,20 @@ router.post("/add/business", function(req, res) {
           .send("Admin of id " + adminID + " does not exist");
       var business = new Business({
         _id: mongoose.Types.ObjectId(),
-        admin: [
-          {
-            id: adminID,
-            authority: adminAuthority && adminAuthority.toUpperCase()
-          }
-        ],
+        admin: [{
+          id: adminID,
+          authority: adminAuthority && adminAuthority.toUpperCase()
+        }],
         name: _business.name,
         logo: _business.logo,
         description: _business.description,
         type: _business.type
       });
 
-      business.save(function(err) {
+      if (!business.name) {
+        return res.status(512).send("A business name is required");
+      }
+      business.save(function (err) {
         if (err) return res.status(512).send(err);
         res.send("Business successfully saved");
       });
@@ -230,7 +226,7 @@ router.post("/add/business", function(req, res) {
     });
 });
 
-router.post("/assign/to/business", function(req, res) {
+router.post("/assign/to/business", function (req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
@@ -254,7 +250,7 @@ router.post("/assign/to/business", function(req, res) {
           assignedBY: assignedBY,
           authority: adminAuthority && adminAuthority.toUpperCase()
         });
-        business.save(function(err) {
+        business.save(function (err) {
           if (err) return res.status(512).send(err);
           res.send("Client successfully linked to business");
         });
@@ -266,19 +262,18 @@ router.post("/assign/to/business", function(req, res) {
 });
 
 // This is the newest function to be used
-router.post("/transactions/for/business/:businessId", function(req, res) {
+router.post("/transactions/for/business/:businessId", function (req, res) {
   var businessID = req.params.businessId;
   var existing = req.body.existing;
   if (!existing) existing = [];
-  Transaction.find(
-    {
-      businessID: businessID,
-      _id: {
-        $nin: existing
-      }
-    },
-    "-proof"
-  )
+  Transaction.find({
+        businessID: businessID,
+        _id: {
+          $nin: existing
+        }
+      },
+      "-proof"
+    )
     .populate("adminID", "userName")
     .populate("client", "userName")
     .then(transactions => {
@@ -299,7 +294,22 @@ router.post("/transactions/for/business/:businessId", function(req, res) {
     });
 });
 
-router.post("/transaction/add", async function(req, res) {
+router.get("/get/transaction/:transactionID", function (req, res) {
+  var transactionID = req.params.transactionID;
+  Transaction.findById(transactionID)
+    .populate("adminID", "userName")
+    .populate("client", "userName")
+    .then(transaction => {
+      if (!transaction)
+        return res.status(512).send("Transaction does not exist");
+      return res.json(transaction);
+    })
+    .catch(err => {
+      return res.status(512).send(err);
+    });
+});
+
+router.post("/transaction/add", async function (req, res) {
   var transaction = new Transaction({
     _id: mongoose.Types.ObjectId(),
     adminID: req.body.adminID, //ForeignKey
@@ -317,7 +327,7 @@ router.post("/transaction/add", async function(req, res) {
   transaction.category =
     transaction.category &&
     transaction.category[0].toUpperCase() +
-      transaction.category.slice(1).toLowerCase();
+    transaction.category.slice(1).toLowerCase();
 
   var business = await Business.findById(transaction.businessID);
   if (!business) {
@@ -328,7 +338,7 @@ router.post("/transaction/add", async function(req, res) {
     !business.categories.find(v => v == transaction.category)
   ) {
     business.categories.push(transaction.category);
-    business.save(function(err) {
+    business.save(function (err) {
       if (err) {
         return res
           .status(512)
@@ -350,7 +360,7 @@ router.post("/transaction/add", async function(req, res) {
     }
   }
 
-  transaction.save(function(err) {
+  transaction.save(function (err) {
     if (err) return res.status(512).send(err);
     // TODO : Notify the other admins about this transaction.
     if (business && business.admin) {
