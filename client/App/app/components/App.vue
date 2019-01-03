@@ -1,5 +1,10 @@
 <template>
-    <Navigator :defaultRoute="this.$router.current.userAuthLevel() != 3 ? currentPage : adminDashboard"/>
+  <GridLayout row="auto,*">
+    <StackLayout row="0">
+      <label textAlignment="center" text="Offline"></label>
+    </StackLayout>
+    <Navigator row="1" :defaultRoute="this.$router.current.userAuthLevel() != 3 ? currentPage : adminDashboard" />
+  </GridLayout>
 </template>
 
 <script>

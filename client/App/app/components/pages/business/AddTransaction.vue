@@ -165,7 +165,7 @@
                     <label :text="rentMonths[rentMonthIndex]" row="1" col="1" class="h4"></label>
                   </GridLayout>
   
-                  <GridLayout v-if="transaction.isClientPayment" class="m-10" rows="auto,auto" columns="auto,*">
+                  <GridLayout v-if="transaction.isClientPayment && transaction.client" class="m-10" rows="auto,auto" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-account-circle-outline' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Client's name"></label>
                     <label :text="transaction.client.userName" row="1" col="1" class="h4"></label>
@@ -427,12 +427,15 @@ export default {
         return;
       }
 
-      let source = new imageSource.ImageSource();
-      let img = await source.fromAsset(this.selectedImage);
-      if (img) {
-        this.transaction.evidence =
-          "data:image/png;base64," + img.toBase64String("png");
+      if (this.selectedImage) {
+        let source = new imageSource.ImageSource();
+        let img = await source.fromAsset(this.selectedImage);
+        if (img) {
+          this.transaction.evidence =
+            "data:image/png;base64," + img.toBase64String("png");
+        }
       }
+
       this.transaction.businessId = this.businessId;
       this.transaction.transacterId = this.$store.state.cache.cachedAdmin._id;
       if (this.transaction.isClientPayment) {
