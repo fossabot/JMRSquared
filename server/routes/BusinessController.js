@@ -8,7 +8,7 @@ import Transaction from "../models/Transaction";
 import FCM from "../services/FirebaseManager";
 const helper = require("../services/Helper");
 
-router.get("/all/for/:userid", function (req, res) {
+router.get("/all/for/:userid", function(req, res) {
   var adminID = req.params.userid;
   Admin.findById(adminID)
     .then(admin => {
@@ -16,12 +16,15 @@ router.get("/all/for/:userid", function (req, res) {
         return res
           .status(512)
           .send("Admin of id " + adminID + " does not exist");
-      Business.find({
-        "admin.id": adminID
-      }, {
-        logo: 0,
-        transactions: 0
-      }).then(businesses => {
+      Business.find(
+        {
+          "admin.id": adminID
+        },
+        {
+          logo: 0,
+          transactions: 0
+        }
+      ).then(businesses => {
         if (businesses == null)
           return res.status(512).send("Error : 9032rtu834g9erbo");
         res.json(businesses);
@@ -32,80 +35,163 @@ router.get("/all/for/:userid", function (req, res) {
     });
 });
 
-router.get("/get/:business/for/:userid", function (req, res) {
+router.get("/get/:business/for/:userid", function(req, res) {
   var businessID = req.params.business;
   var adminID = req.params.userid;
   Business.findById(businessID)
-    .populate("admin.id", '_id userName fullName')
+    .populate("admin.id", "_id userName fullName")
     .then(business => {
       if (business == null)
         return res.status(512).send("The requested business is not avaliable");
-      if (
-        !business.admin ||
-        !business.admin.find(a => a.id._id == adminID)
-      ) {
+      if (!business.admin || !business.admin.find(a => a.id._id == adminID)) {
         return res
           .status(512)
           .send("You are not part of the requested business");
       }
-      Transaction.find({
+      Transaction.find(
+        {
           businessID: businessID
         },
         "-proof"
-      ).then(transactions => {
-        var returnedBusiness = business.toObject()
-        const revenues = helper.GetTransactionProfitAndRevenue(transactions);
-        returnedBusiness.revenues = {
-          date: new Date(),
-          values: revenues
-        };
-        return res.json(returnedBusiness);
-      }).catch(err => {
-        console.log('err', err);
+      )
+        .then(transactions => {
+          var returnedBusiness = business.toObject();
+          const revenues = helper.GetTransactionProfitAndRevenue(transactions);
+          returnedBusiness.revenues = {
+            date: new Date(),
+            values: revenues
+          };
+          return res.json(returnedBusiness);
+        })
+        .catch(err => {
+          console.log("err", err);
+          return res.json(business);
+        });
+    })
+    .catch(err => {
+      return res.status(512).send(err);
+    });
+});
+
+router.post("/set/business/:type", function(req, res) {
+  var businessID = req.body.businessID;
+  var value = req.body.value;
+  var type = req.params.type;
+
+  if (type == "settings") {
+    var settingID = req.body.settingID;
+    Business.findById(businessID)
+      .then(business => {
+        if (!business)
+          return res
+            .status(512)
+            .send("The requested business is not avaliable");
+
+        business.settings.find(s => s._id == settingID).value = value;
+
+        business.markModified("settings");
+        business.save(function(err) {
+          if (err) return res.status(512).send(err);
+          res.send("Business setting successfully saved");
+        });
+      })
+      .catch(err => {
+        return res.status(512).send(err);
+      });
+  } else {
+    value = value && value[0].toUpperCase() + value.slice(1).toLowerCase();
+    Business.findById(businessID)
+      .then(business => {
+        if (!business)
+          return res
+            .status(512)
+            .send("The requested business is not avaliable");
+
+        if (!business.categories.find(v => v == value)) {
+          business.categories.push(value);
+        }
+
+        business.save(function(err) {
+          if (err) return res.status(512).send(err);
+          res.send(`Business ${type} successfully saved`);
+        });
+      })
+      .catch(err => {
+        return res.status(512).send(err);
+      });
+  }
+});
+
+router.get("/get/all/:type/for/:business", function(req, res) {
+  var businessID = req.params.business;
+  var type = req.params.type;
+  if (type == "partners") {
+    Business.findById(businessID)
+      .populate("admin.id", "-deviceTokens")
+      .then(business => {
+        if (business == null)
+          return res
+            .status(512)
+            .send("The requested business is not avaliable");
+        if (!business.admin) res.json([]);
+        res.json(business.admin.map(b => b.id));
+      })
+      .catch(err => {
+        return res.status(512).send(err);
+      });
+  } else {
+    type = type == "expenses" ? "MONEYOUT" : "MONEYIN";
+    Transaction.find(
+      {
+        businessID: businessID
+      },
+      "-proof"
+    )
+      .then(transactions => {
+        if (!transactions) transactions = [];
+        var returnOBJs = [];
+        transactions
+          .filter(t => t.type == type)
+          .forEach(transaction => {
+            if (!returnOBJs.find(r => r.title == transaction.category)) {
+              returnOBJs.push({
+                title: transaction.category,
+                value: Number(transaction.amount),
+                count: 1
+              });
+            } else {
+              returnOBJs.find(
+                r => r.title == transaction.category
+              ).value += Number(transaction.amount);
+              returnOBJs.find(r => r.title == transaction.category).count += 1;
+            }
+          });
+        Business.findById(businessID)
+          .then(business => {
+            business.categories
+              .filter(v => !returnOBJs.find(t => t.title == v))
+              .map(cat => {
+                returnOBJs.push({
+                  title: cat,
+                  value: 0,
+                  count: 0
+                });
+                return cat;
+              });
+            return res.json(returnOBJs);
+          })
+          .catch(err => {
+            return res.json(returnOBJs);
+          });
+      })
+      .catch(err => {
+        console.log("err", err);
         return res.json(business);
       });
-    })
-    .catch(err => {
-      return res.status(512).send(err);
-    });
+  }
 });
 
-router.post("/set/business/settings", function (req, res) {
-  var businessID = req.body.businessID;
-  var settingID = req.body.settingID;
-  var value = req.body.value;
-
-  Business.findById(businessID).then(business => {
-    if (!business) return res.status(512).send("The requested business is not avaliable");
-
-    business.settings.find(s => s._id == settingID).value = value
-
-    business.markModified('settings');
-    business.save(function (err) {
-      if (err) return res.status(512).send(err);
-      res.send("Business setting successfully saved");
-    });
-  }).catch(err => {
-    return res.status(512).send(err);
-  })
-});
-
-router.get("/get/all/partners/for/:business", function (req, res) {
-  var businessID = req.params.business;
-  Business.findById(businessID)
-    .populate("admin.id")
-    .then(business => {
-      if (business == null)
-        return res.status(512).send("The requested business is not avaliable");
-      if (!business.admin) res.json([]);
-      res.json(business.admin.map(b => b.id));
-    })
-    .catch(err => {
-      return res.status(512).send(err);
-    });
-});
-
-router.post("/add/business", function (req, res) {
+router.post("/add/business", function(req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var _business = req.body.business;
@@ -122,17 +208,19 @@ router.post("/add/business", function (req, res) {
           .send("Admin of id " + adminID + " does not exist");
       var business = new Business({
         _id: mongoose.Types.ObjectId(),
-        admin: [{
-          id: adminID,
-          authority: adminAuthority && adminAuthority.toUpperCase()
-        }],
+        admin: [
+          {
+            id: adminID,
+            authority: adminAuthority && adminAuthority.toUpperCase()
+          }
+        ],
         name: _business.name,
         logo: _business.logo,
         description: _business.description,
         type: _business.type
       });
 
-      business.save(function (err) {
+      business.save(function(err) {
         if (err) return res.status(512).send(err);
         res.send("Business successfully saved");
       });
@@ -142,7 +230,7 @@ router.post("/add/business", function (req, res) {
     });
 });
 
-router.post("/assign/to/business", function (req, res) {
+router.post("/assign/to/business", function(req, res) {
   var adminID = req.body.adminID;
   var adminAuthority = req.body.adminAuthority;
   var businessID = req.body.businessID;
@@ -166,7 +254,7 @@ router.post("/assign/to/business", function (req, res) {
           assignedBY: assignedBY,
           authority: adminAuthority && adminAuthority.toUpperCase()
         });
-        business.save(function (err) {
+        business.save(function(err) {
           if (err) return res.status(512).send(err);
           res.send("Client successfully linked to business");
         });
@@ -178,18 +266,19 @@ router.post("/assign/to/business", function (req, res) {
 });
 
 // This is the newest function to be used
-router.post("/transactions/for/business/:businessId", function (req, res) {
+router.post("/transactions/for/business/:businessId", function(req, res) {
   var businessID = req.params.businessId;
   var existing = req.body.existing;
-  if (!existing) existing = []
-  Transaction.find({
-        businessID: businessID,
-        '_id': {
-          "$nin": existing
-        }
-      },
-      "-proof"
-    )
+  if (!existing) existing = [];
+  Transaction.find(
+    {
+      businessID: businessID,
+      _id: {
+        $nin: existing
+      }
+    },
+    "-proof"
+  )
     .populate("adminID", "userName")
     .populate("client", "userName")
     .then(transactions => {
@@ -204,12 +293,13 @@ router.post("/transactions/for/business/:businessId", function (req, res) {
         transactions,
         revenues
       });
-    }).catch(err => {
+    })
+    .catch(err => {
       res.send(err);
     });
 });
 
-router.post("/transaction/add", async function (req, res) {
+router.post("/transaction/add", async function(req, res) {
   var transaction = new Transaction({
     _id: mongoose.Types.ObjectId(),
     adminID: req.body.adminID, //ForeignKey
@@ -224,17 +314,27 @@ router.post("/transaction/add", async function (req, res) {
     proof: req.body.proof
   });
 
+  transaction.category =
+    transaction.category &&
+    transaction.category[0].toUpperCase() +
+      transaction.category.slice(1).toLowerCase();
+
   var business = await Business.findById(transaction.businessID);
   if (!business) {
     return res.status(512).send("The provided business is not avaliable");
   }
-  if (transaction.category && !business.categories.find(v => v == transaction.category.toLowerCase())) {
-    business.categories.push(transaction.category.toLowerCase());
-    business.save(function (err) {
+  if (
+    transaction.category &&
+    !business.categories.find(v => v == transaction.category)
+  ) {
+    business.categories.push(transaction.category);
+    business.save(function(err) {
       if (err) {
-        return res.status(512).send("The selected category is invalid, please try again");
+        return res
+          .status(512)
+          .send("The selected category is invalid, please try again");
       }
-    })
+    });
   }
 
   var admin = await Admin.findById(transaction.adminID);
@@ -242,7 +342,7 @@ router.post("/transaction/add", async function (req, res) {
     return res.status(512).send("The provided user is not avaliable");
   }
 
-  var _client = null
+  var _client = null;
   if (transaction.client) {
     _client = await Admin.findById(transaction.client);
     if (!_client) {
@@ -250,27 +350,37 @@ router.post("/transaction/add", async function (req, res) {
     }
   }
 
-  transaction.save(function (err) {
+  transaction.save(function(err) {
     if (err) return res.status(512).send(err);
     // TODO : Notify the other admins about this transaction.
     if (business && business.admin) {
-      business.admin.filter(b => b.authority == 'ADMIN').map(b => {
-        var title = `Money was ${transaction.type == 'MONEYIN' ? 'deposited into' : 'withdrawn from'} ${business.name}`;
-        var body = `R${transaction.amount} was ${transaction.type == 'MONEYIN' ? 'deposited' : 'withdrawn'} by ${admin.userName} ${transaction.client ? 'from ' + _client.userName : ''} for ${transaction.category}`;
-        var data = {
-          link: "/open/transaction",
-          props: JSON.stringify({
-            businessID: transaction.businessID,
-            transactionID: transaction._id
-          })
-        }
-        FCM.sendToUser(b.id, helper.makePayload(title, body, data)).then(v => {
-          console.log('Notifications success', v);
-        }).catch(err => {
-          console.log('Notifications error', err);
-        })
-        return b;
-      });
+      business.admin
+        .filter(b => b.authority == "ADMIN")
+        .map(b => {
+          var title = `Money was ${
+            transaction.type == "MONEYIN" ? "deposited into" : "withdrawn from"
+          } ${business.name}`;
+          var body = `R${transaction.amount} was ${
+            transaction.type == "MONEYIN" ? "deposited" : "withdrawn"
+          } by ${admin.userName} ${
+            transaction.client ? "from " + _client.userName : ""
+          } for ${transaction.category}`;
+          var data = {
+            link: "/open/transaction",
+            props: JSON.stringify({
+              businessID: transaction.businessID,
+              transactionID: transaction._id
+            })
+          };
+          FCM.sendToUser(b.id, helper.makePayload(title, body, data))
+            .then(v => {
+              console.log("Notifications success", v);
+            })
+            .catch(err => {
+              console.log("Notifications error", err);
+            });
+          return b;
+        });
     }
 
     return res.send("Transaction successfully saved");

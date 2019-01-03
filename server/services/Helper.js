@@ -33,10 +33,10 @@ helper.GetTransactionProfitAndRevenue = function (transactions, maxMonths = 5, m
                 });
             }
             revenues.filter(v => v.key == 'overall').map(v => {
-                if (value.type == "MoneyIn") {
+                if (value.type == "MONEYIN") {
                     v.revenue += Number(value.amount);
                     v.profit += Number(value.amount);
-                } else if (value.type == "MoneyOut") {
+                } else if (value.type == "MONEYOUT") {
                     v.profit -= Number(value.amount);
                 }
                 return v;
@@ -57,10 +57,10 @@ helper.GetTransactionProfitAndRevenue = function (transactions, maxMonths = 5, m
                 });
             }
             revenues.filter(v => v.key == monthsDiff && v.type == "monthly").map(v => {
-                if (value.type == "MoneyIn") {
+                if (value.type == "MONEYIN") {
                     v.revenue += Number(value.amount);
                     v.profit += Number(value.amount);
-                } else if (value.type == "MoneyOut") {
+                } else if (value.type == "MONEYOUT") {
                     v.profit -= Number(value.amount);
                 }
                 return v;
@@ -81,10 +81,10 @@ helper.GetTransactionProfitAndRevenue = function (transactions, maxMonths = 5, m
                 });
             }
             revenues.filter(v => v.key == weeksDiff && v.type == "weekly").map(v => {
-                if (value.type == "MoneyIn") {
+                if (value.type == "MONEYIN") {
                     v.revenue += Number(value.amount);
                     v.profit += Number(value.amount);
-                } else if (value.type == "MoneyOut") {
+                } else if (value.type == "MONEYOUT") {
                     v.profit -= Number(value.amount);
                 }
                 return v;
@@ -105,10 +105,10 @@ helper.GetTransactionProfitAndRevenue = function (transactions, maxMonths = 5, m
                 });
             }
             revenues.filter(v => v.key == daysDiff && v.title == dayDate).map(v => {
-                if (value.type == "MoneyIn") {
+                if (value.type == "MONEYIN") {
                     v.revenue += Number(value.amount);
                     v.profit += Number(value.amount);
-                } else if (value.type == "MoneyOut") {
+                } else if (value.type == "MONEYOUT") {
                     v.profit -= Number(value.amount);
                 }
                 return v;
