@@ -3,7 +3,7 @@
     <StackLayout backgroundColor="white">
       <CardView margin="10" elevation="20">
         <StackLayout>
-          <Ripple @tap="GoTo(option)">
+          <Ripple @tap="AddBusinessExpense()">
             <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
               <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-trending-down' | fonticon"></Label>
               <label row="0" col="1" class="p-x-15 h3" fontSize="20%" text="Add a fixed expense"></label>
@@ -14,13 +14,13 @@
       </CardView>
       <ScrollView>
         <StackLayout>
-          <Ripple class="p-15" v-for="a in 5" :key="a">
+          <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+          <Ripple v-show="!isLoading" class="p-15" v-for="(expense,i) in expenses" :key="i">
             <CardView elevation="10" margin="5">
               <GridLayout class="p-15" rows="auto,auto,auto" columns="*,*">
-                <Label row="0" col="0" class="h3 p-b-5" colSpan="2" textAlignment="center" verticalAlignment="center" text="Londi Cleaner" />
-                <Label row="1" col="0" rowSpan="2" textAlignment="left" textWrap="true" verticalAlignment="center" text="1st of every month" />
-                <Label row="1" col="1" class="text-light-blue" textAlignment="right" textWrap="true" verticalAlignment="center" text="R2000" />
-                <Label row="2" col="1" textAlignment="right" fontSize="15%" textWrap="true" verticalAlignment="center" text="paid for JUNE" />
+                <Label row="0" col="0" class="h3 p-b-5" colSpan="2" textAlignment="center" verticalAlignment="center" :text="expense.title" />
+                <Label row="1" col="1" class="text-light-blue" textAlignment="right" textWrap="true" verticalAlignment="center" :text="`R${expense.value}`" />
+                <Label row="2" col="1" textAlignment="right" fontSize="15%" textWrap="true" verticalAlignment="center" :text="`${expense.count} transactions`" />
               </GridLayout>
             </CardView>
           </Ripple>
@@ -31,45 +31,68 @@
 </template>
 
 <script>
-const http = require("http");
 export default {
-  name: "PartnersList",
+  name: "ExpensesList",
   data() {
     return {
-      option: {},
-      partners: []
+      expenses: [],
+      isLoading: false
     };
   },
   mounted() {
-    this.GetPartnersForBusiness();
-    this.option = {
-      link: "/business/add/partner",
-      props: {
-        businessId: this.businessId,
-        businessName: this.businessName
-      }
-    };
+    this.GetBusinessExpenses();
   },
   props: ["businessName", "businessId"],
   methods: {
-    GetPartnersForBusiness() {
+    GetBusinessExpenses() {
+      this.isLoading = true;
       this.$api
-        .getPartners(this.businessId)
-        .then(partners => {
-          this.partners = partners;
+        .getBusinessExpenses(this.businessId)
+        .then(expenses => {
+          this.isLoading = false;
+          this.expenses = expenses;
         })
         .catch(err => {
+          this.isLoading = false;
           this.$feedback.error({
-            title: "Unable to load your partners",
+            title: "Unable to load your expenses",
             duration: 4000,
             message: "Please try again later"
           });
         });
     },
-    GoTo(option) {
-      if (option.link) {
-        this.navigate(option.link, option.props);
-      }
+    AddBusinessExpense() {
+      prompt({
+        title: `Add a new expense for ${this.businessName}`,
+        message: "Please enter the name of the expense",
+        okButtonText: "Save",
+        cancelButtonText: "Cancel"
+      }).then(result => {
+        if (!result.text || result.text.length < 2) {
+          this.$feedback.error({
+            title: "Invalid expense",
+            duration: 4000,
+            message:
+              "Please try again with a valid name like : Electricity or Rates"
+          });
+          return;
+        }
+        this.isLoading = true;
+        this.$api
+          .addBusinessExpense(this.businessId, result.text)
+          .then(expenses => {
+            this.isLoading = false;
+            this.expenses = expenses;
+          })
+          .catch(err => {
+            this.isLoading = false;
+            this.$feedback.error({
+              title: `Unable to add ${result.text} as an expense`,
+              duration: 4000,
+              message: "Please try again later"
+            });
+          });
+      });
     }
   }
 };

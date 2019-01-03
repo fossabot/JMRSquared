@@ -24,43 +24,43 @@
               <label row="0" col="0" class="font-weight-bold text-mute" :text="transaction.category"></label>
               <label row="1" col="0" class="h3 text-mute" :text="getMoment(transaction.date).format('DD MMM YY')"></label>
               <label row="0" rowSpan="2" col="1" verticalAlignment="center" textAlignment="right" class="mdi m-15" fontSize="25%" :text="'mdi-bank-transfer-in' | fonticon"></label>
-              <Label row="0" rowSpan="2" col="2" verticalAlignment="center" class="font-weight-bold  text-mute p-x-5" :class="{'text-dark-blue':transaction.type == 'MONEYIN','text-light-red':transaction.type == 'MONEYOUT'}" textAlignment="right" :text="(transaction.type == 'MONEYIN' ? '- R' : '+ R') + transaction.amount"></Label>
+              <Label row="0" rowSpan="2" col="2" verticalAlignment="center" class="font-weight-bold  text-mute p-x-5" :class="{'text-dark-blue':transaction.type == 'MONEYIN','text-light-red':transaction.type == 'MONEYOUT'}" textAlignment="right" :text="(transaction.type == 'MONEYIN' ? '+ R' : '- R') + transaction.amount"></Label>
             </GridLayout>
           </Ripple>
         </CardView>
-       <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+        <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
       </StackLayout>
     </ScrollView>
   
-    <StackLayout row="2" ref="bottomSheet" backgroundColor="white" :visibility="isBottomSheetOpen ? 'visible' : 'collapse'" verticalAlignment="bottom">
-      <CardView elevation="15">
-        <StackLayout class="m-x-15 m-y-5">
-          <GridLayout textAlignment="right" columns="auto">
-            <Ripple textAlignment="right" @tap="closeSheet">
-              <label col="1" class="text-light-red mdi m-15" verticalAlignment="center" textAlignment="right" fontSize="25%" :text="'mdi-close' | fonticon"></label>
-            </Ripple>
-          </GridLayout>
-          <GridLayout v-for="a in 5" :key="a" rows="auto,auto" columns="*,*">
-            <StackLayout row="1" :col="i" v-for="(summary,i) in summaryStats" :key="i">
-              <label class="font-weight-bold" vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
-              <label class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.value}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
-            </StackLayout>
-          </GridLayout>
-          <GridLayout textAlignment="center" columns="*">
-            <Ripple @tap="goToStats">
-              <label class="m-15" verticalAlignment="center" textAlignment="center" text="Detailed information"></label>
-            </Ripple>
-          </GridLayout>
-        </StackLayout>
-      </CardView>
-    </StackLayout>
+    <CardView elevation="5" row="2" ref="bottomSheet" :visibility="isBottomSheetOpen ? 'visible' : 'collapse'" verticalAlignment="bottom">
+      <StackLayout class="m-x-15 m-y-5">
+        <GridLayout textAlignment="right" columns="auto">
+          <Ripple textAlignment="right" @tap="closeSheet">
+            <label col="1" class="text-light-red mdi m-15" verticalAlignment="center" textAlignment="right" fontSize="25%" :text="'mdi-close' | fonticon"></label>
+          </Ripple>
+        </GridLayout>
+        <GridLayout v-for="(summary,i) in summaryStats" :key="i" class="p-15" rows="auto,auto,auto" columns="*,*,*">
+          <label row="0" rowSpan="2" col="0" :textWrap="true" class="font-weight-bold" verticalAlignment="center" textAlignment="center" :text="summary.title"></label>
+          <label row="0" col="1" class="font-weight-bold" textAlignment="center" text="Profit"></label>
+          <label row="1" col="1" class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.profit}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
+          <label row="0" col="2" class="font-weight-bold" textAlignment="center" text="Revenue"></label>
+          <label row="1" col="2" class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.revenue}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
+          <StackLayout verticalAlignment="bottom" row="2" colSpan="3" width="100%" class="hr-light p-y-15"></StackLayout>
+        </GridLayout>
+        <GridLayout textAlignment="center" columns="*">
+          <Ripple @tap="goToStats">
+            <label class="m-15" verticalAlignment="center" textAlignment="center" text="Detailed information"></label>
+          </Ripple>
+        </GridLayout>
+      </StackLayout>
+    </CardView>
     <CardView row="3" elevation="5" class="m-x-15 m-y-5">
       <Ripple @tap="isBottomSheetOpen ? closeSheet() : openSheet()" class="p-5">
-        <GridLayout class="m-x-15 m-y-5" rows="auto" columns="*,*">
-          <StackLayout :col="i" v-for="(summary,i) in summaryStats" :key="i">
-            <label class="font-weight-bold" vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
-            <label class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.value}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
-          </StackLayout>
+        <GridLayout v-for="(summary,i) in summaryStats.filter(v => v.key == 'overall')" :key="i" class="m-x-15 m-y-5" rows="auto,auto" columns="*,*">
+          <label row="0" col="0" class="font-weight-bold" textAlignment="center" text="Profit"></label>
+          <label row="1" col="0" class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.profit}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
+          <label row="0" col="1" class="font-weight-bold" textAlignment="center" text="Revenue"></label>
+          <label row="1" col="1" class="font-weight-bold text-dark-blue summaryStats" :text="`R${summary.revenue}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
         </GridLayout>
       </Ripple>
     </CardView>
@@ -73,16 +73,7 @@ const dialogs = require("ui/dialogs");
 export default {
   data() {
     return {
-      summaryStats: [
-        {
-          title: "Revenue",
-          value: 9212
-        },
-        {
-          title: "Profit",
-          value: 502
-        }
-      ],
+      summaryStats: [],
       isLoading: false,
       transactions: [],
       isMainScreen: false,
@@ -115,6 +106,15 @@ export default {
       .catch(err => {
         this.isLoading = false;
       });
+
+    var revenue_profit =
+      this.business.revenues &&
+      this.business.revenues.values &&
+      this.business.revenues.values.filter(
+        v => v.profit != 0 && v.revenue != 0
+      );
+
+    this.summaryStats = revenue_profit;
   },
   props: ["business"],
   methods: {

@@ -258,4 +258,52 @@ export default class API {
             });
         });
     }
+
+    getBusinessIncomes(businessID) {
+        return new Promise((resolve, reject) => {
+            http
+                .getJSON(this.makeGet(`/b/get/all/incomes/for/${businessID}`)).then(result => {
+                    return resolve(result);
+                }).catch(err => {
+                    return reject(err);
+                });
+        });
+    }
+
+    getBusinessExpenses(businessID) {
+        return new Promise((resolve, reject) => {
+            http
+                .getJSON(this.makeGet(`/b/get/all/expenses/for/${businessID}`)).then(result => {
+                    return resolve(result);
+                }).catch(err => {
+                    return reject(err);
+                });
+        });
+    }
+
+    addBusinessExpense(businessID, value) {
+        return new Promise((resolve, reject) => {
+            http.request(this.makePost("/b/set/business/expense", {
+                businessID,
+                value
+            })).then((result) => {
+                return resolve(result)
+            }).catch(err => {
+                return reject(err);
+            });
+        });
+    }
+
+    addBusinessIncome(businessID, value) {
+        return new Promise((resolve, reject) => {
+            http.request(this.makePost("/b/set/business/income", {
+                businessID,
+                value
+            })).then((result) => {
+                return resolve(result)
+            }).catch(err => {
+                return reject(err);
+            });
+        });
+    }
 }

@@ -64,11 +64,6 @@ export default {
       ]
     };
   },
-  created() {
-    if (!this.isLoaded) {
-      this.pageLoaded();
-    }
-  },
   mounted() {
     if (!this.isLoaded) {
       this.pageLoaded();
@@ -82,7 +77,6 @@ export default {
         .then(results => {
           this.business = results;
           this.tabs[0].icon = "mdi-" + this.business.type.icon;
-          this.$forceUpdate();
         })
         .catch(err => {
           this.$feedback.error({

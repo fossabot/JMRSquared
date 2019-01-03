@@ -3,7 +3,7 @@
     <StackLayout backgroundColor="white">
       <CardView margin="10" elevation="20">
         <StackLayout>
-          <Ripple @tap="GoTo(option)">
+          <Ripple @tap="AddBusinessIncome()">
             <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
               <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-trending-up' | fonticon"></Label>
               <label row="0" col="1" class="p-x-15 h3" fontSize="20%" text="Add a fixed income stream"></label>
@@ -14,11 +14,12 @@
       </CardView>
       <ScrollView>
         <StackLayout>
-          <Ripple v-for="(partner,i) in partners" :key="i">
-            <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
-              <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70" borderRadius="50%" />
-              <label row="0" col="1" class="p-x-15 h2" verticalAlignment="bottom" :text="partner.userName"></label>
-              <label row="1" col="1" class="p-x-15 h3" verticalAlignment="bottom" :text="`0${partner.numbers}`"></label>
+          <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+          <Ripple v-show="!isLoading" v-for="(income,i) in incomes" :key="i">
+            <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto">
+              <label row="0" col="0" class="p-x-15 h2" :text="income.title"></label>
+              <label row="1" col="0" class="p-x-15 h3" :text="`R${income.value}`"></label>
+              <Label row="2" col="1" textAlignment="right" fontSize="15%" textWrap="true" verticalAlignment="center" :text="`${income.count} transactions`" />
             </GridLayout>
           </Ripple>
         </StackLayout>
@@ -28,34 +29,29 @@
 </template>
 
 <script>
-const http = require("http");
 export default {
-  name: "PartnersList",
+  name: "IncomeList",
   data() {
     return {
-      option: {},
-      partners: []
+      incomes: [],
+      isLoading: false
     };
   },
   mounted() {
-    this.GetPartnersForBusiness();
-    this.option = {
-      link: "/business/add/partner",
-      props: {
-        businessId: this.businessId,
-        businessName: this.businessName
-      }
-    };
+    this.GetBusinessIncomes();
   },
   props: ["businessName", "businessId"],
   methods: {
-    GetPartnersForBusiness() {
+    GetBusinessIncomes() {
+      this.isLoading = true;
       this.$api
-        .getPartners(this.businessId)
-        .then(partners => {
-          this.partners = partners;
+        .getBusinessIncomes(this.businessId)
+        .then(incomes => {
+          this.isLoading = false;
+          this.incomes = incomes;
         })
         .catch(err => {
+          this.isLoading = false;
           this.$feedback.error({
             title: "Unable to load your partners",
             duration: 4000,
@@ -63,10 +59,37 @@ export default {
           });
         });
     },
-    GoTo(option) {
-      if (option.link) {
-        this.navigate(option.link, option.props);
-      }
+    AddBusinessIncome() {
+      prompt({
+        title: `Add a new income for ${this.businessName}`,
+        message: "Please enter the name of the income",
+        okButtonText: "Save",
+        cancelButtonText: "Cancel"
+      }).then(result => {
+        if (!result.text || result.text.length < 2) {
+          this.$feedback.error({
+            title: "Invalid income",
+            duration: 4000,
+            message: "Please try again with a valid name like : Salary or Rent"
+          });
+          return;
+        }
+        this.isLoading = true;
+        this.$api
+          .addBusinessIncome(this.businessId, result.text)
+          .then(expenses => {
+            this.isLoading = false;
+            this.expenses = expenses;
+          })
+          .catch(err => {
+            this.isLoading = false;
+            this.$feedback.error({
+              title: `Unable to add ${result.text} as an income`,
+              duration: 4000,
+              message: "Please try again later"
+            });
+          });
+      });
     }
   }
 };

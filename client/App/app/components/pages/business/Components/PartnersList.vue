@@ -14,7 +14,8 @@
       </CardView>
       <ScrollView>
         <StackLayout>
-          <Ripple v-for="(partner,i) in partners" :key="i">
+          <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+          <Ripple v-show="!isLoading" v-for="(partner,i) in partners" :key="i">
             <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
               <Image row="0" rowSpan="3" col="0" borderWidth="5px" borderColor="$blueLightColor" stretch="aspectFill" :src="partner.profilePic ? partner.profilePic : $store.state.settings.defaultProfilePic" width="70" height="70" borderRadius="50%" />
               <label row="0" col="1" class="p-x-15 h2" verticalAlignment="bottom" :text="partner.userName"></label>
@@ -34,7 +35,8 @@ export default {
   data() {
     return {
       option: {},
-      partners: []
+      partners: [],
+      isLoading: false
     };
   },
   mounted() {
@@ -50,12 +52,15 @@ export default {
   props: ["businessName", "businessId"],
   methods: {
     GetPartnersForBusiness() {
+      this.isLoading = true;
       this.$api
         .getPartners(this.businessId)
         .then(partners => {
+          this.isLoading = false;
           this.partners = partners;
         })
         .catch(err => {
+          this.isLoading = false;
           this.$feedback.error({
             title: "Unable to load your partners",
             duration: 4000,
