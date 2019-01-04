@@ -56,6 +56,11 @@ Vue.registerElement(
   }
 );
 
+Vue.registerElement(
+  "ImageZoom",
+  () => require('nativescript-image-zoom').ImageZoom
+);
+
 Vue.filter("fonticon", fonticon);
 
 import master from "./services/master";
@@ -129,7 +134,11 @@ Vue.mixin({
     navigate(to, props = null) {
       console.log("Navigating to -> ", to);
       if (to == null) {
-        this.$navigator.back();
+        if (this.currentPage && this.currentPage > 0) {
+          this.currentPage--;
+        } else {
+          this.$navigator.back();
+        }
       } else {
         var options = {};
         if (props != null) {

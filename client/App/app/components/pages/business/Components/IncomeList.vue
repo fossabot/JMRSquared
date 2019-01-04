@@ -1,17 +1,18 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout rows="auto,*,auto" backgroundColor="white">
-      <CardView row="0" margin="10" elevation="20">
-        <StackLayout>
-          <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
-            <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-trending-up' | fonticon"></Label>
-            <label row="0" col="1" class="p-x-15 h3" fontSize="20%" text="Income streams"></label>
-            <label row="1" col="1" class="p-x-15 h4" :text="`Any source of income that ${businessName} receives`"></label>
-          </GridLayout>
-        </StackLayout>
+      <CardView row="0" elevation="15">
+        <GridLayout rows="auto,auto" columns="auto,*" class="bg-dark-blue p-15">
+          <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
+          </Ripple>
+          <label class="p-x-15 text-white" fontSize="18%" col="1" text="Income streams"></label>
+          <label row="1" class="p-x-15 text-white" verticalAlignment="center" fontSize="13%" col="1" :text="`Any source of income that ${businessName} receives`"></label>
+        </GridLayout>
       </CardView>
+  
       <Fab @tap="AddBusinessIncome" row="1" icon="res://ic_add_white_24dp" class="fab-button fixedBtn"></Fab>
-      <ScrollView row="1">
+      <ScrollView rowSpan="2" row="1">
         <StackLayout>
           <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
           <Ripple v-show="!isLoading" v-for="(income,i) in incomes" :key="i">
@@ -23,13 +24,13 @@
           </Ripple>
         </StackLayout>
       </ScrollView>
-      <CardView margin="15" v-if="incomes.filter(v => v.value) && incomes.filter(v => v.value).length > 0" row="2" elevation="20">
-        <StackLayout>
-          <GridLayout class="p-10" rows="auto,auto" columns="auto,*">
-            <label row="0" col="0" fontSize="18%" textAlignment="left" class="p-x-15" text="Total"></label>
-            <label row="1" col="0" fontSize="18%" textAlignment="left" class="p-x-15 font-weight-bold text-dark-blue" :text="`R${incomes.filter(v => v.value).map(v => v.value).reduce(add)}`"></label>
-            <label row="0" col="1" fontSize="18%" textAlignment="right" class="p-x-15" text="Transactions"></label>
-            <Label row="1" col="1" fontSize="18%" textAlignment="right" class="p-x-15 font-weight-bold text-dark-blue" :text="`${incomes.filter(v => v.value).map(v => v.count).reduce(add)}`" />
+      <CardView row="2" margin="15" v-if="incomes.filter(v => v.value) && incomes.filter(v => v.value).length > 0" elevation="20">
+        <StackLayout verticalAlignment="center">
+          <GridLayout class="m-x-15 m-y-5" rows="auto,auto" columns="*,*">
+            <label row="0" col="0" class="font-weight-bold" textAlignment="center" text="Total"></label>
+            <label row="1" col="0" class="font-weight-bold text-dark-blue summaryStats" :text="`R${incomes.filter(v => v.value).map(v => v.value).reduce(add)}`" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
+            <label row="0" col="1" class="font-weight-bold" textAlignment="center" text="Transactions"></label>
+            <label row="1" col="1" class="font-weight-bold text-dark-blue summaryStats" :text="incomes.filter(v => v.value).map(v => v.count).reduce(add)" :class="{'visible':true}" fontSize="15%" vertialAlignment="center" textAlignment="center"></label>
           </GridLayout>
         </StackLayout>
       </CardView>

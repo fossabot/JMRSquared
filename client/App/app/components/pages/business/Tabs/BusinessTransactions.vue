@@ -4,25 +4,53 @@
       <GridLayout v-show="isLoading" rows="*" columns="*">
         <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
       </GridLayout>
-      <GridLayout v-show="!isLoading" rows="auto,auto,*,auto,auto" columns="*">
-        <label text="We here"></label>
+      <GridLayout v-show="!isLoading" rows="auto,auto,*" columns="*">
+        <CardView row="0" elevation="15">
+          <GridLayout columns="auto,*" class="bg-dark-blue p-15">
+            <Ripple @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
+              <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
+            </Ripple>
+            <label class="p-x-15 text-white" verticalAlignment="center" fontSize="18%" col="1" text="Transaction detail"></label>
+          </GridLayout>
+        </CardView>
+        <StackLayout v-if="currentTransaction" class="m-15" row="1">
+          <GridLayout rows="auto,auto,auto,auto,auto,auto,auto,auto" columns="*,auto">
+            <label class="p-b-5" row="0" col="0" text="Date"></label>
+            <label class="p-b-5" row="0" col="1" :text="getMoment(currentTransaction.date).format('dddd , DD MMMM YYYY')"></label>
+            <label class="p-b-5" row="1" col="0" text="Type"></label>
+            <label class="p-b-5" row="1" col="1" :text="currentTransaction.type == 'MONEYIN' ? 'Deposit' : 'Withdraw'"></label>
+            <label class="p-b-5" row="2" col="0" text="Category"></label>
+            <label class="p-b-5" row="2" col="1" :text="currentTransaction.category"></label>
+            <label class="p-b-5" row="3" col="0" text="Amount"></label>
+            <label class="p-b-5" row="3" col="1" :text="`R${currentTransaction.amount}`"></label>
+            <label class="p-b-5" v-if="currentTransaction.description" row="4" col="0" text="Description"></label>
+            <label class="p-b-5" v-if="currentTransaction.description" :textWrap="true" row="4" col="1" :text="currentTransaction.description"></label>
+            <label class="p-b-5" row="5" col="0" text="Uploaded by"></label>
+            <label class="p-b-5" row="5" col="1" :text="currentTransaction.adminID.userName"></label>
+            <label class="p-b-5" v-if="currentTransaction.client" row="6" col="0" text="From"></label>
+            <label class="p-b-5" v-if="currentTransaction.client" row="6" col="1" :text="currentTransaction.client.userName"></label>
+            <label class="p-b-5" v-if="currentTransaction.monthOfPayment" row="7" col="0" text="Month"></label>
+            <label class="p-b-5" v-if="currentTransaction.monthOfPayment" row="7" col="1" :text="currentTransaction.monthOfPayment"></label>
+          </GridLayout>
+        </StackLayout>
+        <label  v-if="!currentTransaction" row="2" verticalAlignment="center" textAlignment="center" text="Invalid transaction selected."></label>
+        <label v-if="currentTransaction && !currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" text="No image"></label>
+        <ImageZoom v-if="currentTransaction && currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" :src="currentTransaction.proof" maxZoom="5" minZoom="2"></ImageZoom>
       </GridLayout>
     </StackLayout>
     <GridLayout v-if="currentPage == 0" rows="auto,auto,*,auto,auto" columns="*">
-      <CardView row="0" class="p-y-15 m-b-5" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-        <Ripple>
-          <GridLayout rows="auto,auto" columns="auto,*,auto">
-            <Ripple row="0" rowSpan="2" col="2" class="p-10" @tap="logOut()" textAlignmemt="left" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-dots-vertical' | fonticon"></Label>
-            </Ripple>
-            <Image v-if="business.logo" row="0" rowSpan="2" col="0" verticalAlignment="center" width="70" height="70" class="circle p-5" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
-            <Ripple v-if="!business.logo" row="0" rowSpan="2" col="0" borderWidth="5px" width="70" height="70" borderColor="white" verticalAlignment="center" borderRadius="50%">
+      <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+         <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
+              <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
+          </Ripple>
+            <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
+            <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
               <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
             </Ripple>
-            <label row="0" col="0" colSpan="3" fontSize="20" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-mute text-dark-blue" :text="business.name"></label>
-            <Label row="1" col="0" colSpan="3" fontSize="15" verticalAlignment="center" textAlignment="center" :textWrap="true" text="Transactions"></Label>
+            <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" :text="business.name"></label>
+             <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" text="Transactions"></Label>
           </GridLayout>
-        </Ripple>
       </CardView>
   
       <CardView row="1" class="p-15" textAlignment="right" verticalAlignment="center" radius="5" margin="15" elevation="5">

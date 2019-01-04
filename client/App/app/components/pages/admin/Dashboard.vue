@@ -1,18 +1,14 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout rows="auto,auto,*">
-      <CardView row="0" class="m-b-15 p-y-15" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-        <GridLayout rows="auto,auto,auto" columns="auto,*,auto">
-          <Ripple row="0" rowSpan="3" col="2" class="p-10" @tap="logOut()" textAlignmemt="left" verticalAlignment="center" borderRadius="50%">
-            <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-dots-vertical' | fonticon"></Label>
-          </Ripple>
-          <Image row="0" rowSpan="3" col="0" verticalAlignment="center" width="60" height="60" class="m-5 circle" borderWidth="5px" borderColor="white" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%"
-          />
-          <label row="0" verticalAlignment="bottom" col="1" class="h2 m-5 font-weight-bold text-mute text-dark-blue" :text="user.userName"></label>
-          <Label row="1" verticalAlignment="bottom" col="1" class="h3 m-5" :text="user.email"></Label>
+      <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+        <GridLayout class="p-5 bg-dark-blue" rows="auto,auto" columns="auto,*,auto">
+          <Image row="0" rowSpan="2" col="0" verticalAlignment="center" width="70" height="70" class="circle" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%"/>
+          <label row="0" verticalAlignment="center" col="1" fontSize="18%" class="p-x-15 text-white font-weight-bold text-mute" :text="user.userName"></label>
+          <Label row="1" verticalAlignment="center" col="1" fontSize="15%" class="p-x-15 text-white" :text="user.email"></Label>
         </GridLayout>
       </CardView>
-  
+
       <StackLayout class="m-x-15" row="1">
         <GridLayout rows="auto" columns="*">
           <label class="h3 font-weight-bold text-mute text-dark-blue" text="Pick a business or Add new one"></label>
