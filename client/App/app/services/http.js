@@ -282,6 +282,7 @@ export default class API {
             http
                 .getJSON(this.makeGet(`/b/get/transaction/${transactionID}`))
                 .then(result => {
+                    console.log('transaction........', result);
                     resolve(result);
                 })
                 .catch(err => {

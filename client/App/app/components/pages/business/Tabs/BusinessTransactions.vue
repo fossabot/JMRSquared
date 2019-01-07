@@ -33,24 +33,24 @@
             <label class="p-b-5" v-if="currentTransaction.monthOfPayment" row="7" col="1" :text="currentTransaction.monthOfPayment"></label>
           </GridLayout>
         </StackLayout>
-        <label  v-if="!currentTransaction" row="2" verticalAlignment="center" textAlignment="center" text="Invalid transaction selected."></label>
+        <label v-if="!currentTransaction" row="2" verticalAlignment="center" textAlignment="center" text="Invalid transaction selected."></label>
         <label v-if="currentTransaction && !currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" text="No image"></label>
         <ImageZoom v-if="currentTransaction && currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" :src="currentTransaction.proof" maxZoom="5" minZoom="2"></ImageZoom>
       </GridLayout>
     </StackLayout>
     <GridLayout v-if="currentPage == 0" rows="auto,auto,*,auto,auto" columns="*">
       <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-         <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
-              <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
+        <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
+          <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
             <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
           </Ripple>
-            <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
-            <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
-            </Ripple>
-            <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" :text="business.name"></label>
-             <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" text="Transactions"></Label>
-          </GridLayout>
+          <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
+          <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
+          </Ripple>
+          <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" :text="business.name"></label>
+          <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" text="Transactions"></Label>
+        </GridLayout>
       </CardView>
   
       <CardView row="1" class="p-15" textAlignment="right" verticalAlignment="center" radius="5" margin="15" elevation="5">
@@ -65,7 +65,7 @@
           <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
           <StackLayout v-if="!isLoading">
             <CardView v-for="(transaction,i) in transactions.filter(t => transactionShowing == 'All' || (transactionShowing == 'Expenses' && t.type == 'MONEYOUT') || (transactionShowing == 'Incomes' && t.type == 'MONEYIN'))" :key="i" radius="5" margin="1" elevation="5">
-              <Ripple @tap="goToTransaction(transaction)" class="m-x-5">
+              <Ripple :class="{'bg-light-blue':selectedTransaction == transaction._id}" @tap="goToTransaction(transaction)" class="m-x-5">
                 <GridLayout class="m-15" rows="auto,auto,auto" columns="auto,*,auto">
                   <label row="0" col="0" class="font-weight-bold text-mute p-x-5" :text="transaction.category"></label>
                   <Label row="1" col="0" fontSize="18%" class="text-mute" :class="{'text-dark-blue':transaction.type == 'MONEYIN','text-light-red':transaction.type == 'MONEYOUT'}" :text="(transaction.type == 'MONEYIN' ? '+ R' : '- R') + transaction.amount"></Label>
@@ -182,40 +182,40 @@ export default {
         this.business.revenues.values.filter(
           v => v.profit != 0 && v.revenue != 0
         );
-
-      this.summaryStats = revenue_profit;
+      if (revenue_profit) {
+        this.summaryStats = revenue_profit;
+      } else {
+        this.summaryStats = {
+          key: "overall",
+          title: "Overall",
+          profit: 0,
+          revenue: 0
+        };
+      }
     },
     goToTransaction(transaction) {
       if (this.selectedTransaction != transaction._id) {
         this.selectedTransaction = transaction._id;
         return;
       } else {
-        this.currentPage = 1;
         this.isLoading = true;
-        if (this.previousTransactions.find(t => t._id == transaction._id)) {
-          this.currentTransaction = this.previousTransactions.find(
-            t => t._id == transaction._id
-          );
-          this.isLoading = false;
-        } else {
-          this.$api
-            .getTransaction(transaction._id)
-            .then(t => {
-              this.previousTransactions.push(t);
-              this.currentTransaction = t;
-              this.isLoading = false;
-            })
-            .catch(err => {
-              this.$feedback.error({
-                title: "Transaction can not be retrieved",
-                duration: 4000,
-                message: "Please try again later."
-              });
-              this.currentPage = 0;
-              this.currentTransaction = null;
-              this.isLoading = false;
+        this.$api
+          .getTransaction(transaction._id)
+          .then(t => {
+            this.currentTransaction = t;
+            this.currentPage = 1;
+            this.isLoading = false;
+          })
+          .catch(err => {
+            this.$feedback.error({
+              title: "Transaction can not be retrieved",
+              duration: 4000,
+              message: "Please try again later."
             });
-        }
+            this.currentPage = 0;
+            this.currentTransaction = null;
+            this.isLoading = false;
+          });
       }
     },
     changeTransactionShowing() {

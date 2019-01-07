@@ -2,17 +2,17 @@
   <StackLayout>
     <GridLayout rows="auto,*" columns="*">
       <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-          <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
-             <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
+        <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
+          <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
             <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
           </Ripple>
-            <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
-            <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
-            </Ripple>
-            <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" :text="business.name"></label>
-            <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" text="Settings"></Label>
-          </GridLayout>
+          <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
+          <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
+          </Ripple>
+          <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" :text="business.name"></label>
+          <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" text="Settings"></Label>
+        </GridLayout>
       </CardView>
       <CardView row="1" margin="10" elevation="5">
         <ScrollView>
@@ -45,6 +45,17 @@
               <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="setting.description"></label>
               <switch row="0" rowSpan="2" col="2" @checkedChange="changeSetting($event,setting.value,setting._id)" :checked="setting.value"></switch>
             </GridLayout>
+  
+            <StackLayout width="100%" class="hr-light"></StackLayout>
+            <GridLayout class="m-10" rows="auto" columns="*,auto">
+              <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Targets"></label>
+            </GridLayout>
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto" v-for="(target,i) in targets" :key="i">
+              <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + target.icon | fonticon"></Label>
+              <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" :text="target.title"></label>
+              <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="target.description"></label>
+              <switch row="0" rowSpan="2" col="2" @checkedChange="changeTarget($event,target.value,target._id)" :checked="target.value == null"></switch>
+            </GridLayout>
           </StackLayout>
         </ScrollView>
       </CardView>
@@ -64,7 +75,30 @@ export default {
       options: [],
       businessSettings: {
         evidenceRequired: false
-      }
+      },
+      targets: [
+        {
+          _id: "rtergwefqwdfegrehtr",
+          value: null,
+          icon: "calendar-today",
+          title: "Daily target",
+          description: "Money that your partners must log daily"
+        },
+        {
+          _id: "jytrhegwfqwqfegeg5hrewgre",
+          value: 2700,
+          icon: "calendar-range",
+          title: "Weekly target",
+          description: "Money that your partners must log per week"
+        },
+        {
+          _id: "jytrhefwrgfeegwfqwqfegeg5hrewgre",
+          value: null,
+          icon: "calendar-check",
+          title: "Monthly target",
+          description: "Money that your partners must log per month"
+        }
+      ]
     };
   },
   mounted() {
