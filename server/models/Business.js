@@ -28,6 +28,7 @@ const BusinessSchema = new mongoose.Schema({
     logo: String,
     type: Object,
     settings: Array,
+    targets: Array,
     description: String,
     categories: [String],
     transactions: [{
@@ -48,7 +49,7 @@ const BusinessSchema = new mongoose.Schema({
     }
 });
 
-BusinessSchema.methods.findSimilarTypes = function (cb) {
+BusinessSchema.methods.findSimilarTypes = function(cb) {
     return this.model('Animal').find({
         type: this.type
     }, cb);

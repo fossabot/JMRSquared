@@ -7,6 +7,17 @@ const SettingSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
+    targets: [{
+        _id: {
+            type: Schema.Types.ObjectId,
+            default: mongoose.Types.ObjectId()
+        },
+        enable: Boolean,
+        value: Number,
+        icon: String,
+        title: String,
+        description: String
+    }],
     settings: {
         business: [{
             // Deep down it knows it is an enum from ( options.businessTypes.type )
@@ -14,6 +25,7 @@ const SettingSchema = new mongoose.Schema({
                 type: Schema.Types.ObjectId,
                 default: mongoose.Types.ObjectId()
             },
+            toAll: Boolean,
             type: {
                 type: String
             }, // e.g Taxify

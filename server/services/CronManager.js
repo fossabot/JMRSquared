@@ -23,7 +23,7 @@ export default class CronJob {
                         Notification.findById(notificationID).then(notification => {
                             if (notification == null) throw "Scheduled notification does not exist (anymore) , " + notificationID
                             notification.status = "SENT";
-                            notification.save(function (err) {
+                            notification.save(function(err) {
                                 if (err) throw "Unable to save notification status change , " + err.message
                             })
                         }).catch(err => {
@@ -40,7 +40,7 @@ export default class CronJob {
                         Notification.findById(notificationID).then(notification => {
                             if (notification == null) throw "Scheduled notification does not exist (anymore) , " + notificationID
                             notification.status = "SENT";
-                            notification.save(function (err) {
+                            notification.save(function(err) {
                                 if (err) throw "Unable to save notification status change , " + err.message
                             })
                         }).catch(err => {
@@ -64,6 +64,7 @@ export default class CronJob {
         this.resendNotifications();
         this.createIDForStaticFields();
         this.populateBusinessSettings();
+        this.populateBusinessTargets();
     }
 
     // A list of jobs that can be fired.
@@ -113,7 +114,7 @@ export default class CronJob {
                 count++;
             });
 
-            settings.save(function (err) {
+            settings.save(function(err) {
                 if (err) throw err;
                 console.log(`${count} settings got new ids`);
             })
@@ -132,15 +133,12 @@ export default class CronJob {
                     {
                         removed: null
                     }
-                ],
-                'type.type': {
-                    $in: businessSettings.map(v => v.type)
-                }
+                ]
             }).then(businesses => {
                 if (!businesses) throw "Unable to find any business that matches";
                 businessSettings.forEach(businessSetting => {
                     if (!businessSetting.businessIDs) businessSetting.businessIDs = [];
-                    businesses.filter(b => !b.settings || businessSetting.businessIDs.filter(s => s == b._id.toString()).length == 0).forEach(business => {
+                    businesses.filter(b => (businessSetting.type == b.type.type || businessSetting.toAll) && (!b.settings || businessSetting.businessIDs.filter(s => s == b._id.toString()).length == 0)).forEach(business => {
                         if (!business.settings) {
                             business.settings = [];
                         }
@@ -149,21 +147,25 @@ export default class CronJob {
                             ...businessSettingClone
                         } = businessSetting.toObject();
 
+                        if (businessSettingClone.toAll) {
+                            businessSettingClone.type = business.type.type
+                        }
+
                         business.settings.push(businessSettingClone);
-                        business.save(function (err) {
+                        business.save(function(err) {
                             if (err) throw err;
                             Setting.findOne().then(settingsInner => {
                                 var count = 0;
-                                settingsInner.settings.business.filter(bs => bs.type == business.type.type && (!bs.businessIDs || bs.businessIDs.filter(bsID => bsID == business._id).length == 0)).forEach(victim => {
+                                settingsInner.settings.business.filter(bs => (bs.type == business.type.type || bs.toAll) && (!bs.businessIDs || bs.businessIDs.filter(bsID => bsID == business._id).length == 0)).forEach(victim => {
                                     if (!victim.businessIDs) {
                                         victim.businessIDs = []
                                     }
                                     victim.businessIDs.push(business._id);
                                     count++;
                                 });
-                                settingsInner.save(function (errr) {
+                                settingsInner.save(function(errr) {
                                     if (errr) throw errr;
-                                    console.log(`A businesses (${business.type.type}) was linked to ${count} settings.`);
+                                    console.log(`A business (${business.type.type}) was linked to ${count} settings.`);
                                 })
                             });
                         })
@@ -173,6 +175,45 @@ export default class CronJob {
                 console.log('businessGettingError', err)
             });
 
+        });
+    }
+
+    populateBusinessTargets() {
+        Setting.findOne().then(settings => {
+            var targets = settings.targets;
+            targets.filter(t => !t._id).forEach(async t => {
+                t._id = mongoose.Types.ObjectId();
+                console.log("Saving .... " + t._id);
+                await settings.save();
+            });
+
+            Business.find({
+                $or: [{
+                        removed: false
+                    },
+                    {
+                        removed: null
+                    }
+                ]
+            }).then(businesses => {
+                if (!businesses) throw "Unable to find any business that matches";
+                targets.forEach(target => {
+                    businesses.forEach(business => {
+                        if (!business.targets.find(v => v._id == target._id.toString())) {
+                            business.targets.push(target);
+                            business.save(function(err) {
+                                if (err) throw err;
+                                console.log(`A business (${business.name}) got a new target ${target.title}`);
+                            });
+                        }
+                    });
+
+                });
+
+                console.log(`All targets are in sync.`);
+            }).catch(err => {
+                console.log('businessGettingError', err)
+            });
         });
     }
 }
