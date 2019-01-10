@@ -6,9 +6,11 @@ import Admin from "../models/Admin";
 import Business from "../models/Business";
 import Transaction from "../models/Transaction";
 import FCM from "../services/FirebaseManager";
+import CronJob from "../services/CronManager";
+const cronJob = new CronJob();
 const helper = require("../services/Helper");
 
-router.get("/all/for/:userid", function(req, res) {
+router.get("/all/for/:userid", function (req, res) {
     var adminID = req.params.userid;
     Admin.findById(adminID)
         .then(admin => {
@@ -32,7 +34,7 @@ router.get("/all/for/:userid", function(req, res) {
         });
 });
 
-router.get("/get/:business/for/:userid", function(req, res) {
+router.get("/get/:business/for/:userid", function (req, res) {
     var businessID = req.params.business;
     var adminID = req.params.userid;
     Business.findById(businessID)
@@ -69,7 +71,7 @@ router.get("/get/:business/for/:userid", function(req, res) {
         });
 });
 
-router.post("/set/business/:type", function(req, res) {
+router.post("/set/business/:type", function (req, res) {
     var businessID = req.body.businessID;
     var value = req.body.value;
     var type = req.params.type;
@@ -86,7 +88,7 @@ router.post("/set/business/:type", function(req, res) {
                 business.settings.find(s => s._id == settingID).value = value;
 
                 business.markModified("settings");
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send("Business setting successfully saved");
                 });
@@ -108,7 +110,7 @@ router.post("/set/business/:type", function(req, res) {
                 business.targets.find(t => t._id == targetID).enable = enable;
 
                 business.markModified("targets");
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send("Business targets successfully saved");
                 });
@@ -129,7 +131,7 @@ router.post("/set/business/:type", function(req, res) {
                     business.categories.push(value);
                 }
 
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send(`Business ${type} successfully saved`);
                 });
@@ -140,7 +142,7 @@ router.post("/set/business/:type", function(req, res) {
     }
 });
 
-router.get("/get/all/:type/for/:business", function(req, res) {
+router.get("/get/all/:type/for/:business", function (req, res) {
     var businessID = req.params.business;
     var type = req.params.type;
     if (type == "partners") {
@@ -208,7 +210,7 @@ router.get("/get/all/:type/for/:business", function(req, res) {
     }
 });
 
-router.post("/add/business", function(req, res) {
+router.post("/add/business", function (req, res) {
     var adminID = req.body.adminID;
     var adminAuthority = req.body.adminAuthority;
     var _business = req.body.business;
@@ -238,8 +240,10 @@ router.post("/add/business", function(req, res) {
             if (!business.name) {
                 return res.status(512).send("A business name is required");
             }
-            business.save(function(err) {
+            business.save(function (err) {
                 if (err) return res.status(512).send(err);
+                cronJob.populateBusinessSettings();
+                cronJob.populateBusinessTargets();
                 res.send("Business successfully saved");
             });
         })
@@ -248,7 +252,7 @@ router.post("/add/business", function(req, res) {
         });
 });
 
-router.post("/assign/to/business", function(req, res) {
+router.post("/assign/to/business", function (req, res) {
     var adminID = req.body.adminID;
     var adminAuthority = req.body.adminAuthority;
     var businessID = req.body.businessID;
@@ -272,7 +276,7 @@ router.post("/assign/to/business", function(req, res) {
                     assignedBY: assignedBY,
                     authority: adminAuthority && adminAuthority.toUpperCase()
                 });
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send("Client successfully linked to business");
                 });
@@ -284,7 +288,7 @@ router.post("/assign/to/business", function(req, res) {
 });
 
 // This is the newest function to be used
-router.post("/transactions/for/business/:businessId", function(req, res) {
+router.post("/transactions/for/business/:businessId", function (req, res) {
     var businessID = req.params.businessId;
     var existing = req.body.existing;
     if (!existing) existing = [];
@@ -316,7 +320,7 @@ router.post("/transactions/for/business/:businessId", function(req, res) {
         });
 });
 
-router.get("/get/transaction/:transactionID", function(req, res) {
+router.get("/get/transaction/:transactionID", function (req, res) {
     var transactionID = req.params.transactionID;
     Transaction.findById(transactionID)
         .populate("adminID", "userName")
@@ -331,7 +335,7 @@ router.get("/get/transaction/:transactionID", function(req, res) {
         });
 });
 
-router.post("/transaction/add", async function(req, res) {
+router.post("/transaction/add", async function (req, res) {
     var transaction = new Transaction({
         _id: mongoose.Types.ObjectId(),
         adminID: req.body.adminID, //ForeignKey
@@ -360,7 +364,7 @@ router.post("/transaction/add", async function(req, res) {
         !business.categories.find(v => v == transaction.category)
     ) {
         business.categories.push(transaction.category);
-        business.save(function(err) {
+        business.save(function (err) {
             if (err) {
                 return res
                     .status(512)
@@ -382,7 +386,7 @@ router.post("/transaction/add", async function(req, res) {
         }
     }
 
-    transaction.save(function(err) {
+    transaction.save(function (err) {
         if (err) return res.status(512).send(err);
         // TODO : Notify the other admins about this transaction.
         if (business && business.admin) {
