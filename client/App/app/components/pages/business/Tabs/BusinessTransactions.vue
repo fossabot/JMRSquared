@@ -35,7 +35,7 @@
         </StackLayout>
         <label v-if="!currentTransaction" row="2" verticalAlignment="center" textAlignment="center" text="Invalid transaction selected."></label>
         <label v-if="currentTransaction && !currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" text="No image"></label>
-        <ImageZoom v-if="currentTransaction && currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" :src="currentTransaction.proof" maxZoom="5" minZoom="2"></ImageZoom>
+        <ImageZoom v-if="currentTransaction && currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" src="//unsplash.it/600/600" maxZoom="5" minZoom="2"></ImageZoom>
       </GridLayout>
     </StackLayout>
     <GridLayout v-if="currentPage == 0" rows="auto,auto,*,auto,auto" columns="*">
@@ -212,8 +212,6 @@ export default {
               duration: 4000,
               message: "Please try again later."
             });
-            this.currentPage = 0;
-            this.currentTransaction = null;
             this.isLoading = false;
           });
       }

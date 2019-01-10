@@ -50,11 +50,15 @@
             <GridLayout class="m-10" rows="auto" columns="*,auto">
               <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Targets"></label>
             </GridLayout>
-            <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto" v-for="(target,i) in targets" :key="i">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto,auto" v-for="target in targets" :key="target._id">
               <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + target.icon | fonticon"></Label>
               <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" :text="target.title"></label>
-              <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="target.description"></label>
-              <switch row="0" rowSpan="2" col="2" @checkedChange="changeTarget($event,target.value,target._id)" :checked="target.value == null"></switch>
+              <label v-show="!target.enable" colSpan="2" row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="target.description"></label>
+              <TextField v-show="target.enable" row="1" col="1" class="h4 m-x-15" :hint="`How much is the ${ target.title }?`" v-model="target.value" returnKeyType="next" keyboardType="number"></TextField>
+              <Ripple v-show="target.enable" row="1" col="2" @tap="changeTarget(target)" verticalAlignment="center" borderRadius="50%">
+                <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="25%" :text="'mdi-check' | fonticon"></Label>
+              </Ripple>
+              <switch row="0" rowSpan="2" col="3" @checkedChange="changeTarget(target)" v-model="target.enable"></switch>
             </GridLayout>
           </StackLayout>
         </ScrollView>
@@ -80,6 +84,7 @@ export default {
         {
           _id: "rtergwefqwdfegrehtr",
           value: null,
+          enable: false,
           icon: "calendar-today",
           title: "Daily target",
           description: "Money that your partners must log daily"
@@ -87,6 +92,7 @@ export default {
         {
           _id: "jytrhegwfqwqfegeg5hrewgre",
           value: 2700,
+          enable: true,
           icon: "calendar-range",
           title: "Weekly target",
           description: "Money that your partners must log per week"
@@ -94,6 +100,7 @@ export default {
         {
           _id: "jytrhefwrgfeegwfqwqfegeg5hrewgre",
           value: null,
+          enable: false,
           icon: "calendar-check",
           title: "Monthly target",
           description: "Money that your partners must log per month"
@@ -136,9 +143,32 @@ export default {
   },
   props: ["business"],
   methods: {
+    changeTarget(target) {
+      // This is an empty enabled
+      if (target.enable && !target.value) {
+        return;
+      }
+      this.$api
+        .changeBusinessTarget(
+          this.business._id,
+          target._id,
+          target.enable,
+          target.value
+        )
+        .then(changedBusinessTarget => {
+          this.$feedback.success({
+            title: "Your changes are saved."
+          });
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Unable to save your change.",
+            duration: 4000,
+            message: "You have to be connected to the internet"
+          });
+        });
+    },
     changeSetting(event, value, settingsID) {
-      console.log("event", event.value);
-      console.log("value", value);
       if (event.value != value) {
         this.$api
           .changeBusinessSettings(this.business._id, settingsID, event.value)
