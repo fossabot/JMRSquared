@@ -1,44 +1,6 @@
 <template>
   <StackLayout>
-    <StackLayout v-if="currentPage == 1">
-      <GridLayout v-show="isLoading" rows="*" columns="*">
-        <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
-      </GridLayout>
-      <GridLayout v-show="!isLoading" rows="auto,auto,*" columns="*">
-        <CardView row="0" elevation="15">
-          <GridLayout columns="auto,*" class="bg-dark-blue p-15">
-            <Ripple @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
-            </Ripple>
-            <label class="p-x-15 text-white" verticalAlignment="center" fontSize="18%" col="1" text="Transaction detail"></label>
-          </GridLayout>
-        </CardView>
-        <StackLayout v-if="currentTransaction" class="m-15" row="1">
-          <GridLayout rows="auto,auto,auto,auto,auto,auto,auto,auto" columns="*,auto">
-            <label class="p-b-5" row="0" col="0" text="Date"></label>
-            <label class="p-b-5" row="0" col="1" :text="getMoment(currentTransaction.date).format('dddd , DD MMMM YYYY')"></label>
-            <label class="p-b-5" row="1" col="0" text="Type"></label>
-            <label class="p-b-5" row="1" col="1" :text="currentTransaction.type == 'MONEYIN' ? 'Deposit' : 'Withdraw'"></label>
-            <label class="p-b-5" row="2" col="0" text="Category"></label>
-            <label class="p-b-5" row="2" col="1" :text="currentTransaction.category"></label>
-            <label class="p-b-5" row="3" col="0" text="Amount"></label>
-            <label class="p-b-5" row="3" col="1" :text="`R${currentTransaction.amount}`"></label>
-            <label class="p-b-5" v-if="currentTransaction.description" row="4" col="0" text="Description"></label>
-            <label class="p-b-5" v-if="currentTransaction.description" :textWrap="true" row="4" col="1" :text="currentTransaction.description"></label>
-            <label class="p-b-5" row="5" col="0" text="Uploaded by"></label>
-            <label class="p-b-5" row="5" col="1" :text="currentTransaction.adminID.userName"></label>
-            <label class="p-b-5" v-if="currentTransaction.client" row="6" col="0" text="From"></label>
-            <label class="p-b-5" v-if="currentTransaction.client" row="6" col="1" :text="currentTransaction.client.userName"></label>
-            <label class="p-b-5" v-if="currentTransaction.monthOfPayment" row="7" col="0" text="Month"></label>
-            <label class="p-b-5" v-if="currentTransaction.monthOfPayment" row="7" col="1" :text="currentTransaction.monthOfPayment"></label>
-          </GridLayout>
-        </StackLayout>
-        <label v-if="!currentTransaction" row="2" verticalAlignment="center" textAlignment="center" text="Invalid transaction selected."></label>
-        <label v-if="currentTransaction && !currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" text="No image"></label>
-        <ImageZoom v-if="currentTransaction && currentTransaction.proof" row="2" verticalAlignment="center" textAlignment="center" src="//unsplash.it/600/600" maxZoom="5" minZoom="2"></ImageZoom>
-      </GridLayout>
-    </StackLayout>
-    <GridLayout v-if="currentPage == 0" rows="auto,auto,*,auto,auto" columns="*">
+    <GridLayout rows="auto,auto,*,auto,auto" columns="*">
       <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
         <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
           <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
@@ -65,15 +27,14 @@
           <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
           <StackLayout v-if="!isLoading">
             <CardView v-for="(transaction,i) in transactions.filter(t => transactionShowing == 'All' || (transactionShowing == 'Expenses' && t.type == 'MONEYOUT') || (transactionShowing == 'Incomes' && t.type == 'MONEYIN'))" :key="i" radius="5" margin="1" elevation="5">
-              <Ripple :class="{'bg-light-blue':selectedTransaction == transaction._id}" @tap="goToTransaction(transaction)" class="m-x-5">
+              <Ripple @tap="goToTransaction(transaction._id)" class="m-x-5">
                 <GridLayout class="m-15" rows="auto,auto,auto" columns="auto,*,auto">
                   <label row="0" col="0" class="font-weight-bold text-mute p-x-5" :text="transaction.category"></label>
                   <Label row="1" col="0" fontSize="18%" class="text-mute" :class="{'text-dark-blue':transaction.type == 'MONEYIN','text-light-red':transaction.type == 'MONEYOUT'}" :text="(transaction.type == 'MONEYIN' ? '+ R' : '- R') + transaction.amount"></Label>
                   <label v-if="transaction.client && transaction.client.userName" fontSize="15%" row="0" col="1" textAlignment="center" class="h4" :text="transaction.client.userName"></label>
                   <label v-if="transaction.monthOfPayment" row="1" col="1" textAlignment="center" fontSize="15%" :text="transaction.monthOfPayment"></label>
-                  <label v-show="selectedTransaction != transaction._id" row="0" col="2" class="h4 text-mute" :text="getMoment(transaction.date).format('Do MMMM')"></label>
-                  <label v-show="selectedTransaction == transaction._id" row="0" col="2" verticalAlignment="bottom" class="h4 text-mute" :text="getMoment(transaction.date).fromNow()"></label>
-                  <label v-show="selectedTransaction == transaction._id && transaction.description" row="3" col="0" colSpan="3" :textWrap="true" textAlignment="center" verticalAlignment="bottom" class="h4 text-mute" :text="transaction.description"></label>
+                  <label row="0" col="2" verticalAlignment="bottom" class="h4 text-mute" :text="getMoment(transaction.date).fromNow()"></label>
+                  <label v-show="transaction.description" row="3" col="0" colSpan="3" :textWrap="true" textAlignment="center" verticalAlignment="bottom" class="h4 text-mute" :text="transaction.description"></label>
                 </GridLayout>
               </Ripple>
             </CardView>
@@ -123,14 +84,12 @@ const dialogs = require("ui/dialogs");
 export default {
   data() {
     return {
-      currentPage: 0,
       summaryStats: [],
       isLoading: false,
       transactions: [],
       isMainScreen: false,
       isBottomSheetOpen: false,
       selectedScreen: "",
-      selectedTransaction: null,
       transactionShowing: "All",
       previousTransactions: [],
       currentTransaction: null,
@@ -193,29 +152,6 @@ export default {
         };
       }
     },
-    goToTransaction(transaction) {
-      if (this.selectedTransaction != transaction._id) {
-        this.selectedTransaction = transaction._id;
-        return;
-      } else {
-        this.isLoading = true;
-        this.$api
-          .getTransaction(transaction._id)
-          .then(t => {
-            this.currentTransaction = t;
-            this.currentPage = 1;
-            this.isLoading = false;
-          })
-          .catch(err => {
-            this.$feedback.error({
-              title: "Transaction can not be retrieved",
-              duration: 4000,
-              message: "Please try again later."
-            });
-            this.isLoading = false;
-          });
-      }
-    },
     changeTransactionShowing() {
       switch (this.transactionShowing) {
         case "All":
@@ -264,6 +200,11 @@ export default {
     },
     goToStats() {
       this.$emit("changeTab", "Stats");
+    },
+    goToTransaction(transactionID) {
+      this.navigate("/business/transaction", {
+        transactionID: transactionID
+      });
     },
     goToAddTransaction() {
       this.navigate("/business/add/transaction", {

@@ -15,6 +15,7 @@ import BusinessHome from '../components/pages/business/BusinessHome.vue'
 import PartnersList from '../components/pages/business/Components/PartnersList.vue'
 import ExpensesList from '../components/pages/business/Components/ExpensesList.vue'
 import IncomeList from '../components/pages/business/Components/IncomeList.vue'
+import Transaction from '../components/pages/business/Components/Transaction.vue'
 
 // Notifications
 import SendNotification from '../components/pages/notification/SendNotification.vue'
@@ -149,6 +150,17 @@ router.routes = {
     component: IncomeList,
     meta: {
       title: 'Income list',
+      authLevel: 3,
+      source: null
+    },
+    props: true
+  },
+  '/business/transaction': {
+    name: 'Transaction',
+    path: '/business/transaction/:transactionID',
+    component: Transaction,
+    meta: {
+      title: 'Transaction',
       authLevel: 3,
       source: null
     },

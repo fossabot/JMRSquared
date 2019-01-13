@@ -30,6 +30,8 @@
     "nativescript-plugin-firebase": "^7.4.2",
     "nativescript-pulltorefresh": "^2.2.0",
     "nativescript-ripple": "^2.1.0",
+    "nativescript-screenshot": "0.0.2",
+    "nativescript-social-share": "^1.5.1",
     "nativescript-theme-core": "^1.0.4",
     "nativescript-toast": "^1.4.6",
     "nativescript-vue": "^2.0.0",

@@ -30,9 +30,9 @@
             </GridLayout>
   
             <GridLayout v-for="(optional,i) in business.type.optionals" :key="i" class="m-10" rows="auto,auto" columns="auto,*">
-              <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-' + optional.icon | fonticon"></label>
-              <label row="0" col="1" class="h3 font-weight-bold text-mute" :text="optional.title"></label>
-              <label :text="optional.answer" row="1" col="1" class="h4"></label>
+              <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + optional.icon | fonticon"></Label>
+              <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" :text="optional.title"></label>
+              <label row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="optional.answer"></label>
             </GridLayout>
   
             <StackLayout v-if="business.settings.length > 0" width="100%" class="hr-light"></StackLayout>
@@ -46,11 +46,11 @@
               <switch row="0" rowSpan="2" col="2" @checkedChange="changeSetting($event,setting.value,setting._id)" :checked="setting.value"></switch>
             </GridLayout>
   
-            <StackLayout width="100%" class="hr-light"></StackLayout>
-            <GridLayout class="m-10" rows="auto" columns="*,auto">
+            <StackLayout v-if="business.targets.length > 0" width="100%" class="hr-light"></StackLayout>
+            <GridLayout v-if="business.targets.length > 0" class="m-10" rows="auto" columns="*,auto">
               <label row="0" col="0" class="h3 font-weight-bold text-mute text-dark-blue" text="Targets"></label>
             </GridLayout>
-            <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto,auto" v-for="target in targets" :key="target._id">
+            <GridLayout class="m-10" rows="auto,auto" columns="auto,*,auto,auto" v-for="(target,i) in targets" :key="i">
               <Label row="0" rowSpan="2" col="0" fontSize="25%" verticalAlignment="center" borderRadius="50%" textAlignment="center" class="h2 mdi" :text="'mdi-' + target.icon | fonticon"></Label>
               <label row="0" col="1" class="p-x-15 h3 font-weight-bold text-mute" :text="target.title"></label>
               <label v-show="!target.enable" colSpan="2" row="1" col="1" :textWrap="true" class="p-x-15 h4 text-mute" :text="target.description"></label>
@@ -80,32 +80,7 @@ export default {
       businessSettings: {
         evidenceRequired: false
       },
-      targets: [
-        {
-          _id: "rtergwefqwdfegrehtr",
-          value: null,
-          enable: false,
-          icon: "calendar-today",
-          title: "Daily target",
-          description: "Money that your partners must log daily"
-        },
-        {
-          _id: "jytrhegwfqwqfegeg5hrewgre",
-          value: 2700,
-          enable: true,
-          icon: "calendar-range",
-          title: "Weekly target",
-          description: "Money that your partners must log per week"
-        },
-        {
-          _id: "jytrhefwrgfeegwfqwqfegeg5hrewgre",
-          value: null,
-          enable: false,
-          icon: "calendar-check",
-          title: "Monthly target",
-          description: "Money that your partners must log per month"
-        }
-      ]
+      targets: []
     };
   },
   mounted() {
@@ -140,6 +115,8 @@ export default {
       },
       icon: "trending-up"
     });
+
+    this.targets = JSON.parse(JSON.stringify(this.business.targets));
   },
   props: ["business"],
   methods: {
