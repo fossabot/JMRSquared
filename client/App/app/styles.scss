@@ -1,0 +1,147 @@
+// NativeScript core theme
+// @see https://docs.nativescript.org/ui/theme
+@import '~nativescript-theme-core/scss/skins/purple/index';
+@import '~nativescript-theme-core/scss/index';
+// Global SCSS styling
+// @see https://docs.nativescript.org/ui/styling
+@import 'assets/variables';
+
+CardView {
+  border: 5px solid #0093a4;
+}
+
+.fab-button {
+  height: 55;
+  width: 55; /// this is required on iOS - Android does not require width so you might need to adjust styles 
+  background-color: $blueDarkColor;
+  horizontal-align: right;
+  align-content: flex-end;
+  align-self: flex-end;
+  margin: 20;
+  vertical-align: bottom;
+}
+
+.faded-blue {
+  background: linear-gradient(to bottom right, #eeeeee, #0093a4, #0093a4, #eeeeee);
+}
+
+.bgBlueDark {
+  background-color: $blueDarkColor;
+}
+
+.page {
+  background: $greyColor;
+}
+
+.mdi {
+  font-family: "Material Design Icons",
+    "materialdesignicons";
+}
+
+.smallText {
+  font-size: 12.5em;
+}
+
+.tinyText {
+  font-size: 8.5em;
+}
+
+.smallTitle {
+  text-decoration-color: $blueColor;
+  text-decoration: underline;
+}
+
+.iconPic {
+  vertical-align: middle;
+  text-align: center;
+  font-size: 100;
+}
+
+.activeText {
+  color: $blueLightColor;
+}
+
+.bg-grey {
+  background-color: #aaaaaa;
+}
+
+.chip-selected {
+  background-color: #9E9E9E;
+}
+
+.bg-light-blue {
+  background-color: $blueColor;
+}
+
+.bg-dark-blue {
+  background-color: $blueDarkColor;
+}
+
+.bg-light-green {
+  background-color: $greenColor;
+}
+
+.bg-light-red {
+  background-color: $redColor;
+}
+
+.text-light-blue {
+  color: $blueColor;
+}
+
+.text-dark-blue {
+  color: $blueDarkColor;
+}
+
+.text-light-red {
+  color: $redColor;
+}
+
+.text-light-green {
+  color: $greenColor;
+}
+
+.text-white {
+  color: white;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.circle {
+  position: relative;
+  border-radius: 50%;
+  width: 25%;
+  height: auto;
+}
+
+.bottom-line-red {
+  border-bottom-color: $redColor;
+  border-bottom-width: 5px;
+}
+
+.bottom-line-blue {
+  border-bottom-color: $blueColor;
+  border-bottom-width: 8px;
+}
+
+.m-top-5 {
+  margin-top: -5px;
+  z-index: 99;
+}
+
+.m-top-10 {
+  margin-top: -10px;
+  z-index: 99;
+}
+
+.m-top-15 {
+  margin-top: -15px;
+  z-index: 99;
+}
+
+.m-top-20 {
+  margin-top: -20px;
+  z-index: 99;
+}

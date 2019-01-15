@@ -35,6 +35,12 @@ import TaxifyTransactions from '../components/Taxify/TaxifyTransactions.vue'
 import CosmeticsHome from '../components/Cosmetics/CosmeticsHome.vue'
 import CosmeticsTransactions from '../components/Cosmetics/CosmeticsTransactions.vue'
 
+// Business
+import AddBusiness from '../components/Business/AddBusiness.vue'
+import AddPartner from '../components/Business/AddPartner.vue'
+import BusinessHome from '../components/Business/BusinessHome.vue'
+import PartnersList from '../components/Modals/PartnersList.vue'
+
 const http = require("http");
 
 import store from '../store';
@@ -253,6 +259,54 @@ const router = new VueRouter({
         authLevel: 1
       },
     },
+    /**
+     * Business stuff START
+     */
+    {
+      name: 'AddBusiness',
+      path: '/business/add/business',
+      component: AddBusiness,
+      meta: {
+        title: 'Add Business',
+        authLevel: 3,
+        source: null
+      },
+    },
+    {
+      name: 'AddPartner',
+      path: '/business/add/partner/:businessId/:businessName',
+      component: AddPartner,
+      meta: {
+        title: 'Add Partner',
+        authLevel: 3,
+        source: null
+      },
+      props: true
+    },
+    {
+      name: 'BusinessHome',
+      path: '/business/home/:businessID',
+      component: BusinessHome,
+      meta: {
+        title: 'Business Home',
+        authLevel: 3,
+        source: null
+      },
+      props: true
+    }, {
+      name: 'PartnersList',
+      path: '/business/partners/list/:businessID/:businessName',
+      component: PartnersList,
+      meta: {
+        title: 'Partners list',
+        authLevel: 3,
+        source: null
+      },
+      props: true
+    },
+    /**
+     * Business stuff END
+     */
     {
       path: '*',
       redirect: '/home'
@@ -272,6 +326,11 @@ router.beforeEach((to, from, next) => {
     authLevel = appSettings.getString(store.state.cache.adminLoggedInString) != null ? -1 : -2;
     appSettings.setNumber("authLevel", authLevel);
   }
+
+  // feedback.error({
+  //   title: "Your level " + authLevel,
+  //   message: "You have permissions to access " + store.state.cache.cachedAdmin.role + " only ... Trying to access " + to.meta.authLevel + " " + to.name
+  // });
 
   switch (to.meta.authLevel) {
     case 1:

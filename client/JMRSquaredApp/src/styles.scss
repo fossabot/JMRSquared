@@ -6,8 +6,8 @@
 // @see https://docs.nativescript.org/ui/styling
 @import 'assets/variables';
 
-CardView{
-  border:5px solid #0093a4;
+CardView {
+  border: 5px solid #0093a4;
 }
 
 .fab-button {
@@ -16,20 +16,20 @@ CardView{
   background-color: $blueDarkColor;
   horizontal-align: right;
   align-content: flex-end;
-  align-self: flex-end;  
-  margin:20;
-  vertical-align: bottom; 
+  align-self: flex-end;
+  margin: 20;
+  vertical-align: bottom;
 }
 
-.bgBlueDark{
+.bgBlueDark {
   background-color: $blueDarkColor;
 }
 
-.page{
-    background:$greyColor;
+.page {
+  background: $greyColor;
 }
 
-.fa{
+.fa {
   font-family: "FontAwesome";
 }
 
@@ -37,83 +37,110 @@ CardView{
   font-family: "Material Icons", "MaterialIcons-Regular";
 }
 
-.smallText{
-  font-size:12.5em;
+.smallText {
+  font-size: 12.5em;
 }
 
-.tinyText{
-  font-size:8.5em;
+.tinyText {
+  font-size: 8.5em;
 }
 
-.smallTitle{
-  text-decoration-color:$blueColor; 
+.smallTitle {
+  text-decoration-color: $blueColor;
   text-decoration: underline;
 }
 
-.iconPic{
+.iconPic {
   vertical-align: middle;
   text-align: center;
   font-size: 100;
 }
 
-.activeText{
-  color:$blueLightColor;
+.activeText {
+  color: $blueLightColor;
 }
 
-.bg-grey{
-  background-color:#aaaaaa;
+.bg-grey {
+  background-color: #aaaaaa;
 }
 
-.chip-selected{
-  background-color:#9E9E9E;
+.chip-selected {
+  background-color: #9E9E9E;
 }
 
-.bg-light-blue{
+.bg-light-blue {
   background-color: $blueColor;
 }
 
-.bg-dark-blue{
+.bg-dark-blue {
   background-color: $blueDarkColor;
 }
 
-.bg-light-green{
+.bg-light-green {
   background-color: $greenColor;
 }
 
-.bg-light-red{
-  background-color:$redColor;
+.bg-light-red {
+  background-color: $redColor;
 }
 
-.text-light-blue{
-  color:$blueColor;
+.text-light-blue {
+  color: $blueColor;
 }
 
-.text-dark-blue{
-  color:$blueDarkColor;
+.text-dark-blue {
+  color: $blueDarkColor;
 }
 
-.text-light-red{
-  color:$redColor;
+.text-light-red {
+  color: $redColor;
 }
 
-.text-light-green{
-  color:$greenColor;
+.text-light-green {
+  color: $greenColor;
 }
 
-.text-white{
-  color:white;
+.text-white {
+  color: white;
 }
 
-.bg-white{
-  background-color:white;
+.bg-white {
+  background-color: white;
 }
 
-.bottom-line-red{
+.circle {
+  position: relative;
+  border-radius: 50%;
+  width: 25%;
+  height: auto;
+}
+
+.bottom-line-red {
   border-bottom-color: $redColor;
-  border-bottom-width:  5px;
+  border-bottom-width: 5px;
 }
 
-.bottom-line-blue{
+.bottom-line-blue {
   border-bottom-color: $blueColor;
-  border-bottom-width:  8px;
+  border-bottom-width: 8px;
+}
+
+.m-top-5 {
+  margin-top: -5px;
+  z-index: 99;
+}
+
+.m-top-10 {
+  margin-top: -10px;
+  z-index: 99;
+}
+
+.m-top-15 {
+  margin-top: -15px;
+  z-index: 99;
+}
+
+.m-top-20 {
+  margin-top: -20px;
+  z-index: 99;
 }

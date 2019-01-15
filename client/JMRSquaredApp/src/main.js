@@ -9,6 +9,7 @@ import {
 } from "nativescript-couchbase";
 
 import moment from "moment";
+var approximateNumber = require('./lib/approximate-number');
 
 import "./styles.scss";
 
@@ -58,10 +59,16 @@ Vue.registerElement(
   () => require("nativescript-floatingactionbutton").Fab
 );
 
+Vue.registerElement(
+  "DropDown",
+  () => require("nativescript-drop-down//drop-down").DropDown
+);
+
 Vue.filter("fonticon", fonticon);
 
 Vue.prototype.$db = new Couchbase("jmrdb");
 Vue.prototype.$feedback = new Feedback();
+Vue.prototype.$approx = approximateNumber;
 
 const dialogs = require("ui/dialogs");
 
@@ -76,6 +83,13 @@ Vue.mixin({
       isLoading: false,
       toggleSearch: false
     };
+  },
+  computed: {
+    adminProfile: {
+      get() {
+        return this.$store.state.cache.cachedAdmin;
+      }
+    },
   },
   methods: {
     showChangeLog() {
