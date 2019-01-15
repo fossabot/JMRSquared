@@ -114,10 +114,11 @@ export default {
     },
     onPinch(args) {
       var value = this.z;
-      if (args.scale > 1) {
-        this.onZoomIn(value++);
-      } else {
-        this.onZoomOut(value--);
+      console.log("state", args.state);
+      if (args.scale > 0 && args.state) {
+        this.onZoomIn((value += args.scale * 2));
+      } else if (args.scale > 0 && !args.state) {
+        this.onZoomOut((value -= args.scale * 2));
       }
     },
     onPan(args) {
