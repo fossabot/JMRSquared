@@ -59,6 +59,12 @@ router.get("/get/:business/for/:userid", function (req, res) {
                         date: new Date(),
                         values: revenues
                     };
+
+                    const targets = helper.GetTransactionBusinessTargetsFromTransactions(business.targets, transactions);
+                    returnedBusiness.targets = {
+                        date: new Date(),
+                        values: targets
+                    };
                     return res.json(returnedBusiness);
                 })
                 .catch(err => {

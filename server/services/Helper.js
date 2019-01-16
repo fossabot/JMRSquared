@@ -17,6 +17,31 @@ helper.makePayload = function (title = "Title", body = "This is the body", data 
     }
 }
 
+helper.GetTransactionBusinessTargetsFromTransactions = function (targets, transactions) {
+    if (!transactions) transactions = [];
+    if (!targets) targets = [];
+
+    var mappedTargets = targets.filter(v => v.enable && v.value).map(target => {
+        var mappedTargets = {
+            title: '',
+            value: 0
+        };
+        if (target.title && target.title.toLowerCase().indexOf('monthly') >= 0) {
+            mappedTargets.title = `Amount due on ${moment().endOf('month').format('Do MMMM YYYY')}`
+            mappedTargets.value = transactions.filter(t => moment().endOf('month').diff(t.date, 'months') == 0).reduce((a, b) => a + b, 0);
+        } else if (target.title && target.title.toLowerCase().indexOf('weekly') >= 0) {
+            mappedTargets.title = `Amount due this week on ${moment().endOf('week').format('dddd')} the ${moment().endOf('week').format('Do')} `
+            mappedTargets.value = transactions.filter(t => moment().endOf('week').diff(t.date, 'week') == 0).reduce((a, b) => a + b, 0);
+        } else if (target.title && target.title.toLowerCase().indexOf('daily') >= 0) {
+            mappedTargets.title = `Amount due today ${moment().endOf('day').format('Do MMMM')}`
+            mappedTargets.value = transactions.filter(t => moment().endOf('week').diff(t.date, 'week') == 0).reduce((a, b) => a + b, 0);
+        }
+        mappedTargets.value = target.value - mappedTargets.value;
+        return mappedTargets;
+    });
+    return mappedTargets;
+}
+
 helper.GetTransactionProfitAndRevenue = function (transactions, maxMonths = 5, maxWeeks = 3, maxDays = 3) {
     var revenues = [];
     if (!transactions) transactions = [];
