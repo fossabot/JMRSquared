@@ -60,10 +60,10 @@ router.get("/get/:business/for/:userid", function (req, res) {
                         values: revenues
                     };
 
-                    const targets = helper.GetTransactionBusinessTargetsFromTransactions(business.targets, transactions);
-                    returnedBusiness.targets = {
+                    const currentTargets = helper.GetTransactionBusinessTargetsFromTransactions(business.targets, transactions);
+                    returnedBusiness.currentTargets = {
                         date: new Date(),
-                        values: targets
+                        values: currentTargets
                     };
                     return res.json(returnedBusiness);
                 })
