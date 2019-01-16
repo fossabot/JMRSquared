@@ -179,13 +179,11 @@ export default class CronJob {
     }
 
     populateBusinessTargets() {
-        Setting.findOne().then(settings => {
+        Setting.findOne().then(async settings => {
             var targets = settings.targets;
-            targets.filter(t => !t._id).forEach(async t => {
-                t._id = mongoose.Types.ObjectId();
-                console.log("Saving .... " + t._id);
+            if (targets.find(t => !t._id)) {
                 await settings.save();
-            });
+            }
 
             Business.find({
                 $or: [{
