@@ -22,22 +22,22 @@ helper.GetTransactionBusinessTargetsFromTransactions = function (targets, transa
     if (!targets) targets = [];
 
     var mappedTargets = targets.filter(v => v.enable && v.value).map(target => {
-        var mappedTargets = {
+        var mappedTarget = {
             title: '',
             value: 0
         };
         if (target.title && target.title.toLowerCase().indexOf('monthly') >= 0) {
-            mappedTargets.title = `Amount due on ${moment().endOf('month').format('Do MMMM YYYY')}`
-            mappedTargets.value = transactions.filter(t => moment().endOf('month').diff(t.date, 'months') == 0).reduce((a, b) => a + b, 0);
+            mappedTarget.title = `Amount due on ${moment().endOf('month').format('Do MMMM YYYY')}`
+            mappedTarget.value = transactions.filter(t => moment().endOf('month').diff(t.date, 'months') == 0).reduce((a, b) => a + b, 0);
         } else if (target.title && target.title.toLowerCase().indexOf('weekly') >= 0) {
-            mappedTargets.title = `Amount due this week on ${moment().endOf('week').format('dddd')} the ${moment().endOf('week').format('Do')} `
-            mappedTargets.value = transactions.filter(t => moment().endOf('week').diff(t.date, 'week') == 0).reduce((a, b) => a + b, 0);
+            mappedTarget.title = `Amount due this week on ${moment().endOf('week').format('dddd')} the ${moment().endOf('week').format('Do')} `
+            mappedTarget.value = transactions.filter(t => moment().endOf('week').diff(t.date, 'week') == 0).reduce((a, b) => a + b, 0);
         } else if (target.title && target.title.toLowerCase().indexOf('daily') >= 0) {
-            mappedTargets.title = `Amount due today ${moment().endOf('day').format('Do MMMM')}`
-            mappedTargets.value = transactions.filter(t => moment().endOf('week').diff(t.date, 'week') == 0).reduce((a, b) => a + b, 0);
+            mappedTarget.title = `Amount due today ${moment().endOf('day').format('Do MMMM')}`
+            mappedTarget.value = transactions.filter(t => moment().endOf('week').diff(t.date, 'week') == 0).reduce((a, b) => a + b, 0);
         }
-        mappedTargets.value = target.value - mappedTargets.value;
-        return mappedTargets;
+        mappedTarget.value = target.value - mappedTarget.value;
+        return mappedTarget;
     });
     return mappedTargets;
 }
