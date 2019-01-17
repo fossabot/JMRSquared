@@ -22,11 +22,14 @@ router.get("/all/for/:userid", function (req, res) {
                 "admin.id": adminID
             }, {
                 logo: 0,
-                transactions: 0
+                transactions: 0,
+                settings:0,
+                categories:0,
+                targets:0
             }).then(businesses => {
                 if (businesses == null)
                     return res.status(512).send("Error : 9032rtu834g9erbo");
-                res.json(businesses);
+     res.json(businesses);
             });
         })
         .catch(err => {
@@ -37,18 +40,21 @@ router.get("/all/for/:userid", function (req, res) {
 router.get("/get/:business/for/:userid", function (req, res) {
     var businessID = req.params.business;
     var adminID = req.params.userid;
-    Business.findById(businessID)
+    Business.findById(businessID,'-logo')
         .populate("admin.id", "_id userName fullName")
         .then(business => {
             if (business == null)
                 return res.status(512).send("The requested business is not avaliable");
-            if (!business.admin || !business.admin.find(a => a.id._id == adminID)) {
+            if (!business.admin || !business.admin.some(a => a.id._id == adminID)) {
                 return res
                     .status(512)
                     .send("You are not part of the requested business");
             }
+              console.time('Counter');
+  
             Transaction.find({
-                        businessID: businessID
+                        businessID: businessID,
+                         removed: false
                     },
                     "-proof"
                 )
@@ -65,7 +71,8 @@ router.get("/get/:business/for/:userid", function (req, res) {
                         date: new Date(),
                         values: currentTargets
                     };
-                    return res.json(returnedBusiness);
+                    console.timeEnd('Counter')
+           return res.json(returnedBusiness);
                 })
                 .catch(err => {
                     console.log("err", err);
@@ -84,7 +91,13 @@ router.post("/set/business/:type", function (req, res) {
 
     if (type == "settings") {
         var settingID = req.body.settingID;
-        Business.findById(businessID)
+        Business.findById(businessID,
+         {
+                logo: 0,
+                transactions: 0,
+                categories:0,
+                targets:0
+            })
             .then(business => {
                 if (!business)
                     return res
@@ -105,7 +118,12 @@ router.post("/set/business/:type", function (req, res) {
     } else if (type == "target") {
         var targetID = req.body.targetID;
         var enable = req.body.enable;
-        Business.findById(businessID)
+        Business.findById(businessID, {
+                logo: 0,
+                transactions: 0,
+                settings:0,
+                categories:0,
+            })
             .then(business => {
                 if (!business)
                     return res
@@ -126,7 +144,13 @@ router.post("/set/business/:type", function (req, res) {
             });
     } else {
         value = value && value[0].toUpperCase() + value.slice(1).toLowerCase();
-        Business.findById(businessID)
+        Business.findById(businessID,
+         {
+                logo: 0,
+                transactions: 0,
+                settings:0,
+                targets:0
+            })
             .then(business => {
                 if (!business)
                     return res
@@ -152,7 +176,14 @@ router.get("/get/all/:type/for/:business", function (req, res) {
     var businessID = req.params.business;
     var type = req.params.type;
     if (type == "partners") {
-        Business.findById(businessID)
+        Business.findById(businessID,
+             {
+                logo: 0,
+                transactions: 0,
+                settings:0,
+                categories:0,
+                targets:0
+        })
             .populate("admin.id", "-deviceTokens")
             .then(business => {
                 if (business == null)
@@ -178,7 +209,7 @@ router.get("/get/all/:type/for/:business", function (req, res) {
                 transactions
                     .filter(t => t.type == type)
                     .forEach(transaction => {
-                        if (!returnOBJs.find(r => r.title == transaction.category)) {
+                        if (!returnOBJs.some(r => r.title == transaction.category)) {
                             returnOBJs.push({
                                 title: transaction.category,
                                 value: Number(transaction.amount),
@@ -191,7 +222,12 @@ router.get("/get/all/:type/for/:business", function (req, res) {
                             returnOBJs.find(r => r.title == transaction.category).count += 1;
                         }
                     });
-                Business.findById(businessID)
+                Business.findById(businessID, {
+                logo: 0,
+                transactions: 0,
+                settings:0,
+                targets:0
+            })
                     .then(business => {
                         business.categories
                             .filter(v => !returnOBJs.find(t => t.title == v))
@@ -274,7 +310,13 @@ router.post("/assign/to/business", function (req, res) {
                     .status(512)
                     .send("Admin of id " + adminID + " does not exist");
 
-            Business.findById(businessID).then(business => {
+            Business.findById(businessID, {
+                logo: 0,
+                transactions: 0,
+                settings:0,
+                categories:0,
+                targets:0
+            }).then(business => {
                 if (business == null)
                     return res.status(512).send("Error : 9032rtu834g9erbo");
                 business.admin.push({
@@ -306,6 +348,7 @@ router.post("/transactions/for/business/:businessId", function (req, res) {
             },
             "-proof"
         )
+        .sort({date:-1})
         .populate("adminID", "userName")
         .populate("client", "userName")
         .then(transactions => {
@@ -313,13 +356,7 @@ router.post("/transactions/for/business/:businessId", function (req, res) {
                 res.status(500);
                 res.send("Error : 9032rtu834g9erbo");
             }
-            console.log("Got " + transactions.length + " transactions");
-            transactions.reverse();
-            const revenues = helper.GetTransactionProfitAndRevenue(transactions);
-            res.json({
-                transactions,
-                revenues
-            });
+            res.json(transactions);
         })
         .catch(err => {
             res.send(err);
@@ -361,7 +398,12 @@ router.post("/transaction/add", async function (req, res) {
         transaction.category[0].toUpperCase() +
         transaction.category.slice(1).toLowerCase();
 
-    var business = await Business.findById(transaction.businessID);
+    var business = await Business.findById(transaction.businessID, {
+                logo: 0,
+                transactions: 0,
+                settings:0,
+                targets:0
+            });
     if (!business) {
         return res.status(512).send("The provided business is not avaliable");
     }
