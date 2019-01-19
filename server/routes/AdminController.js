@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const auth = require('../config/auth');
 
 import mongoose from "mongoose";
 // import the models
@@ -20,7 +21,7 @@ const helper = require('../services/Helper');
                 - 
 */
 
-router.get("/all", function (req, res) {
+router.get("/all", auth.required, (req, res, next) => {
     Admin.find()
         .populate(["documents"])
         .populate(["notifications"])
@@ -49,7 +50,7 @@ router.get("/GetById/:adminID", function (req, res) {
         });
 });
 
-router.post("/login", function (req, res) {
+router.post("/login", auth.required, (req, res, next) => {
     if (req.body.useEmail) {
         Admin.findOne({
                 email: req.body.email,
