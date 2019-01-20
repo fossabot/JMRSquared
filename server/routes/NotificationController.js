@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 import mongoose from "mongoose";
+const auth = require('../config/auth');
 
 // import the models
 import Notification from "../models/Notification";
@@ -148,8 +149,8 @@ router.get("/get/new/for/:userId/business/:businessID", function (req, res) {
         });
       });
       res.json(notifications);
-    }).catch(err=>{
-     return res.status(514).json(err.message);
+    }).catch(err => {
+      return res.status(514).json(err.message);
     });
 });
 

@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const auth = require('../config/auth');
 import mongoose from "mongoose";
 
 import Setting from "../models/Setting";
