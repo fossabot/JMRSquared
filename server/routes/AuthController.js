@@ -18,19 +18,11 @@ router.post('/register', auth.disabled, (req, res, next) => {
     } = req;
 
     if (!user.email) {
-        return res.status(422).json({
-            errors: {
-                email: 'is required',
-            },
-        });
+        return res.status(512).send("An email is required.");
     }
 
     if (!user.password) {
-        return res.status(422).json({
-            errors: {
-                password: 'is required',
-            },
-        });
+        return res.status(512).send("A password is required.");
     }
 
     const finalUser = new User(user);
@@ -44,7 +36,7 @@ router.post('/register', auth.disabled, (req, res, next) => {
                 session: false
             }, (err, passportUser, info) => {
                 if (err) {
-                    return next(err);
+                    return res.status(512).send("The invalid login details");
                 }
 
                 if (user.adminID) {
@@ -82,31 +74,23 @@ router.post('/login', auth.disabled, (req, res, next) => {
     } = req;
 
     if (!user.email) {
-        return res.status(422).json({
-            errors: {
-                email: 'is required',
-            },
-        });
+        return res.status(512).send("An email is required.");
     }
 
     if (!user.password) {
-        return res.status(422).json({
-            errors: {
-                password: 'is required',
-            },
-        });
+        return res.status(512).send("A password is required.");
     }
 
     return passport.authenticate('local', {
         session: false
     }, (err, passportUser, info) => {
         if (err) {
-            return next(err);
+            return res.status(512).send("The invalid login details");
         }
-
+        console.log('user', user.adminID)
         if (user.adminID) {
-            Admin.findById(user.adminID).then(user => {
-                if (user.removed) {
+            Admin.findById(user.adminID, 'removed').then(_user => {
+                if (_user.removed) {
                     return res.status(512).send("The user is currently removed");
                 } else {
                     if (passportUser) {

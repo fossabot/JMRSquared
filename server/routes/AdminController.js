@@ -10,6 +10,7 @@ import Transaction from "../models/Transaction";
 import Bug from "../models/Bug";
 import Rent from "../models/Rent";
 import Student from "../models/Student";
+import User from "../models/User";
 const helper = require('../services/Helper');
 
 /*
@@ -28,6 +29,24 @@ router.get("/all", auth.required, (req, res, next) => {
         .then(admins => {
             if (admins == null) res.send("Error : 9032rtu834g9erbo");
             res.json(admins);
+        });
+});
+
+router.post("/block/user/:adminID", auth.required, (req, res, next) => {
+    var adminID = req.params.adminID;
+    Admin.findById(adminID)
+        .then(admin => {
+            if (admin == null) res.status(512).send("User not found");
+            admin.removed = true;
+            admin.save(function () {
+                User.deleteMany({
+                    adminID: admin._id
+                }).then(t => {
+                    res.send("Removed the user.");
+                }).catch(err => {
+                    res.status(512).send(err.message);
+                });
+            })
         });
 });
 
