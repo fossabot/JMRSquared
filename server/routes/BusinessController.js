@@ -172,7 +172,7 @@ router.post("/set/business/:type", auth.required, (req, res, next) => {
     }
 });
 
-router.get("/get/all/:type/for/:business", function (req, res) {
+router.get("/get/all/:type/for/:business", auth.required, (req, res, next) => {
     var businessID = req.params.business;
     var type = req.params.type;
     if (type == "partners") {
@@ -251,7 +251,7 @@ router.get("/get/all/:type/for/:business", function (req, res) {
     }
 });
 
-router.post("/add/business", function (req, res) {
+router.post("/add/business", auth.required, (req, res, next) => {
     var adminID = req.body.adminID;
     var adminAuthority = req.body.adminAuthority;
     var _business = req.body.business;
@@ -293,7 +293,7 @@ router.post("/add/business", function (req, res) {
         });
 });
 
-router.post("/assign/to/business", function (req, res) {
+router.post("/assign/to/business", auth.required, (req, res, next) => {
     var adminID = req.body.adminID;
     var adminAuthority = req.body.adminAuthority;
     var businessID = req.body.businessID;
@@ -335,7 +335,7 @@ router.post("/assign/to/business", function (req, res) {
 });
 
 // This is the newest function to be used
-router.post("/transactions/for/business/:businessId", function (req, res) {
+router.post("/transactions/for/business/:businessId", auth.required, (req, res, next) => {
     var businessID = req.params.businessId;
     var existing = req.body.existing;
     if (!existing) existing = [];
@@ -364,7 +364,7 @@ router.post("/transactions/for/business/:businessId", function (req, res) {
         });
 });
 
-router.get("/get/transaction/:transactionID", function (req, res) {
+router.get("/get/transaction/:transactionID", auth.required, (req, res, next) => {
     var transactionID = req.params.transactionID;
     Transaction.findById(transactionID)
         .populate("adminID", "userName")
@@ -379,7 +379,7 @@ router.get("/get/transaction/:transactionID", function (req, res) {
         });
 });
 
-router.post("/transaction/add", async function (req, res) {
+router.post("/transaction/add", auth.required, async (req, res, next) => {
     var transaction = new Transaction({
         _id: mongoose.Types.ObjectId(),
         adminID: req.body.adminID, //ForeignKey
