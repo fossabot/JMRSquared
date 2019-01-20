@@ -69,7 +69,7 @@ router.get("/GetById/:adminID", function (req, res) {
         });
 });
 
-router.post("/login", auth.required, (req, res, next) => {
+router.post("/login", auth.disabled, (req, res, next) => {
     if (req.body.useEmail) {
         Admin.findOne({
                 email: req.body.email,
