@@ -1,5 +1,5 @@
 var admin = require("firebase-admin");
-var helper = require("./Helper");
+import helper from '../services/Helper';
 
 var serviceAccount = require("../firebase_service_account.json");
 
@@ -50,7 +50,7 @@ class FCM {
                     }
                 })
                 .catch(function (error) {
-                    if (error.filter(e => JSON.stringify(e.error).indexOf("The provided registration token is not registered") >= 0)) {
+                    if (error.filter && error.filter(e => JSON.stringify(e.error).indexOf("The provided registration token is not registered") >= 0)) {
                         Admin.findOne({
                             deviceTokens: {
                                 $elemMatch: {

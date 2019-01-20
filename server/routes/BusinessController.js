@@ -9,7 +9,7 @@ import Transaction from "../models/Transaction";
 import FCM from "../services/FirebaseManager";
 import CronJob from "../services/CronManager";
 const cronJob = new CronJob();
-const helper = require("../services/Helper");
+import helper from '../services/Helper';
 
 router.get("/all/for/:userid", auth.required, (req, res, next) => {
     var adminID = req.params.userid;

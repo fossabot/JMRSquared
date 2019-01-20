@@ -1,36 +1,25 @@
-import User from "../models/User";
+import Admin from "../models/Admin";
 const jwt = require('express-jwt');
-const getTokenFromHeaders = async (req) => {
+
+function getTokenFromHeaders(req) {
     const {
         headers: {
             authorization,
-            CurrentUserID
+            currentuserid
         }
     } = req;
 
     if (authorization && authorization.split(' ')[0] === 'Token') {
-        if (!CurrentUserID) {
-            return authorization.split(' ')[1];
-        } else {
-            try {
-                var user = await Admin.findById(CurrentUserID);
-                if (!user || user.removed) {
-                    throw new Error("User is removed");
-                }
-                return authorization.split(' ')[1];
-            } catch (err) {
-                return null;
-            }
-        }
+        return authorization.split(' ')[1];
     }
-    return null;
+    return '';
 };
 
 const auth = {
     required: jwt({
         secret: 'secret',
         userProperty: 'payload',
-        getToken: getTokenFromHeaders,
+        getToken: getTokenFromHeaders
     }),
     optional: jwt({
         secret: 'secret',
@@ -41,7 +30,7 @@ const auth = {
     disabled: jwt({
         secret: 'secret',
         userProperty: 'payload',
-        getToken: null,
+        getToken: '',
         credentialsRequired: false,
     })
 };

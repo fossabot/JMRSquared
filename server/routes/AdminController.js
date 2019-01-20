@@ -11,7 +11,8 @@ import Bug from "../models/Bug";
 import Rent from "../models/Rent";
 import Student from "../models/Student";
 import User from "../models/User";
-const helper = require('../services/Helper');
+import FCM from "../services/FirebaseManager";
+import helper from '../services/Helper';
 
 /*
   TODO : Add admin
@@ -42,7 +43,15 @@ router.post("/block/user/:adminID", auth.required, (req, res, next) => {
                 User.deleteMany({
                     adminID: admin._id
                 }).then(t => {
-                    res.send("Removed the user.");
+                    FCM.sendToUser(admin._id, helper.makePayload('', '', {
+                        link: '/home',
+                        props: null,
+                        deactive: 'true'
+                    })).then(v => {
+                        res.send("Removed the user.");
+                    }).catch(err => {
+                        throw err;
+                    })
                 }).catch(err => {
                     res.status(512).send(err.message);
                 });
