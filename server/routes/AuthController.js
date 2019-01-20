@@ -9,7 +9,7 @@ router.get('/', auth.required, (req, res, next) => {
     res.send("You are authenticated!");
 });
 
-router.post('/register', auth.optional, (req, res, next) => {
+router.post('/register', auth.disabled, (req, res, next) => {
     const {
         body: {
             user
@@ -58,7 +58,7 @@ router.post('/register', auth.optional, (req, res, next) => {
         });
 });
 
-router.post('/login', auth.optional, (req, res, next) => {
+router.post('/login', auth.disabled, (req, res, next) => {
     const {
         body: {
             user
