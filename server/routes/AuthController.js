@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const passport = require('../config/passport');
 const auth = require('../config/auth');
+import Admin from "../models/Admin";
 const router = require('express').Router();
 
 import User from "../models/User";
@@ -46,14 +47,29 @@ router.post('/register', auth.disabled, (req, res, next) => {
                     return next(err);
                 }
 
-                if (passportUser) {
-                    const user = passportUser;
-                    user.token = passportUser.generateJWT();
-                    user.lastUsedDate = Date.now;
-                    return res.json(user.toAuthJSON());
+                if (user.adminID) {
+                    Admin.findById(user.adminID).then(user => {
+                        if (user.removed) {
+                            return res.status(512).send("The user is currently removed");
+                        } else {
+                            if (passportUser) {
+                                const user = passportUser;
+                                user.token = passportUser.generateJWT();
+                                user.lastUsedDate = Date.now();
+                                return res.json(user.toAuthJSON());
+                            }
+                        }
+                    }).catch(err => {
+                        return res.status(512).send("Invalid user");
+                    });
+                } else {
+                    if (passportUser) {
+                        const user = passportUser;
+                        user.token = passportUser.generateJWT();
+                        user.lastUsedDate = Date.now();
+                        return res.json(user.toAuthJSON());
+                    }
                 }
-
-                return status(400).info;
             })(req, res, next);
         });
 });
@@ -88,14 +104,29 @@ router.post('/login', auth.disabled, (req, res, next) => {
             return next(err);
         }
 
-        if (passportUser) {
-            const user = passportUser;
-            user.token = passportUser.generateJWT();
-            user.lastUsedDate = Date.now();
-            return res.json(user.toAuthJSON());
+        if (user.adminID) {
+            Admin.findById(user.adminID).then(user => {
+                if (user.removed) {
+                    return res.status(512).send("The user is currently removed");
+                } else {
+                    if (passportUser) {
+                        const user = passportUser;
+                        user.token = passportUser.generateJWT();
+                        user.lastUsedDate = Date.now();
+                        return res.json(user.toAuthJSON());
+                    }
+                }
+            }).catch(err => {
+                return res.status(512).send("Invalid user");
+            });
+        } else {
+            if (passportUser) {
+                const user = passportUser;
+                user.token = passportUser.generateJWT();
+                user.lastUsedDate = Date.now();
+                return res.json(user.toAuthJSON());
+            }
         }
-
-        return status(400).info;
     })(req, res, next);
 });
 module.exports = router;
