@@ -60,6 +60,8 @@ router.post('/register', auth.disabled, (req, res, next) => {
                         user.token = passportUser.generateJWT();
                         user.lastUsedDate = Date.now();
                         return res.json(user.toAuthJSON());
+                    } else {
+                        return res.status(512).send("The user is currently removed");
                     }
                 }
             })(req, res, next);
@@ -98,6 +100,8 @@ router.post('/login', auth.disabled, (req, res, next) => {
                         user.token = passportUser.generateJWT();
                         user.lastUsedDate = Date.now();
                         return res.json(user.toAuthJSON());
+                    } else {
+                        return res.status(512).send("The user is currently removed");
                     }
                 }
             }).catch(err => {

@@ -13,8 +13,8 @@ const getTokenFromHeaders = async (req) => {
             return authorization.split(' ')[1];
         } else {
             try {
-                var user = await User.findById(CurrentUserID);
-                if (!user) {
+                var user = await Admin.findById(CurrentUserID);
+                if (!user || user.removed) {
                     throw new Error("User is removed");
                 }
                 return authorization.split(' ')[1];
