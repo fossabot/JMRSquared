@@ -193,7 +193,7 @@ router.get("/get/all/:type/for/:business", auth.required, (req, res, next) => {
                 for (const partner of partners) {
                     var transaction = await Transaction.findOne({
                         client: mongoose.Types.ObjectId(partner._id)
-                    }, "_id client date amount");
+                    }, "client date amount");
 
                     partner.lastEventDate = transaction ? transaction.date : null;
                     partner.lastEventAmount = transaction ? transaction.amount : 0;
