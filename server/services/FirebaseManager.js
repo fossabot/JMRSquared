@@ -6,7 +6,7 @@ var serviceAccount = require("../firebase_service_account.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://jmrsquared-5872c.firebaseio.com"
-});
+}, "JMRSquared");
 
 var options = {
     priority: "high",
@@ -15,6 +15,14 @@ var options = {
 import Admin from '../models/Admin';
 
 class FCM {
+    getInstanceId() {
+        try {
+            return admin.instanceId(admin.app('JMRSquared'));
+        } catch (ex) {
+            return null;
+        }
+    }
+
     sendToUser(adminID, payload) {
         return new Promise((resolve, reject) => {
             Admin.findById(adminID)

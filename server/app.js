@@ -9,6 +9,7 @@ var app = express();
 import 'babel-polyfill';
 
 import mongoose from "mongoose";
+import rootController from "./routes/RootController";
 import adminController from "./routes/AdminController";
 import businessController from "./routes/BusinessController";
 import studentController from "./routes/StudentController";
@@ -75,6 +76,7 @@ app.use("/a", adminController);
 app.use("/n", notificationController);
 app.use("/settings", settingController);
 app.use("/auth", authController);
+app.use("/", rootController);
 require('./config/passport');
 
 /// catch 404 and forwarding to error handler

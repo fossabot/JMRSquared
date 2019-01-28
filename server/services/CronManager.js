@@ -55,7 +55,7 @@ export default class CronJob {
     }
 
     getTasks() {
-        return this.tasks.map(t => t.status)
+        return this.tasks
     }
 
     // This is called on app.js (everytime the server starts)

@@ -52,7 +52,6 @@ router.get("/get/:business/for/:userid", auth.required, (req, res, next) => {
                     .status(512)
                     .send("You are not part of the requested business");
             }
-            console.time('Counter');
 
             Transaction.find({
                         businessID: businessID,
@@ -73,7 +72,6 @@ router.get("/get/:business/for/:userid", auth.required, (req, res, next) => {
                         date: new Date(),
                         values: currentTargets
                     };
-                    console.timeEnd('Counter')
                     return res.json(returnedBusiness);
                 })
                 .catch(err => {
@@ -184,13 +182,26 @@ router.get("/get/all/:type/for/:business", auth.required, (req, res, next) => {
                 targets: 0
             })
             .populate("admin.id", "-deviceTokens")
-            .then(business => {
+            .then(async business => {
                 if (business == null)
                     return res
                         .status(512)
                         .send("The requested business is not avaliable");
                 if (!business.admin) res.json([]);
-                res.json(business.admin.map(b => b.id));
+                var partners = business.admin.map(b => b.id).toObject();
+                partners.map(async partner =>{
+                 partner.lastEventTitle = "Last payment";
+                   try {
+                    var transaction = await Transaction.findOne({client:partner._id},
+                "-proof")
+               partner.lastEventDate = transaction.date;
+                    partner.lastEventAmount = transaction.amount;
+                 }catch(ex){
+                    partner.lastEventDate = null;
+                    partner.lastEventAmount = 0;
+                }
+                });
+                res.json(partners);
             })
             .catch(err => {
                 return res.status(512).send(err);
