@@ -106,7 +106,7 @@ router.post("/set/business/:type", auth.required, (req, res, next) => {
                 business.settings.find(s => s._id == settingID).value = value;
 
                 business.markModified("settings");
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send("Business setting successfully saved");
                 });
@@ -133,7 +133,7 @@ router.post("/set/business/:type", auth.required, (req, res, next) => {
                 business.targets.find(t => t._id == targetID).enable = enable;
 
                 business.markModified("targets");
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send("Business targets successfully saved");
                 });
@@ -159,7 +159,7 @@ router.post("/set/business/:type", auth.required, (req, res, next) => {
                     business.categories.push(value);
                 }
 
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send(`Business ${type} successfully saved`);
                 });
@@ -189,21 +189,16 @@ router.get("/get/all/:type/for/:business", auth.required, (req, res, next) => {
                         .send("The requested business is not avaliable");
                 if (!business.admin) res.json([]);
                 var partners = business.admin.toObject().map(b => b.id);
-                partners.map(async partner => {
+
+                for (const partner of partners) {
+                    var transaction = await Transaction.findOne({
+                        client: mongoose.Types.ObjectId(partner._id)
+                    }, "_id client date amount");
+
+                    partner.lastEventDate = transaction ? transaction.date : null;
+                    partner.lastEventAmount = transaction ? transaction.amount : 0;
                     partner.lastEventTitle = "Last payment";
-                    console.log('partner', partner)
-                    try {
-                        var transaction = await Transaction.findOne({ client: mongoose.Types.ObjectId(partner._id) },
-                            "-proof")
-                        if (!transaction) throw new Error("No transaction found.");
-                        partner.lastEventDate = transaction.date;
-                        partner.lastEventAmount = transaction.amount;
-                    } catch (ex) {
-                        console.log('err', ex.message);
-                        partner.lastEventDate = null;
-                        partner.lastEventAmount = 0;
-                    }
-                });
+                }
                 res.json(partners);
             })
             .catch(err => {
@@ -295,7 +290,7 @@ router.post("/add/business", auth.required, (req, res, next) => {
             if (!business.name) {
                 return res.status(512).send("A business name is required");
             }
-            business.save(function(err) {
+            business.save(function (err) {
                 if (err) return res.status(512).send(err);
                 cronJob.populateBusinessSettings();
                 cronJob.populateBusinessTargets();
@@ -337,7 +332,7 @@ router.post("/assign/to/business", auth.required, (req, res, next) => {
                     assignedBY: assignedBY,
                     authority: adminAuthority && adminAuthority.toUpperCase()
                 });
-                business.save(function(err) {
+                business.save(function (err) {
                     if (err) return res.status(512).send(err);
                     res.send("Client successfully linked to business");
                 });
@@ -393,7 +388,7 @@ router.get("/get/transaction/:transactionID", auth.required, (req, res, next) =>
         });
 });
 
-router.post("/transaction/add", auth.required, async(req, res, next) => {
+router.post("/transaction/add", auth.required, async (req, res, next) => {
     var transaction = new Transaction({
         _id: mongoose.Types.ObjectId(),
         adminID: req.body.adminID, //ForeignKey
@@ -427,7 +422,7 @@ router.post("/transaction/add", auth.required, async(req, res, next) => {
         !business.categories.find(v => v == transaction.category)
     ) {
         business.categories.push(transaction.category);
-        business.save(function(err) {
+        business.save(function (err) {
             if (err) {
                 return res
                     .status(512)
@@ -449,7 +444,7 @@ router.post("/transaction/add", auth.required, async(req, res, next) => {
         }
     }
 
-    transaction.save(function(err) {
+    transaction.save(function (err) {
         if (err) return res.status(512).send(err);
         // TODO : Notify the other admins about this transaction.
         if (business && business.admin) {
