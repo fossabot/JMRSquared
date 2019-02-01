@@ -9,7 +9,7 @@
                 <label class="h3" text="Adding a transaction for : "></label>
                 <label class="h3 m-l-20" :text="businessName"></label>
               </StackLayout>
-              <Button row="0" col="1" @tap="$router.back()" selfAlign="right" text="Cancel"></Button>
+              <Button row="0" col="1" @tap="navigate(null,true)" selfAlign="right" text="Cancel"></Button>
             </GridLayout>
           </StackLayout>
         </CardView>
@@ -119,7 +119,7 @@
                   <StackLayout width="100%" class="hr-light"></StackLayout>
   
                   <Ripple v-if="businessSettings.filter(t => t.title == 'Transaction evidence').length > 0" @tap="uploadEvidence()">
-                    <GridLayout class="m-10" rows="auto,auto,auto" columns="auto,*">
+                    <GridLayout class="m-10" rows="auto,auto,*" columns="auto,*">
                       <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-file-document' | fonticon"></label>
                       <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Evidence"></label>
                       <label row="1" col="1" text="Tap to upload a proof" class="h4"></label>
@@ -183,7 +183,7 @@
                     <label :text="transaction.description" row="1" col="1" class="h4"></label>
                   </GridLayout>
   
-                  <GridLayout v-show="selectedImage" class="m-10" rows="auto,auto" columns="auto,*">
+                  <GridLayout v-show="selectedImage" class="m-10" rows="auto,*" columns="auto,*">
                     <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-file-document' | fonticon"></label>
                     <label row="0" col="1" class="h3 font-weight-bold text-mute" text="Evidence"></label>
                     <Image row="1" col="1" v-show="selectedImage" :src="selectedImage" stretch="aspectFill" width="90%" />
@@ -206,7 +206,7 @@
               </GridLayout>
               <GridLayout v-show="savedTransaction" rows="auto,auto" columns="*">
                 <Label row="0" text="Your transaction was saved successfully!" textWrap="true" class="text-mute text-light-blue" textAlignment="center"></Label>
-                <Button row="1" @tap="GoTo('/business/home',{props:{businessID:businessId}})" class="btn-primary bg-light-blue" text="All Transactions"></Button>
+                <Button row="1" @tap="GoTo('/business/home',{businessID:businessId},{clearHistory: true})" class="btn-primary bg-light-blue" text="All Transactions"></Button>
               </GridLayout>
             </FlexboxLayout>
             <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
@@ -230,7 +230,6 @@ import * as imagepicker from "nativescript-imagepicker";
 import * as connectivity from "tns-core-modules/connectivity";
 import * as camera from "nativescript-camera";
 
-const http = require("http");
 export default {
   data() {
     return {
@@ -459,7 +458,7 @@ export default {
               title: response.content.toString(),
               duration: 4000,
               onTap: () => {
-                this.ShowNewTransaction(0);
+                this.GoTo('/business/home',{businessID:this.businessId},{clearHistory: true});
               }
             });
             this.savedTransaction = true;
@@ -519,14 +518,6 @@ export default {
             this.$modal.close();
           }
         }
-      });
-    },
-    switchPage(card) {
-      dialogs.alert("Going to " + card.redirect).then(() => {
-        console.log(card.redirect);
-      });
-      this.$router.push({
-        path: card.redirect
       });
     },
     uploadEvidence() {

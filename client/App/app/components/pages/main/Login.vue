@@ -1,19 +1,19 @@
 <template>
-  <page actionBarHidden="true" @loaded="pageLoaded()">
-    <GridLayout rows="auto,*">
-      <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-        <GridLayout class="bg-dark-blue p-y-15 p-5" rows="auto" columns="auto,*,auto">
-          <Ripple rowSpan="2" @tap="navigate('/home')" verticalAlignment="center" borderRadius="50%">
-            <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-home' | fonticon"></Label>
+  <page class="backgroundImage" actionBarHidden="true" @loaded="pageLoaded()">
+    <GridLayout class="backgroundImageOverlay" rows="auto,*">
+      <CardView class="m-b-5" backgroundColor="transparent" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
+        <GridLayout class="bg-dark-blue-overlay p-y-15 p-5" rows="auto" columns="auto,*,auto">
+          <Ripple @tap="navigate('/home')" verticalAlignment="center" borderRadius="50%">
+               <Image verticalAlignment="center" width="50" height="50" class="circle" stretch="aspectFill" src="res://icon" borderRadius="50%" />
           </Ripple>
-          <Ripple row="0" rowSpan="2" col="2" verticalAlignment="center" class="p-20 m-x-20 font-weight-bold" @tap="isEnterEmail = !isEnterEmail">
+          <Ripple row="0" col="2" verticalAlignment="center" @tap="isEnterEmail = !isEnterEmail">
             <Label class="text-white" verticalAlignment="center" textWrap="true" :text="isEnterEmail ? 'Use numbers' : 'Use email'"></Label>
           </Ripple>
-          <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" text="Login"></label>
+          <label row="0" col="0" colSpan="3" fontSize="20%" verticalAlignment="center" textAlignment="center" class="font-weight-bold text-white text-mute" text="Login"></label>
         </GridLayout>
       </CardView>
       <ScrollView row="1" width="100%">
-        <CardView verticalAlignment="center" padding="10" margin="5" elevation="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
+        <CardView verticalAlignment="center" padding="10" margin="25" elevation="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
           <GridLayout width="100%">
             <FlexboxLayout class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
   
@@ -35,17 +35,15 @@
                 <TextField row="1" col="1" ref="password" secure="true" returnKeyType="done" v-model="user.password" @returnPress="submit()" :class="{ light: !isLoading }"></TextField>
               </GridLayout>
   
-              <ActivityIndicator :busy="isLoading"></ActivityIndicator>
+              <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
   
               <StackLayout v-show="!isLoading">
-                <Button text="Login" :isEnabled="!isLoading" class="submit-button bg-dark-blue" @tap="submit()"></Button>
+                <Button text="Login" :isEnabled="!isLoading" class="submit-button bg-dark-blue text-white" @tap="submit()"></Button>
               </StackLayout>
   
-              <GridLayout v-show="$navigator.route.meta.userAuthLevel > 0" justifyContent="flex-end" columns="*" rows="auto">
-                <Button v-if="$navigator.route.meta.userAuthLevel == 1" @tap="navigate('/tenant/dashboard')" :text="'Continue as ' + $store.state.cache.cachedTenant.username"></Button>
-                <Button v-if="$navigator.route.meta.userAuthLevel == 3" @tap="navigate('/admin/dashboard')" :text="'Continue as ' + $store.state.cache.cachedAdmin.userName"></Button>
+              <GridLayout v-if="$router.current.userAuthLevel() > 0" justifyContent="flex-end" columns="*" rows="auto">
+                <Button v-if="$router.current.userAuthLevel() == 3" @tap="navigate('/admin/dashboard',null,{ clearHistory: true })" :text="'Continue as ' + $store.state.cache.cachedAdmin.userName"></Button>
               </GridLayout>
-  
             </FlexboxLayout>
           </GridLayout>
         </CardView>
@@ -56,8 +54,6 @@
 
 <script>
 const dialogs = require("ui/dialogs");
-const http = require("http");
-
 import * as Toast from "nativescript-toast";
 var appSettings = require("application-settings");
 
@@ -99,64 +95,81 @@ export default {
     submit() {
       var self = this;
       this.isLoading = true;
-      var connectionType = connectivity.getConnectionType();
-      if (connectionType == connectivity.connectionType.none) {
-        if (this.$navigator.route.meta.userAuthLevel == -1) {
-          this.loadAdminData();
-        } else if (this.$navigator.route.meta.userAuthLevel == -2) {
-          this.loadTenantData();
-        } else {
-          this.$feedback.error({
-            title: "NO INTERNET CONNECTION",
-            duration: 4000,
-            message: "Please switch on your data/wifi."
-          });
-        }
-      } else {
-        http
-          .request({
-            url: this.$store.state.settings.baseLink + "/a/login",
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            content: JSON.stringify({
-              useEmail: this.isEnterEmail,
-              numbers: this.user.numbers,
-              email: this.user.email,
-              pass: this.user.password
-            })
-          })
-          .then(response => {
-            var statusCode = response.statusCode;
-            this.$feedback.info({
-              message: statusCode
-            });
-            if (statusCode == 200) {
-              var result = response.content.toJSON();
-              this.loginAdmin(self, result);
-              this.isLoading = false;
-              this.navigate("/admin/dashboard");
-            } else {
-              var error = response.content.toString();
-              this.$feedback.error({
-                message: error
+      this.$api
+        .adminLogin({
+          useEmail: this.isEnterEmail,
+          numbers: this.user.numbers,
+          email: this.user.email,
+          pass: this.user.password
+        })
+        .then(response => {
+          var statusCode = response.statusCode;
+          if (statusCode == 200) {
+            var result = response.content.toJSON();
+            this.appSettings.setString("CurrentUserID", result._id);
+            this.$api
+              .getAuthToken()
+              .then(answer => {
+                console.log("tag", answer);
+                this.loginAdmin(self, result);
+                this.isLoading = false;
+                this.navigate("/admin/dashboard", null, {
+                  clearHistory: true,
+                  transition: {
+                    name: "slideTop",
+                    duration: 1000,
+                    curve: "spring"
+                  }
+                });
+              })
+              .catch(err => {
+                this.$feedback.warning({
+                  title: "Access denied!",
+                  duration: 40000,
+                  message: err.message
+                });
+                this.isLoading = false;
+                this.navigate("/home", null, {
+                  clearHistory: true
+                });
+                console.log("err", err);
               });
-              this.isLoading = false;
-            }
-          })
-          .catch(err => {
-            this.$feedback.error({
-              message: err
-            });
+          } else if (statusCode == 512) {
+            throw new Error(response.data.toString());
+          } else {
+            throw new Error("Try again later");
+          }
+        })
+        .catch(err => {
+          if (err.message.indexOf("Failed to connect") >= 0) {
+            err.message = "Please check your internet connection";
+          }
 
-            this.isLoading = false;
+          this.$feedback.error({
+            title: "Unable to log in",
+            message: err.message
           });
-      }
+          this.isLoading = false;
+        });
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
+.backgroundImage {
+  background: url("~/assets/images/suit77_black_white.jpeg") no-repeat center;
+  background-size: cover;
+  padding-top: 3%;
+  padding-bottom: 3%;
+}
+
+.backgroundImageOverlay {
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+}
+
+.bg-dark-blue-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
 </style>

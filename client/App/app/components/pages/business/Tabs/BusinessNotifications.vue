@@ -1,46 +1,23 @@
 <template>
   <GridLayout columns="*" rows="auto,*">
     <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
-       <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
-              <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
-            <Label verticalAlignment="center" textAlignment="center" class="mdi text-white p-15" fontSize="25%" :text="'mdi-keyboard-backspace' | fonticon"></Label>
-          </Ripple>
-            <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
-            <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
-            </Ripple>
-            <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" :text="business.name"></label>
-             <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" :text="business.description"></Label>
-        </GridLayout>
+      <GridLayout class="bg-dark-blue p-5" rows="auto,auto" columns="auto,*,auto">
+        <Ripple rowSpan="2" @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
+          <Label verticalAlignment="center" textAlignment="center" class="mdi text-white p-15" fontSize="25%" :text="'mdi-keyboard-backspace' | fonticon"></Label>
+        </Ripple>
+        <Image v-if="business.logo" row="0" rowSpan="2" col="2" verticalAlignment="center" width="70" height="70" class="circle p-5" stretch="aspectFill" :src="business.logo" borderRadius="50%" />
+        <Ripple v-if="!business.logo" row="0" rowSpan="2" col="2" width="70" height="70" verticalAlignment="center" borderRadius="50%">
+          <Label verticalAlignment="center" textAlignment="center" class="mdi" fontSize="35%" :text="'mdi-image-filter-center-focus' | fonticon"></Label>
+        </Ripple>
+        <label row="0" col="0" colSpan="3" fontSize="18%" verticalAlignment="bottom" textAlignment="center" class="font-weight-bold text-white text-mute" text="Notifications"></label>
+        <Label row="1" col="0" colSpan="3" fontSize="15%" verticalAlignment="center" textAlignment="center" class="text-white" :textWrap="true" :text="`Reminders and alerts about ${business.name}`"></Label>
+      </GridLayout>
     </CardView>
     <StackLayout class="p-x-15" row="1">
       <CardView margin="5" elevation="10">
         <GridLayout rows="auto,auto,auto,*,auto" columns="*,*,*">
-          <Ripple row="0" col="0" colSpan="3">
-            <GridLayout class="m-15" rows="auto" columns="*">
-              <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" :text="business.name"></label>
-            </GridLayout>
-          </Ripple>
-  
-          <StackLayout row="1" col="0" colSpan="3">
-            <Ripple @tap="GoTo(businessPartner)">
-              <GridLayout rows="auto" columns="auto,*">
-                <label row="0" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-15" fontSize="25%" :text="'mdi-worker' | fonticon"></label>
-                <label row="0" col="1" verticalAlignment="center" class="h3 font-weight-bold text-mute" :text="businessPartner.value"></label>
-              </GridLayout>
-            </Ripple>
-          </StackLayout>
-  
-          <Ripple row="2" col="0" colSpan="3">
-            <GridLayout class="m-15" rows="auto" columns="*">
-              <label row="0" col="0" verticalAlignment="center" class="h3 font-weight-bold text-mute text-dark-blue" text="Notifications"></label>
-            </GridLayout>
-          </Ripple>
-  
-          <ActivityIndicator v-if="!Notifications" row="3" col="0" colSpan="3" textAlignment="center" verticalAlignment="center" :busy="!Notifications"></ActivityIndicator>
-  
-          <Fab @tap="GoTo(sendNotificationPage)" row="3" col="0" colSpan="3" icon="res://ic_bell_plus_white_24dp" class="fab-button fixedBtn"></Fab>
-          <PullToRefresh row="3" col="0" colSpan="3" @refresh="refreshList($event)">
+          <ActivityIndicator v-if="!Notifications" col="0" colSpan="3" textAlignment="center" verticalAlignment="center" :busy="!Notifications"></ActivityIndicator>
+          <PullToRefresh col="0" colSpan="3" @refresh="refreshList($event)">
             <ScrollView v-if="Notifications">
               <StackLayout>
                 <GridLayout rows="auto" columns="*,auto" v-for="(notification,i) in Notifications" :key="i">
@@ -61,15 +38,6 @@
               </StackLayout>
             </ScrollView>
           </PullToRefresh>
-          <StackLayout row="4" :col="i" v-for="(summary,i) in summaryStats" :key="i">
-            <Ripple @tap="showStats(summary,summary.isToParent)">
-              <StackLayout class="p-15">
-                <label class="h3 font-weight-bold text-dark-blue summaryStats" :text="summary.value" :class="{'visible':true}" fontSize="25%" vertialAlignment="center" textAlignment="center"></label>
-                <label class="font-weight-bold" vertialAlignment="center" textAlignment="center" :text="summary.title"></label>
-              </StackLayout>
-            </Ripple>
-            <StackLayout width="100%" class="hr-light"></StackLayout>
-          </StackLayout>
         </GridLayout>
       </CardView>
     </StackLayout>

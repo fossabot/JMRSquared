@@ -6,20 +6,20 @@
       </GridLayout>
       <GridLayout ref="transactionScreen" backgroundColor="white" v-if="transaction" v-show="!isLoading" rows="auto,auto,*" columns="*">
         <CardView row="0" elevation="15">
-          <GridLayout columns="auto,*,auto" class="bg-dark-blue p-15">
+          <GridLayout columns="auto,*,auto" class="bg-dark-blue p-10">
             <Ripple @tap="navigate(null)" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
+              <Label verticalAlignment="center" textAlignment="center" class="mdi text-white p-5" fontSize="25%" :text="'mdi-arrow-left' | fonticon"></Label>
             </Ripple>
             <label class="p-x-15 text-white" verticalAlignment="center" fontSize="18%" col="1" text="Transaction detail"></label>
             <Ripple v-if="transaction" col="2" @tap="shareImage(transaction)" verticalAlignment="center" borderRadius="50%">
-              <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-share-variant' | fonticon"></Label>
+              <Label verticalAlignment="center" textAlignment="center" class="mdi text-white p-5" fontSize="25%" :text="'mdi-share-variant' | fonticon"></Label>
             </Ripple>
           </GridLayout>
         </CardView>
         <StackLayout v-if="transaction" class="m-15" row="1">
           <GridLayout rows="auto,auto,auto,auto,auto,auto,auto,auto" columns="*,auto">
             <label class="p-b-5" row="0" col="0" text="Date"></label>
-            <label class="p-b-5" row="0" col="1" :text="getMoment(transaction.date).format('dddd , DD MMMM YYYY')"></label>
+            <label class="p-b-5" row="0" col="1" :text="getMoment(transaction.date).format('dddd , DD MMMM YYYY , HH:mm')"></label>
             <label class="p-b-5" row="1" col="0" text="Type"></label>
             <label class="p-b-5" row="1" col="1" :text="transaction.type == 'MONEYIN' ? 'Deposit' : 'Withdraw'"></label>
             <label class="p-b-5" row="2" col="0" text="Category"></label>
@@ -114,11 +114,14 @@ export default {
     },
     onPinch(args) {
       var value = this.z;
-      console.log("state", args.state);
-      if (args.scale > 0 && args.state) {
-        this.onZoomIn((value += args.scale * 2));
-      } else if (args.scale > 0 && !args.state) {
-        this.onZoomOut((value -= args.scale * 2));
+      if (args.scale > 1) {
+        value += args.scale / 10;
+        this.onZoomIn(value);
+      } else if (args.scale < 1) {
+        value -= args.scale;
+        if (value > 2) {
+          this.onZoomOut(value);
+        }
       }
     },
     onPan(args) {

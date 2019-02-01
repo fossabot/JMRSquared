@@ -3,7 +3,7 @@
     <StackLayout row="0" class="bg-light-red" v-show="connectionType == 0">
       <label class="text-white p-5" fontSize="15" textAlignment="center" text="offline"></label>
     </StackLayout>
-    <Navigator row="1" :defaultRoute="this.$router.current.userAuthLevel() != 3 ? currentPage : adminDashboard" />
+    <Navigator row="1" :defaultRoute="this.$router.current.userAuthLevel() < 1 ? currentPage : adminDashboard" />
   </GridLayout>
 </template>
 

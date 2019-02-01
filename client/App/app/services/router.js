@@ -20,7 +20,6 @@ import Transaction from '../components/pages/business/Components/Transaction.vue
 // Notifications
 import SendNotification from '../components/pages/notification/SendNotification.vue'
 
-const http = require("http");
 import store from '../store';
 
 var appSettings = require("application-settings");
@@ -200,73 +199,6 @@ router.current = {
       router.userAuthLevel = authLevel;
     }
     return router.userAuthLevel
-  }
-}
-
-router.beforeEach = (to, from, next) => {
-  let authLevel = appSettings.getNumber("authLevel");
-
-  let documentID = appSettings.getString(store.state.cache.adminLoggedInString) != null ? appSettings.getString(store.state.cache.adminLoggedInString) : appSettings.getString(store.state.cache.tenantLoggedInString);
-
-  if (isNaN(authLevel) && documentID == null) {
-    authLevel = 0;
-    appSettings.setNumber("authLevel", authLevel);
-  } else if (documentID != null && authLevel < 0) {
-    authLevel = appSettings.getString(store.state.cache.adminLoggedInString) != null ? -1 : -2;
-    appSettings.setNumber("authLevel", authLevel);
-  }
-
-  // feedback.error({
-  //   title: "Your level " + authLevel,
-  //   message: "You have permissions to access " + store.state.cache.cachedAdmin.role + " only ... Trying to access " + to.meta.authLevel + " " + to.name
-  // });
-
-  switch (to.meta.authLevel) {
-    case 1:
-      if (authLevel < 1) {
-        feedback.error({
-          title: "You are not Authorized to access this page!"
-        });
-        return;
-      }
-      break;
-    case 2:
-      if (authLevel < 2) {
-        feedback.error({
-          title: "You are not Authorized to access this page!"
-        });
-        return;
-      }
-      break;
-    case 3:
-      if (authLevel < 3) {
-        feedback.error({
-          title: "You are not Authorized to access this page!"
-        });
-        return;
-      } else {
-        if (to.meta.source != null && to.meta.source != store.state.cache.cachedAdmin.role && store.state.cache.cachedAdmin.role != "ALL") {
-          feedback.error({
-            title: "You are not Authorized to access this page!",
-            message: "You have permissions to access " + store.state.cache.cachedAdmin.role + " only "
-          });
-          return;
-        }
-      }
-      break;
-  }
-
-  to.meta.userAuthLevel = authLevel;
-
-  if (to.name == 'studentProfile' || to.name == 'tenantProfileEdit') {
-    http.getJSON(store.state.settings.baseLink + "/s/" + to.params.profileID + "/get").then((student) => {
-      to.meta.user = student;
-      next();
-    }).catch(err => {
-      alert(err);
-    });
-  } else {
-    next();
   }
 }
 

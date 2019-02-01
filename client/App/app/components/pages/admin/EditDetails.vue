@@ -2,15 +2,15 @@
     <page @loaded="pageLoaded()">
         <ActionBar>
             <GridLayout rows="auto" columns="auto,*,auto,auto" orientation="horizontal">
-                <Ripple class="p-10" @tap="$router.back()" verticalAlignment="center" col="0" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
+                <Ripple class="p-10" @tap="navigate(null,true)" verticalAlignment="center" col="0" borderRadius="50%">
+                    <Label verticalAlignment="center" class="mdi p-5" fontSize="25%" :text="'mdi-arrow-back' | fonticon"></Label>
                 </Ripple>
                 <Label col="1" class="m-l-25 font-weight-bold" verticalAlignment="center" :text="'Edit ' + user.userName + '\'s details'"></Label>
                 <Ripple class="p-10" @tap="reportBug()" verticalAlignment="center" col="2" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
+                    <Label verticalAlignment="center" class="mdi p-5" fontSize="25%" :text="'mdi-bug-report' | fonticon"></Label>
                 </Ripple>
                 <Ripple class="p-10" @tap="logOut()" verticalAlignment="center" col="3" borderRadius="50%">
-                    <Label verticalAlignment="center" class="mdi text-light-red" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
+                    <Label verticalAlignment="center" class="mdi text-light-red p-5" fontSize="25%" :text="'mdi-power-settings-new' | fonticon"></Label>
                 </Ripple>
             </GridLayout>
         </ActionBar>
@@ -167,29 +167,6 @@
                 //TODO : REMOVE THIS RETURN AND GO TO post the DB
                 this.isLoading = false;
                 return;
-    
-                http.request({
-                    url: this.$store.state.settings.baseLink + "/a/update",
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    content: JSON.stringify({
-                        id: this.user.id,
-                        userName: this.userName,
-                        email: this.email,
-                        numbers: this.numbers,
-                        newPassword: this.newPassword,
-                        oldPassword: this.oldPassword,
-                        profilePic: this.profilePic
-                    })
-                }).then(response => {
-    
-                }).catch(err => {
-                    this.$feedback.error({
-                        message: err
-                    });
-                });
             },
     
             changeProfilePicture() {

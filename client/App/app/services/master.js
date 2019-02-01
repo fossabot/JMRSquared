@@ -10,7 +10,12 @@ import {
 from "nativescript-feedback";
 import API from "./http";
 import store from '../store';
-import { device, screen, isAndroid, isIOS } from "tns-core-modules/platform";
+import {
+    device,
+    screen,
+    isAndroid,
+    isIOS
+} from "tns-core-modules/platform";
 
 var firebase = require("nativescript-plugin-firebase");
 
@@ -22,7 +27,7 @@ master.firebase = firebase;
 master.device_token = null;
 master.store = store;
 master.deviceInfo = {
-   deviceType:device.deviceType,
+    deviceType: device.deviceType,
     screen: {
         width: screen.mainScreen.widthDIPs,
         height: screen.mainScreen.heightDIPs,
@@ -30,13 +35,14 @@ master.deviceInfo = {
         widthPixels: screen.mainScreen.widthPixels,
         heightPixels: screen.mainScreen.heightPixels
     },
-    model:device.model,
+    model: device.model,
     manufacturer: device.manufacturer,
-   /* uuid:device.uuid,
-   */ os:device.os,
-    osVersion:device.osVersion,
-    sdkVersion:device.sdkVersion,
-    language:device.language,
+    /* uuid:device.uuid,
+     */
+    os: device.os,
+    osVersion: device.osVersion,
+    sdkVersion: device.sdkVersion,
+    language: device.language,
 };
 
 master.http = new API(store.state.settings.baseLink, master);
@@ -69,57 +75,35 @@ master.initFCM = function (self) {
     return new Promise((resolve, reject) => {
         firebase
             .init({
-                onMessageReceivedCallback: (message) => {
-                    console.log("Notification", message);
-                    if (message.foreground) {
-                        master.feedback.success({
-                            title: message.title,
-                            duration: 4000,
-                            message: message.body,
-                            onTap: () => {
-                                if (message.data && message.data.link) {
-                                    self.navigate(message.data.link, message.data.props);
-                                }
-                            }
-                        })
-                    } else {
-                        self.navigate("/login");
-                    }
-                },
+                onMessageReceivedCallback: self.notificationReceived,
                 onPushTokenReceivedCallback: token => {
-                    master.feedback.success({
-                        title: "Welcome",
-                        duration: 10000,
-                        message: "We managed to set you up for push notifications"
-                    });
                     master.appSettings.setString("device_token", token);
+                    master.http.getAuthToken();
                     master.device_token = token;
                 }
             })
-            .then(
-                instance => {
+            .then(() => {
+                if (master.appSettings.getString("device_token") == null) {
+                    firebase.getCurrentPushToken().then((token) => {
+                        master.appSettings.setString("device_token", token);
+                        master.device_token = token;
+                    });
+                }
+                resolve(firebase);
+            }).catch(err => {
+                if (err.message.indexOf('already') >= 0) {
                     if (master.appSettings.getString("device_token") == null) {
                         firebase.getCurrentPushToken().then((token) => {
+                            console.log('push instance ..... ', token)
                             master.appSettings.setString("device_token", token);
                             master.device_token = token;
                         });
                     }
-                    resolve(instance);
-                },
-                err => {
-                    if (err.message.indexOf('already') >= 0) {
-                        if (master.appSettings.getString("device_token") == null) {
-                            firebase.getCurrentPushToken().then((token) => {
-                                master.appSettings.setString("device_token", token);
-                                master.device_token = token;
-                            });
-                        }
-                        resolve();
-                    } else {
-                        reject(err);
-                    }
+                    resolve(firebase);
+                } else {
+                    reject(err);
                 }
-            );
+            });
     });
 }
 

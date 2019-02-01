@@ -1,16 +1,17 @@
 <template>
-  <page actionBarHidden="true">
+  <page backgroundSpanUnderStatusBar actionBarHidden="true">
     <GridLayout rows="auto,auto,*">
       <CardView class="m-b-5" row="0" textAlignment="center" shadowOpacity="0.2" shadowRadius="50" elevation="20">
         <GridLayout class="p-5 bg-dark-blue" rows="auto,auto" columns="auto,*,auto">
-          <Image row="0" rowSpan="2" col="0" verticalAlignment="center" width="70" height="70" class="circle" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%"/>
+          <Image row="0" rowSpan="2" col="0" verticalAlignment="center" width="70" height="70" class="circle" stretch="aspectFill" :src="user.profilePic ? user.profilePic : $store.state.settings.defaultProfilePic" borderRadius="50%" />
           <label row="0" verticalAlignment="center" col="1" fontSize="18%" class="p-x-15 text-white font-weight-bold text-mute" :text="user.userName"></label>
           <Label row="1" verticalAlignment="center" col="1" fontSize="15%" class="p-x-15 text-white" :text="user.email"></Label>
-        <Ripple v-show="$router.current.userAuthLevel() > 0" rowSpan="2" class="p-x-15" @tap="logOut()" verticalAlignment="center" col="2" height="100%" borderRadius="50">
-           <Label verticalAlignment="center" textAlignment="center" class="mdi text-white" fontSize="25%" :text="'mdi-logout' | fonticon"></Label>
-         </Ripple> </GridLayout>
+          <Ripple rowSpan="2" class="p-x-15" @tap="logOut()" verticalAlignment="center" col="2" height="100%" borderRadius="50">
+            <Label verticalAlignment="center" textAlignment="center" class="mdi text-white p-5" fontSize="25%" :text="'mdi-logout' | fonticon"></Label>
+          </Ripple>
+        </GridLayout>
       </CardView>
-
+  
       <StackLayout class="m-x-15" row="1">
         <GridLayout rows="auto" columns="*">
           <label class="h3 font-weight-bold text-mute text-dark-blue" text="Pick a business or Add new one"></label>
@@ -49,8 +50,8 @@ import * as imagepicker from "nativescript-imagepicker";
 
 var appSettings = require("application-settings");
 import * as connectivity from "tns-core-modules/connectivity";
-const http = require("http");
 
+import { isIOS } from "tns-core-modules/platform";
 export default {
   data() {
     return {
@@ -79,15 +80,35 @@ export default {
       }
     }
   },
-  created() {
-    if (!this.isLoaded) {
-      this.pageLoaded();
-    }
-  },
   mounted() {
     if (!this.isLoaded) {
       this.pageLoaded();
     }
+    setTimeout(() => {
+      const testing = true;
+      console.log("tag", "before");
+      this.$firebase.admob
+        .showBanner({
+          size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
+          margins: {
+            bottom: 10,
+            top: -1
+          },
+          androidBannerId: "ca-app-pub-4924835910036108~3001656373",
+          iosBannerId: "ca-app-pub-4924835910036108~3001656373",
+          testing: testing, // when not running in production set this to true, Google doesn't like it any other way
+          iosTestDeviceIds: [],
+          keywords: ["business", "money", "cash", "rich", "free", "job", "work"] // add keywords for ad targeting
+        })
+        .then(() => {})
+        .catch(errorMessage => {
+          dialogs.alert({
+            title: "AdMob error",
+            message: errorMessage,
+            okButtonText: "Hmmkay"
+          });
+        });
+    }, 10000);
   },
   methods: {
     pageLoaded(args = null) {

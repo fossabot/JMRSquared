@@ -1,50 +1,22 @@
 <template>
-  <page @loaded="pageLoaded()">
-    <ActionBar>
-      <GridLayout rows="auto" columns="*,auto" orientation="horizontal">
-        <Label col="0" class="m-l-25 font-weight-bold" verticalAlignment="center" text="Home"></Label>
-        <Ripple v-show="$router.current.userAuthLevel() > 0" class="p-x-15" @tap="logOut()" verticalAlignment="center" col="2" height="100%" borderRadius="50%">
-          <Label verticalAlignment="center" text="Log out"></Label>
-        </Ripple>
-      </GridLayout>
-    </ActionBar>
-    <FlexboxLayout justifyContent="space-between" width="100%" height="100%" flexDirection="column">
-      <FlexboxLayout justifyContent="flex-start" flexDirection="column">
-        <label :text="introTxt" textWrap="true" class="body p-t-30 p-l-15 p-r-15" textAlignment="center"></label>
-      </FlexboxLayout>
-      <FlexboxLayout flexDirection="column">
-        <GridLayout columns="auto" rows="auto" justifyContent="center">
-          <Image src="res://jmrlogo" row="0" col="0" width="100%" alignSelf="center" stretch="aspectFit" />
-        </GridLayout>
-      </FlexboxLayout>
-      <FlexboxLayout justifyContent="flex-end" flexDirection="column">
-        <GridLayout rows="auto" columns="*" textAlginment="center">
-          <Button backgroundColor="transparent" width="50%" selfAlign="center" @tap="$router.push('/explore')" textAlignment="center" borderWidth="5px" borderColor="#0093a4" text="Explore"></Button>
-        </GridLayout>
-        <GridLayout v-show="$router.current.userAuthLevel() <= 0" justifyContent="flex-end" columns="*" rows="*" height="70">
-          <Button @tap="navigate('/login')" row="0" text="Login"></Button>
-        </GridLayout>
-        <GridLayout v-show="$router.current.userAuthLevel() > 0" justifyContent="flex-end" columns="*" rows="*" height="70">
-          <ActivityIndicator :busy="isLoading"></ActivityIndicator>
-          <Button v-show="!isLoading" @tap="loadData($router.current.userAuthLevel())" text="My Dashboard"></Button>
-        </GridLayout>
-      </FlexboxLayout>
-    </FlexboxLayout>
+  <page class="backgroundImage" actionBarHidden="true" @loaded="pageLoaded()">
+    <GridLayout class="backgroundImageOverlay" rows="auto,*,auto,auto" columns="*,auto">
+      <label colSpan="2" :text="introTxt" fontSize="18" :textWrap="true" class="p-20 text-white bg-dark-blue-overlay topMainText" textAlignment="center"></label>
+      <Image row="2" col="1" src="res://jmrlogo" alignSelf="center" stretch="aspectFill" />
+      <Button row="3" colSpan="2" class="bg-dark-blue p-15 text-white" fontSize="18" @tap="navigate('/login')" text="Login"></Button>
+    </GridLayout>
   </page>
 </template>
 
 <script>
 const dialogs = require("ui/dialogs");
-const http = require("http");
-
 var appSettings = require("application-settings");
 
 import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      introTxt:
-        "JMRSquared allows you to manage your businesses and keep track of your earnings and loses on all your businesses in one place."
+      introTxt: "Digitalize your business and keep track of all your earnings."
     };
   },
   created() {
@@ -67,4 +39,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.topMainText {
+  color: white;
+  background-color: linear-gradient(
+    top bottom,
+    rgba(255, 0, 0, 0.5),
+    rgba(255, 20, 0, 0.7),
+    rgba(255, 0, 30, 0.5),
+    rgba(255, 20, 30, 0.7)
+  );
+}
+
+.backgroundImage {
+  background: url("~/assets/images/suit77_black_white.jpeg") no-repeat center
+    center;
+  background-size: cover;
+  padding-top: 3%;
+  padding-bottom: 3%;
+}
+
+.backgroundImageOverlay {
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+}
+
+.bg-dark-blue-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
 </style>

@@ -25,9 +25,7 @@ const mutations = {
           state.cachedAdmin.device_token = obj.appSettings.getString("device_token");
           obj.api.addUserDeviceToken(state.cachedAdmin._id, state.cachedAdmin.device_token).then(response => {
             var statusCode = response.statusCode;
-            if (statusCode == 200) {
-              console.log("ADDTOKEN-success", response)
-            } else {
+            if (statusCode != 200) {
               var error = response.content;
               throw new Error(error);
             }
@@ -114,13 +112,9 @@ const mutations = {
     let documentID = obj.appSettings.getString(cacheString);
     if (obj.user.device_token != obj.appSettings.getString("device_token")) {
       obj.user.device_token = obj.appSettings.getString("device_token");
-      console.log("ADDTOKEN-request", obj.user._id);
-      console.log("ADDTOKEN-request-token", obj.user.device_token);
       obj.api.addUserDeviceToken(obj.user._id, obj.user.device_token).then(response => {
         var statusCode = response.statusCode;
-        if (statusCode == 200) {
-          console.log("ADDTOKEN-success", response)
-        } else {
+        if (statusCode != 200) {
           var error = response.content;
           throw new Error(error);
         }
