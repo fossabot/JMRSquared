@@ -7,12 +7,13 @@ const AdminSchema = new mongoose.Schema({
         default: mongoose.Types.ObjectId()
     },
     userName: String,
+    fullName: String,
     pass: String,
     email: String,
     role: {
         type: String,
-        enum: ['ALL', 'PROPERTY', 'TAXIFY', 'COSMETICS'],
-        default: 'PROPERTY'
+        enum: ['ALL', 'PROPERTY', 'TAXIFY', 'COSMETICS', 'WORKER', 'CLIENT'],
+        default: 'WORKER'
     },
     numbers: Number,
     profilePic: String,
@@ -36,6 +37,67 @@ const AdminSchema = new mongoose.Schema({
     documents: [{
         type: Schema.Types.ObjectId,
         ref: 'Document'
+    }],
+    deviceTokens: [{
+        date: {
+            type: Date
+        },
+        lastActiveDate: {
+            type: Date,
+            default: new Date()
+        },
+        token: {
+            type: String
+        },
+        deviceInfo: {
+            deviceType: {
+                type: String,
+                default: null
+            },
+            screen: {
+                width: String,
+                height: String,
+                scale: String,
+                widthPixels: String,
+                heightPixels: String
+            },
+            model: {
+                type: String,
+                default: null
+            },
+            manufacturer: {
+                type: String,
+                default: null
+            },
+            manufacturer: {
+                type: String,
+                default: null
+            },
+            os: {
+                type: String,
+                default: null
+            },
+            osVersion: {
+                type: String,
+                default: null
+            },
+            sdkVersion: {
+                type: String,
+                default: null
+            },
+            language: {
+                type: String,
+                default: null
+            },
+        },
+        dateRemoved: {
+            type: Date,
+            default: null
+        },
+        removed: {
+            type: Boolean,
+            default: false
+        }
     }]
 });
 
