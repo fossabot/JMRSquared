@@ -10,36 +10,34 @@ const TransactionSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Admin'
     }, //ForeignKey
+    businessID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Business'
+    },
     amount: String,
-    itemCount: {
-        type: Number,
-        default: null
-    },
-    carName: {
-        type: String,
-        default: null
-    },
-    propertyName: {
-        type: String,
-        default: null
-    },
-    productName: {
-        type: String,
-        default: null
-    },
-    //Withdraw , Deposit , Rent
     type: {
         type: String,
-        enum: ['WITHDRAW', 'DEPOSIT', 'RENT'],
-        default: "DEPOSIT"
+        enum: ['MONEYIN', 'MONEYOUT'],
+        default: "MONEYIN"
     },
-    rentTenantID: String,
-    rentTenantName: String,
-    rentMonth: String,
+    category: String,
+    client: {
+        type: Schema.Types.ObjectId,
+        ref: 'Admin',
+        default: null
+    },
+    monthOfPayment: {
+        type: String,
+        default: null
+    },
     description: String,
     proof: {
         type: Object,
         default: null
+    },
+    insertedDate: {
+        type: Date,
+        default: Date.now()
     },
     date: {
         type: Date,
@@ -48,12 +46,7 @@ const TransactionSchema = new mongoose.Schema({
     removed: {
         type: Boolean,
         default: false
-    },
-    source: {
-        type: String,
-        enum: ['All', 'PROPERTY', 'TAXIFY', 'COSMETICS'],
-        default: 'PROPERTY'
-    },
+    }
 });
 
 TransactionSchema.methods.findSimilarTypes = function (cb) {
